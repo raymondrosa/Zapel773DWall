@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="es"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ZAPEL 3D · Pórticos, muros, losas, fundaciones y sismo (Etapa 6)</title>
+<title>ZAPEL 3D · Pórticos, muros, losas, fundaciones y sismo (Etapa 7)</title>
 <style>
 :root{--bg:#fff;--fg:#1f2328;--mut:#6b7280;--bd:#d0d7de;--pn:#f6f8fa;--ac:#2563eb;--g:#d8dee4;--ok:#16a34a;--er:#dc2626;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0d1117;--fg:#e6edf3;--mut:#9aa4af;--bd:#30363d;--pn:#161b22;--ac:#58a6ff;--g:#2a313a;--ok:#3fb950;--er:#f85149}}
@@ -27,11 +27,11 @@ table{border-collapse:collapse;width:100%}td,th{padding:1px 3px;text-align:right
 @media(max-width:760px){#mn{flex-direction:column}#pn{width:auto;max-height:40%;border-left:0;border-top:1px solid var(--bd)}}
 </style></head><body>
 <div id="tb">
-<button id="t_sel" class="on">Seleccionar</button><button id="t_bar">Barra</button><button id="t_wal">Muro</button><button id="t_slb">Losa</button><button id="t_are">Carga de área</button><button id="t_zap">Zapata</button><button id="t_pla">Platea</button><button id="b_del">Eliminar</button><button id="b_clr">Limpiar</button><button id="b_save">💾 Guardar</button><button id="b_open">📂 Abrir</button><input type="file" id="fo" accept=".json,application/json" style="display:none">
+<button id="t_sel" class="on">Seleccionar</button><button id="t_bar">Barra</button><button id="t_wal">Muro</button><button id="t_slb">Losa</button><button id="t_are">Carga de área</button><button id="t_zap">Zapata</button><button id="t_pla">Matre</button><button id="b_del">Eliminar</button><button id="b_clr">Limpiar</button><button id="b_save">💾 Guardar</button><button id="b_open">📂 Abrir</button><input type="file" id="fo" accept=".json,application/json" style="display:none">
 <span class="sp"></span><label>Plano <select id="pl"><option>XY</option><option>XZ</option><option>YZ</option></select></label>
-<select id="un"><option value="SI">kN · m (SI)</option><option value="IM">kip · ft (Imperial)</option></select><label>Nivel <input id="lv" type="number" value="0" step="0.5" style="width:60px"> <span class="gu" data-u="L">m</span></label><label>Malla <input id="gs" type="number" value="0.5" step="0.1" min="0.05" style="width:55px"> <span class="gu" data-u="L">m</span></label>
+<select id="un"><option value="IM" selected>kip · ft (Imperial)</option><option value="SI">kN · m (SI)</option></select><label>Nivel <input id="lv" type="number" value="0" step="0.5" style="width:60px"> <span class="gu" data-u="L">m</span></label><label>Malla <input id="gs" type="number" value="0.5" step="0.1" min="0.05" style="width:55px"> <span class="gu" data-u="L">m</span></label>
 <span class="sp"></span><label><input type="checkbox" id="vs" checked> Ver sección</label><label><input type="checkbox" id="cm" checked> Cotas</label><button id="v_iso">Iso</button><button id="v_xy">Planta</button><button id="v_xz">Frente</button><button id="v_yz">Lateral</button><button id="b_fit">Encuadrar</button><button id="zi">＋</button><button id="zo">－</button>
-<span class="sp"></span><button id="b_ex4">Ej. edificio</button><button id="b_ex">Ej. pórtico</button><button id="b_ex2">Ej. viga sobre suelo</button><button id="b_ex3">Ej. viga de acero</button><button id="b_sismo">Sismo ASCE 7-22</button><button class="go" id="b_run">▶ Calcular</button>
+<span class="sp"></span><button id="b_ex4">Ej. edificio</button><button id="b_ex">Ej. pórtico</button><button id="b_ex2">Ej. viga sobre suelo</button><button id="b_ex3">Ej. viga de acero</button><button id="b_sismo">Sismo ASCE 7-22 / PRBC 2018</button><button class="go" id="b_run">▶ Calcular</button>
 <span class="sp"></span><span id="md"></span><label>×<input id="df" type="number" value="1" step="0.5" min="0.1" style="width:50px"></label><button id="b_an">▶ Animar</button>
 </div>
 <div id="tb2">
@@ -41,7 +41,7 @@ table{border-collapse:collapse;width:100%}td,th{padding:1px 3px;text-align:right
 <span id="hint"></span>
 </div>
 <div id="mn"><div id="cw"><canvas id="cv"></canvas><div id="st"></div></div>
-<div id="pn"><div id="prop"></div><div id="out"></div><div class="m" style="margin-top:14px;padding-top:8px;border-top:1px solid var(--bd);font-size:11px;line-height:1.5">ZAPEL 3D · Etapa 6<br>Barras · muros · losas · zapatas y plateas<br>Cargas de área · contornos · sismo ASCE 7-22 (ELF y modal)<br>Basado en ZAPEL77P<br>Autor: Dr. Bernardo Deschapelles<br>Actualizado por el Prof. Raymond Rosa Ávila</div></div></div>
+<div id="pn"><div id="prop"></div><div id="out"></div><div class="m" style="margin-top:14px;padding-top:8px;border-top:1px solid var(--bd);font-size:11px;line-height:1.5">ZAPEL 3D · Etapa 7<br>Barras · muros · losas · zapatas y matres<br>Cargas de área · contornos · sismo ASCE 7-22 / PRBC 2018 (ELF y modal)<br>Basado en ZAPEL77P<br>Autor: Dr. Bernardo Deschapelles<br>Actualizado por el Prof. Raymond Rosa Ávila</div></div></div>
 <script>
 const $=id=>document.getElementById(id),cv=$('cv'),g=cv.getContext('2d');
 /*==NUCLEO:INICIO==*/
@@ -81,7 +81,7 @@ function prism(r,a,z,col){const s=sp(r),ax=axes(r);if(ax.L<1e-9)return;const at=
  g.restore()}
 const PLS={XY:[0,1,2],XZ:[0,2,1],YZ:[1,2,0]},RL=['Ux','Uy','Uz','Rx','Ry','Rz'],FL=['Fx','Fy','Fz','Mx','My','Mz'];
 const D={ty:'rect',b:.3,h:.5,bf:.15,hf:.12,bw:.25,Dm:.4,d:.3,tf:.01,tw:.007,tt:.01,pts:[[0,0],[.3,0],[.3,.5],[0,.5]],mat:'H',fc:28,E:25,ang:0,wa:0,wb:0,xa:0,xb:0,ya:0,yb:0,pza:0,pzb:0,pya:0,pyb:0,kz:0,ky:0,div:4,a1:0,a2:0};
-let cu='SI';const UN={SI:{L:['m',1],F:['kN',1],FL:['kN·m',1],q:['kN/m',1],E:['GPa',1],k:['kN/m³',1],d:['mm',1000],s:['mm',1000],fc:['MPa',1],A:['cm²',1e4],I:['cm⁴',1e8],p:['kN/m²',1],gw:['kN/m³',1],ar:['m²',1]},IM:{L:['ft',3.28084],F:['kip',.224809],FL:['kip·ft',.737562],q:['kip/ft',.068522],E:['ksi',145.038],k:['kip/ft³',.006366],d:['in',39.3701],s:['in',39.3701],fc:['ksi',.145038],A:['in²',1550.003],I:['in⁴',2402510],p:['ksf',.0208854],gw:['kip/ft³',.00636588],ar:['ft²',10.7639]}},UF=k=>k?UN[cu][k][1]:1,UL=k=>UN[cu][k][0],fmtv=v=>+v.toPrecision(6),KM={N:'F',Vy:'F',Vz:'F',T:'FL',My:'FL',Mz:'FL',Sy:'q',Sz:'q'};
+let cu='IM';const UN={SI:{L:['m',1],F:['kN',1],FL:['kN·m',1],q:['kN/m',1],E:['GPa',1],k:['kN/m³',1],d:['mm',1000],s:['mm',1000],fc:['MPa',1],A:['cm²',1e4],I:['cm⁴',1e8],p:['kN/m²',1],gw:['kN/m³',1],ar:['m²',1]},IM:{L:['ft',3.28084],F:['kip',.224809],FL:['kip·ft',.737562],q:['kip/ft',.068522],E:['ksi',145.038],k:['kip/ft³',.006366],d:['in',39.3701],s:['in',39.3701],fc:['ksi',.145038],A:['in²',1550.003],I:['in⁴',2402510],p:['ksf',.0208854],gw:['kip/ft³',.00636588],ar:['ft²',10.7639]}},UF=k=>k?UN[cu][k][1]:1,UL=k=>UN[cu][k][0],fmtv=v=>+v.toPrecision(6),KM={N:'F',Vy:'F',Vz:'F',T:'FL',My:'FL',Mz:'FL',Sy:'q',Sz:'q'};
 let N=[],B=[],MUROS=[],LOSAS=[],CARGAS=[],ZAPATAS=[],PLATEAS=[],sismoRes=null,tool='sel',sel=null,res=null,mode='model',chain=null,poly=null,drag=null,ms=null,C={a:-.6,p:.45,S:40,ox:300,oy:300},dpr=devicePixelRatio||1;
 /* valores por defecto de los objetos nuevos (siempre en unidades internas: m, kN, kN/m²) */
 const DEF={wt:.15,wh:2.8,st:.20,aq:2},GAM={H:24,A:78.5,O:24};
@@ -308,7 +308,13 @@ const SISTEMAS=[
  ['Muros especiales de hormigón',6,5,2.5,.0488,.75],
  ['Muros de hormigón (ordinarios)',4,4,2.5,.0488,.75],
  ['Combinación pórtico-muro especial',7,5.5,2.5,.0488,.75]];
-const DEFSIS={ss:1,s1:.4,clase:'D',riesgo:1,sis:3,TL:8,fA:.25,nmo:10,met:'elf'};
+const DEFSIS={ss:1,s1:.4,clase:'D',riesgo:1,sis:3,TL:8,fA:.25,nmo:10,met:'elf',cod:'asce22',ecc:5};
+/* Coeficientes de sitio IBC 2018 / ASCE 7-16 (tablas 1613.2.3 y 11.4-1/11.4-2): base del PRBC 2018 */
+const SX6=[.25,.5,.75,1,1.25,1.5],SY6=[.1,.2,.3,.4,.5,.6];
+const SITIO16={A:{fa:[.8,.8,.8,.8,.8,.8],fv:[.8,.8,.8,.8,.8,.8]},B:{fa:[.9,.9,.9,.9,.9,.9],fv:[.8,.8,.8,.8,.8,.8]},
+ C:{fa:[1.3,1.3,1.2,1.2,1.2,1.2],fv:[1.5,1.5,1.5,1.5,1.5,1.4]},D:{fa:[1.6,1.4,1.2,1.1,1,1],fv:[2.4,2.2,2,1.9,1.8,1.7]},
+ E:{fa:[2.4,1.7,1.3,1.2,1.2,1.2],fv:[4.2,3.3,2.8,2.4,2.2,2]},F:{fa:[2.4,1.7,1.3,1.2,1.2,1.2],fv:[4.2,3.3,2.8,2.4,2.2,2]}};
+function coefSitio(p,Si){if(p.cod=='prbc18'){const S=SITIO16[p.clase]||SITIO16.D;return {Fa:interp(SX6,S.fa,+p.ss),Fv:interp(SY6,S.fv,+p.s1)}}return {Fa:interp(SX,Si.fa,+p.ss),Fv:interp(SY,Si.fv,+p.s1)}}
 let SISMO={...DEFSIS};
 function interp(xs,ys,x){if(x<=xs[0])return ys[0];if(x>=xs[xs.length-1])return ys[ys.length-1];
  for(let i=1;i<xs.length;i++)if(x<=xs[i]){const t=(x-xs[i-1])/(xs[i]-xs[i-1]);return ys[i-1]+(ys[i]-ys[i-1])*t}
@@ -347,7 +353,7 @@ function rayleigh(lv,Fv,r,dir){let s1=0,s2=0;
  if(!(s2>0)||!(s1>0))return 0;return 2*Math.PI*Math.sqrt(s1/(9.81*s2))}
 function sismoCalc(){
  const p={...DEFSIS,...(SISMO||{})},Si=SITIO[p.clase]||SITIO.D;
- const Fa=interp(SX,Si.fa,+p.ss),Fv=interp(SY,Si.fv,+p.s1);
+ const {Fa,Fv}=coefSitio(p,Si);
  const SMS=Fa*p.ss,SM1=Fv*p.s1,SDS=2*SMS/3,SD1=2*SM1/3,T0=.2*SD1/SDS,Ts=SD1/SDS;
  const Ie=[1,1,1.25,1.5][+p.riesgo]||1;
  const sis=SISTEMAS[+p.sis]||SISTEMAS[3],[nom,R,Cd,O0,Ct,xx]=sis;
@@ -355,7 +361,7 @@ function sismoCalc(){
  if(lv.length<2)return {err:'No hay niveles con peso: define cargas verticales o pesos propios.'};
  const z0=lv[0].z,hn=lv[lv.length-1].z-z0,W=lv.reduce((s,L)=>s+L.w,0);
  if(!(W>1e-6))return {err:'El peso sísmico es nulo.'};
- const Ta=Ct*Math.pow(hn,xx),Cu=SD1>=.2?1.4:SD1>=.15?1.5:1.6;
+ const Ta=Ct*Math.pow(hn,xx),Cu=interp([.1,.15,.2,.3,.4],[1.7,1.6,1.5,1.4,1.4],SD1);
  const pat=k=>lv.map(L=>L.w*Math.pow(Math.max(L.z-z0,0),k));
  const r1=aplicaSismo(lv,pat(1),'X',0),T1=rayleigh(lv,pat(1),r1,'X');
  const k=Math.min(2,Math.max(1,1+(T1-.5)/2));
@@ -368,7 +374,7 @@ function sismoCalc(){
  const extDir=dir=>{let a=1e9,b=-1e9;N.forEach(n=>{const v=dir=='X'?n.y:n.x;if(v<a)a=v;if(v>b)b=v});return Math.max(b-a,0)};
  const casos=[];let mejor=null,mejorD=0;
  [['X',1],['X',-1],['Y',1],['Y',-1]].forEach(([dir,sg])=>{
-  const ee=sg*.05*extDir(dir),r=aplicaSismo(lv,sh,dir,ee);
+  const ee=sg*Math.max(5,+p.ecc||5)/100*extDir(dir),r=aplicaSismo(lv,sh,dir,ee);
   const dTop=Math.abs(despNivel(r,lv[lv.length-1].nodos,dir));
   casos.push({dir,sg,r});
   if(dTop>mejorD){mejorD=dTop;mejor=r}});
@@ -387,11 +393,11 @@ function sismoCalc(){
   const ddis=Cd/Ie*dr,th=Pab[i]*ddis/(Math.max(Vx,1e-9)*hs*Cd);
   tab.push({z:L.z,w:L.w,F:sh[i],V:Vx,dr,dd:dr*Cd/Ie,da,theta:th,ok:dr*Cd/Ie<=da+.0005,ok2:th<=.1})}
  return {err:null,T1,Fa,Fv,SMS,SM1,SDS,SD1,T0,Ts,Ie,R,Cd,O0,nom,Ta,Cu,Tcalc,T,Cs,V,W,hn,k,dir:p.dir,
-  niveles:lv.map((L,i)=>({z:L.z,w:L.w,F:sh[i]})),tab,res:mejor}}
+  niveles:lv.map((L,i)=>({z:L.z,w:L.w,F:sh[i]})),tab,res:mejor,ecc:Math.max(5,+p.ecc||5),cod:p.cod}}
 /* ---------- Análisis modal espectral (ASCE 7-22, §12.9) ---------- */
 function espectro(){
  const p={...DEFSIS,...(SISMO||{})},Si=SITIO[p.clase]||SITIO.D;
- const Fa=interp(SX,Si.fa,+p.ss),Fv=interp(SY,Si.fv,+p.s1);
+ const {Fa,Fv}=coefSitio(p,Si);
  const SMS=Fa*p.ss,SM1=Fv*p.s1,SDS=2*SMS/3,SD1=2*SM1/3;
  const Ie=[1,1,1.25,1.5][+p.riesgo]||1;
  const sis=SISTEMAS[+p.sis]||SISTEMAS[3];
@@ -545,18 +551,25 @@ function modalCalc(){
  out.res=out.dirs.X.comb&&out.dirs.Y.comb?
   (out.dirs.X.comb.dmax>=out.dirs.Y.comb.dmax?out.dirs.X.comb:out.dirs.Y.comb):(out.dirs.X.comb||out.dirs.Y.comb);
  return out}
-/* ---------- Plateas (losas de fundación) ---------- */
+/* ---------- Matres (losas de fundación) ---------- */
 const DEFPL={H:.6,ks:20000,qa:200,fc:28,fy:420,s:.8};
+let PCC={res:undefined,v:{}};
 function plateaCalc(ip){
  const pl=PLATEAS[ip];if(!pl)return null;
- const R=esRect(pl.pts);if(!R)return {err:'La platea debe ser rectangular.'};
+ if(PCC.res!==res)PCC={res,v:{}};
+ const ky=JSON.stringify([pl,N.map(n=>[n.x,n.y,n.z,n.r,n.f])]);
+ if(PCC.v[ky])return PCC.v[ky];
+ return PCC.v[ky]=plateaCalc0(ip)}
+function plateaCalc0(ip){
+ const pl=PLATEAS[ip];if(!pl)return null;
+ const R=esRect(pl.pts);if(!R)return {err:'La matre debe ser rectangular.'};
  const {a,b,p0,ex,ey}=R,H=+pl.H||.6,ks=+pl.ks||20000,s=Math.max(+pl.s||.8,.3);
  const cols=[];
  N.forEach((n,i)=>{if(!n.r.some(v=>v))return;
   const dx=n.x-p0[0],dy=n.y-p0[1],u=dx*ex[0]+dy*ex[1],v=dx*ey[0]+dy*ey[1];
   if(u<-1e-6||u>a+1e-6||v<-1e-6||v>b+1e-6)return;
   cols.push({i,u,v,Rz:res&&res.R?res.R[6*i+2]:0,Mx:res&&res.R?res.R[6*i+3]:0,My:res&&res.R?res.R[6*i+4]:0})});
- if(!cols.length)return {err:'No hay apoyos dentro de la platea.'};
+ if(!cols.length)return {err:'No hay apoyos dentro de la matre.'};
  const A=a*b,P=cols.reduce((t,q)=>t+q.Rz,0),cx=a/2,cy=b/2;
  const Mu=cols.reduce((t,q)=>t+q.Rz*(q.v-cy)+q.Mx*ex[0]+q.My*ex[1],0);
  const Mv=cols.reduce((t,q)=>t-q.Rz*(q.u-cx)+q.Mx*ey[0]+q.My*ey[1],0);
@@ -578,7 +591,7 @@ function plateaCalc(ip){
   cols.forEach(q=>{const i=Math.min(nx,Math.max(0,Math.round(q.u/sx))),j=Math.min(ny,Math.max(0,Math.round(q.v/sy))),k=id(i,j);
    N[k].f[2]-=q.Rz;N[k].f[3]+=q.Mx;N[k].f[4]+=q.My});
   const rr=analyze();
-  if(rr.err)return {err:'Grilla de platea: '+rr.err};
+  if(rr.err)return {err:'Grilla de matre: '+rr.err};
   // presión de contacto y momentos por unidad de ancho
   const qg=[],Mx=[],My=[];
   for(let j=0;j<=ny;j++){qg.push([]);Mx.push([]);My.push([]);for(let i=0;i<=nx;i++){qg[j].push(0);Mx[j].push(0);My[j].push(0)}}
@@ -733,7 +746,7 @@ function draw(){
   g.strokeStyle=on?ac:'#475569';g.lineWidth=on?2:1;pPath(ps);g.stroke();pPath(pb);g.stroke();
   for(let k=0;k<ps.length;k++){g.beginPath();g.moveTo(ps[k][0],ps[k][1]);g.lineTo(pb[k][0],pb[k][1]);g.stroke()}
   g.fillStyle=on?ac:'#475569';const c0=ps.reduce((aa,q)=>[aa[0]+q[0]/ps.length,aa[1]+q[1]/ps.length],[0,0]);
-  g.fillText('PL'+(i+1),c0[0]+4,c0[1]+4)});
+  g.fillText('MT'+(i+1),c0[0]+4,c0[1]+4)});
  B.forEach((r,bi)=>{const a=N[r.i],z=N[r.j];if($('vs').checked&&mode=='model')prism(r,a,z,sel&&sel.t=='b'&&sel.i==bi?ac:fg);g.strokeStyle=sel&&sel.t=='b'&&sel.i==bi?ac:(R?mt:fg);g.lineWidth=R?1:3;g.beginPath();g.moveTo(...proj(a.x,a.y,a.z));g.lineTo(...proj(z.x,z.y,z.z));g.stroke();
   const m=proj((a.x+z.x)/2,(a.y+z.y)/2,(a.z+z.z)/2);g.fillStyle=mt;g.fillText('B'+(bi+1),m[0]+4,m[1]-6);
   if(!R){g.strokeStyle='#d97706';g.lineWidth=1;if(r.wa||r.wb)ld(a,z,r.wa,r.wb,[0,0,-1]);if(r.xa||r.xb)ld(a,z,r.xa,r.xb,[1,0,0]);if(r.ya||r.yb)ld(a,z,r.ya,r.yb,[0,1,0]);if(r.pza||r.pzb){const ez=axes(r).ez;ld(a,z,r.pza,r.pzb,[-ez[0],-ez[1],-ez[2]])}if(r.pya||r.pyb)ld(a,z,r.pya,r.pyb,axes(r).ey)}});
@@ -751,7 +764,7 @@ function draw(){
    if(res.u){g.strokeStyle='#7c3aed';g.lineWidth=2;g.setLineDash([]);
     MUROS.forEach(w=>{if(!wallGeo(w))return;g.beginPath();w.n.forEach((kk,j)=>{const q=N[kk];if(!q)return;const p=proj(q.x+res.u[6*kk]*k,q.y+res.u[6*kk+1]*k,q.z+res.u[6*kk+2]*k);j?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1])});g.closePath();g.stroke()})}
   g.fillStyle=mt;g.fillText('Deformada ampliada ×'+k0.toExponential(1)+' · δmax = '+(res.dmax*UF('d')).toPrecision(3)+' '+UL('d'),10,16)}
- if(R&&mode!='def'&&mode!='sw'&&mode!='sMx'&&mode!='sMy'){const e=res.ext[mode],sg=['My','Mz','Sy','Sz'].includes(mode)?-1:1,col={N:'#9333ea',Vy:'#16a34a',Vz:'#16a34a',T:'#d97706',My:'#dc2626',Mz:'#dc2626',Sy:'#0891b2',Sz:'#0891b2'}[mode],ax=['Vz','My','N','Sz'].includes(mode)?'ez':'ey',k=sg*60/C.S/e;
+ if(R&&mode!='def'&&mode!='sw'&&mode!='sMx'&&mode!='sMy'&&mode!='mq'&&mode!='mMx'&&mode!='mMy'){const e=res.ext[mode],sg=['My','Mz','Sy','Sz'].includes(mode)?-1:1,col={N:'#9333ea',Vy:'#16a34a',Vz:'#16a34a',T:'#d97706',My:'#dc2626',Mz:'#dc2626',Sy:'#0891b2',Sz:'#0891b2'}[mode],ax=['Vz','My','N','Sz'].includes(mode)?'ez':'ey',k=sg*60/C.S/e;
  res.smp.forEach(b=>{if(!b.length)return;const Pt=q=>{const o=q[mode]*k,v=q.ax[ax];return proj(q.P[0]+v[0]*o,q.P[1]+v[1]*o,q.P[2]+v[2]*o)},p0=proj(...b[0].P),p1=proj(...b.at(-1).P),Q=b.map(Pt);
   g.beginPath();g.moveTo(...p0);Q.forEach(p=>g.lineTo(...p));g.lineTo(...p1);g.closePath();g.globalAlpha=.2;g.fillStyle=col;g.fill();g.globalAlpha=1;g.strokeStyle=col;g.lineWidth=1.5;g.beginPath();Q.forEach((p,i)=>i?g.lineTo(...p):g.moveTo(...p));g.stroke();
   let im=0;b.forEach((q,i)=>{if(Math.abs(q[mode])>Math.abs(b[im][mode]))im=i});if(Math.abs(b[im][mode])>.02*e){g.fillStyle=fg;g.fillText((b[im][mode]*UF(KM[mode])).toFixed(2),Q[im][0]+4,Q[im][1]-4)}});
@@ -762,21 +775,21 @@ function draw(){
  if(poly&&poly.length){const ps=poly.map(p=>proj(p[0],p[1],polyZ));g.strokeStyle=ac;g.lineWidth=1.5;g.setLineDash([5,4]);g.beginPath();ps.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));
   if(ms&&ms.p){const q=proj(ms.p[0],ms.p[1],polyZ);g.lineTo(q[0],q[1])}g.stroke();g.setLineDash([]);g.fillStyle=ac;
   ps.forEach(p=>{g.beginPath();g.arc(p[0],p[1],3.5,0,7);g.fill()})}
- if(res&&(mode=='sw'||mode=='sMx'||mode=='sMy')){
+ if(res&&(mode=='sw'||mode=='sMx'||mode=='sMy'||mode=='mq'||mode=='mMx'||mode=='mMy')){
   const grupos=[];
-  if(mode=='sw'){
+  if(mode=='sw'||mode=='mq'||mode=='mMx'||mode=='mMy'){
    const pl=[];
-   PLATEAS.forEach((p,i)=>{const pc=plateaCalc(i);if(!pc||pc.err||!pc.gr)return;
+   if(mode!='sw')PLATEAS.forEach((p,i)=>{const pc=plateaCalc(i);if(!pc||pc.err||!pc.gr)return;
     const R=esRect(p.pts);if(!R)return;const g2=pc.gr;
-    const F=[];for(let k=0;k<=g2.nx;k++){F.push([]);for(let j=0;j<=g2.ny;j++)F[k].push(g2.qg[j][k])}
+    const F=[];for(let k=0;k<=g2.nx;k++){F.push([]);for(let j=0;j<=g2.ny;j++)F[k].push((mode=='mMx'?g2.Mx:mode=='mMy'?g2.My:g2.qg)[j][k])}
     const P4=[[R.p0[0],R.p0[1],p.z],[R.p0[0]+R.ex[0]*R.a,R.p0[1]+R.ex[1]*R.a,p.z],
      [R.p0[0]+R.ex[0]*R.a+R.ey[0]*R.b,R.p0[1]+R.ex[1]*R.a+R.ey[1]*R.b,p.z],[R.p0[0]+R.ey[0]*R.b,R.p0[1]+R.ey[1]*R.b,p.z]];
     pl.push({q4:P4,nu:g2.nx,nv:g2.ny,F})});
-   if(pl.length)grupos.push({tit:'presión de contacto (platea)',uni:'kN/m²',esc:UF('p'),items:pl});
+   if(pl.length)grupos.push(mode=='mq'?{tit:'presión de contacto (matre)',uni:UL('p'),esc:UF('p'),items:pl}:{tit:(mode=='mMx'?'Mx':'My')+' de la matre',uni:UL('FL')+'/'+UL('L'),esc:UF('FL')/UF('L'),items:pl});
    const mw=[];
-   MUROS.forEach((w,i)=>{const cm=muroCampo(i);if(!cm)return;
+   if(mode=='sw')MUROS.forEach((w,i)=>{const cm=muroCampo(i);if(!cm)return;
     const P4=wallGeo(w).p.map(q=>[q.x,q.y,q.z]);mw.push({q4:P4,nu:cm.nu,nv:cm.nv,F:cm.F})});
-   if(mw.length)grupos.push({tit:'σ axial del muro',uni:'kN/m²',esc:UF('p'),items:mw});
+   if(mw.length)grupos.push({tit:'σ axial del muro',uni:UL('p'),esc:UF('p'),items:mw});
   }else{
    const ls=[];
    LOSAS.forEach((sl,si)=>{const p2=placas()[si];if(!p2)return;
@@ -784,7 +797,7 @@ function draw(){
     const P4=[[p0[0],p0[1],sl.z],[p0[0]+ex[0]*a,p0[1]+ex[1]*a,sl.z],
      [p0[0]+ex[0]*a+ey[0]*b,p0[1]+ex[1]*a+ey[1]*b,sl.z],[p0[0]+ey[0]*b,p0[1]+ey[1]*b,sl.z]];
     ls.push({q4:P4,nu:p2.nu,nv:p2.nv,F})});
-   if(ls.length)grupos.push({tit:(mode=='sMx'?'Mx':'My')+' de la losa',uni:UL('FL')+'/m',esc:UF('FL'),items:ls});
+   if(ls.length)grupos.push({tit:(mode=='sMx'?'Mx':'My')+' de la losa',uni:UL('FL')+'/'+UL('L'),esc:UF('FL')/UF('L'),items:ls});
   }
   grupos.forEach((g,gi)=>{
    let mn=1e30,mx=-1e30;
@@ -803,7 +816,8 @@ function resumenContorno(){
   cm.F.forEach(c=>c.forEach(v=>{if(v<a)a=v;if(v>b)b=v}));o.push(['M'+(i+1),'\u03c3',a*UF('p'),b*UF('p'),UL('p')])})}
  else if(mode=='sMx'||mode=='sMy'){const ps=placas();LOSAS.forEach((s,i)=>{const p=ps[i];if(!p)return;
   const F=mode=='sMx'?p.Mx:p.My;let a=1e30,b=-1e30;
-  F.forEach(c=>c.forEach(v=>{if(v<a)a=v;if(v>b)b=v}));o.push(['L'+(i+1),mode=='sMx'?'Mx':'My',a*UF('FL'),b*UF('FL'),UL('FL')+'/m'])})}
+  F.forEach(c=>c.forEach(v=>{if(v<a)a=v;if(v>b)b=v}));o.push(['L'+(i+1),mode=='sMx'?'Mx':'My',a*UF('FL')/UF('L'),b*UF('FL')/UF('L'),UL('FL')+'/'+UL('L')])})}
+ else if(mode=='mq'||mode=='mMx'||mode=='mMy'){PLATEAS.forEach((p,i)=>{const pc=plateaCalc(i);if(!pc||pc.err||!pc.gr)return;const A=mode=='mq'?pc.gr.qg:mode=='mMx'?pc.gr.Mx:pc.gr.My;let a=1e30,b=-1e30;A.forEach(c=>c.forEach(v=>{if(v<a)a=v;if(v>b)b=v}));const k=mode=='mq'?UF('p'):UF('FL')/UF('L');o.push(['MT'+(i+1),mode=='mq'?'q':mode=='mMx'?'Mx':'My',a*k,b*k,mode=='mq'?UL('p'):UL('FL')+'/'+UL('L')])})}
  return o}
 function form(){const p=$('prop');
  if(!sel){const chips=[];
@@ -933,19 +947,19 @@ function zapataCalc(i){
 function formPL(p){
  const o=PLATEAS[sel.i];if(!o){sel=null;return form()}
  const pc=plateaCalc(sel.i),u=UF('L');
- p.innerHTML='<b>Platea '+(sel.i+1)+'</b> <span class="m">('+(o.pts.length)+' vértices · cota '+(o.z*u).toFixed(2)+' '+UL('L')+')</span>'
+ p.innerHTML='<b>Matre '+(sel.i+1)+'</b> <span class="m">('+(o.pts.length)+' vértices · cota '+(o.z*u).toFixed(2)+' '+UL('L')+')</span>'
   +numF(o,'z','Cota z','L')+numF(o,'H','Canto H','L')+numF(o,'ks','Balasto ks','k')
   +numF(o,'qa','Capacidad qa','p')+numF(o,'fc','f’c','fc')+numF(o,'s','Paso de grilla','L')
   +'<label style="display:block">Vértices x, y ('+UL('L')+'), uno por línea<textarea data-p="1" rows="4" style="width:100%;box-sizing:border-box">'+o.pts.map(q=>fmtv(q[0]*u)+', '+fmtv(q[1]*u)).join('\n')+'</textarea></label>'
   +'<div class="m" style="margin-top:6px;line-height:1.55">'+(pc&&!pc.err?
    'Apoyos dentro: '+pc.cols+' · P = '+(pc.P*UF('F')).toFixed(1)+' '+UL('F')+'<br>'
-   +'Platea rígida: q máx = '+(pc.qR*UF('p')).toFixed(1)+' / q mín = '+(pc.qRmin*UF('p')).toFixed(1)+' ≤ '+(pc.qa*UF('p')).toFixed(0)+(pc.okQ?' ✓':' ✗')
+   +'Matre rígida: q máx = '+(pc.qR*UF('p')).toFixed(1)+' / q mín = '+(pc.qRmin*UF('p')).toFixed(1)+' ≤ '+(pc.qa*UF('p')).toFixed(0)+(pc.okQ?' ✓':' ✗')
    +'<br>Grilla: q máx = '+(pc.gr.qm*UF('p')).toFixed(1)+' · q mín = '+(pc.gr.qn*UF('p')).toFixed(1)
    +'<br>M máx ∥u = '+(pc.gr.mu*UF('FL')).toFixed(1)+' · ∥v = '+(pc.gr.mv*UF('FL')).toFixed(1)+' '+UL('FL')+'/m'
    +'<br>Punzonamiento: '+(pc.vuP/1000).toFixed(2)+' MPa'+(pc.okP?' ✓':' ✗')
-   :'Pulsa ▶ Calcular para analizar la platea con las reacciones.')+'</div>'
+   :'Pulsa ▶ Calcular para analizar la matre con las reacciones.')+'</div>'
   +'<div class="m" style="font-size:11px">Modelo: grilla equivalente de vigas sobre resortes (balasto ks) con las reacciones de los pilares como cargas.</div>'
-  +'<button style="margin-top:6px;width:100%" id="bDel">Eliminar platea</button>';
+  +'<button style="margin-top:6px;width:100%" id="bDel">Eliminar matre</button>';
  bindNum(p,o);bindPoly(p,o)}
 
 function formZ(p){
@@ -983,7 +997,7 @@ function del(){if(!sel)return;
 function setM(m){mode=m;document.querySelectorAll('#md button').forEach(b=>b.classList.toggle('on',b.dataset.m==m));draw();if(!sel)form()}
 function setT(t){tool=t;chain=null;poly=null;
  ['sel','bar','wal','slb','are','zap','pla'].forEach(k=>{const b=$('t_'+k);if(b)b.classList.toggle('on',t==k)});
- const h={sel:'',bar:'Barra: clic en cada nodo; clic derecho o Esc termina la cadena.',wal:'Muro: clic en el inicio y en el fin del muro (en planta); se levanta desde el nivel actual.',slb:'Losa: clic en los vértices; clic derecho, Esc o doble clic cierra el polígono.',zap:'Zapata: clic en un nodo con apoyo para crear o seleccionar su zapata aislada.',pla:'Platea: dibuja el rectángulo en planta; calcula con las reacciones de los pilares que caen dentro.',are:'Carga de área: clic sobre una losa para aplicarla, o dibuja el polígono de la carga.'}[t]||'';
+ const h={sel:'',bar:'Barra: clic en cada nodo; clic derecho o Esc termina la cadena.',wal:'Muro: clic en el inicio y en el fin del muro (en planta); se levanta desde el nivel actual.',slb:'Losa: clic en los vértices; clic derecho, Esc o doble clic cierra el polígono.',zap:'Zapata: clic en un nodo con apoyo para crear o seleccionar su zapata aislada.',pla:'Matre: dibuja el rectángulo en planta; calcula con las reacciones de los pilares que caen dentro.',are:'Carga de área: clic sobre una losa para aplicarla, o dibuja el polígono de la carga.'}[t]||'';
  $('hint').textContent=h;draw()}
 function view(a,p,pl){C.a=a;C.p=p;if(pl)$('pl').value=pl;fit();draw()}
 function load(n,b,ms,ls,cs,zs,pt){N=n;B=b;MUROS=ms||[];LOSAS=ls||[];CARGAS=cs||[];ZAPATAS=zs||[];PLATEAS=pt||[];sel=null;res=null;chain=null;poly=null;$('out').innerHTML='';form();mode='model';fit();setM('model')}
@@ -995,9 +1009,9 @@ function run(){res=analyze();const o=$('out');if(res.err){o.innerHTML='<span cla
  if(res.muros.some(Boolean))h+='<b>Muros · fuerzas en la base</b><table><tr><th></th><th>N</th><th>V</th><th>M</th></tr>'+res.muros.map((q,i)=>q?'<tr><td>M'+(i+1)+'</td><td>'+f(q.N*F_)+'</td><td>'+f(Math.abs(q.V)*F_)+'</td><td>'+f(Math.abs(q.M)*M_)+'</td></tr>':'').join('')+'</table><div class="m" style="font-size:11px">N &gt; 0 tracción · V y M en el plano del muro ('+UL('F')+', '+UL('FL')+')</div>';
  if(res.cargas&&(res.cargas.losas||res.cargas.areas||res.cargas.muros))h+='<b>Cargas de superficie ('+UL('F')+')</b><table><tr><td>Losas, peso propio</td><td>'+f(res.cargas.losas*F_)+'</td></tr><tr><td>Cargas de área</td><td>'+f(res.cargas.areas*F_)+'</td></tr><tr><td>Peso de muros</td><td>'+f(res.cargas.muros*F_)+'</td></tr></table>';
  if(PLATEAS.length){const pp=PLATEAS.map((z,i)=>[i,plateaCalc(i)]).filter(q=>q[1]&&!q[1].err);
-  if(pp.length)h+='<b>Plateas ('+UL('p')+', '+UL('FL')+')</b><table><tr><th></th><th>q máx rígida</th><th>q máx grilla</th><th>M máx</th></tr>'
-   +pp.map(([i,q])=>'<tr><td>PL'+(i+1)+'</td><td'+(q.okQ?'':' class="er"')+'>'+(q.qR*UF('p')).toFixed(1)+'</td><td>'+(q.gr.qm*UF('p')).toFixed(1)+'</td><td>'+(Math.max(q.gr.mu,q.gr.mv)*UF('FL')).toFixed(1)+'</td></tr>').join('')+'</table>'
-   +pp.map(([i,q])=>'<div class="m" style="font-size:11px">PL'+(i+1)+': '+(q.okQ?'q≤qa ✓':'<span class="er">q&gt;qa ✗</span>')+' · '+(q.okN?'contacto total ✓':'<span class="er">despegue ✗</span>')+' · '+(q.okP?'punzonamiento ✓':'<span class="er">punzonamiento ✗</span>')+'</div>').join('')}
+  if(pp.length)h+='<b>Matres ('+UL('p')+', '+UL('FL')+'/'+UL('L')+')</b><table><tr><th></th><th>q máx rígida</th><th>q máx grilla</th><th>M máx</th></tr>'
+   +pp.map(([i,q])=>'<tr><td>MT'+(i+1)+'</td><td'+(q.okQ?'':' class="er"')+'>'+(q.qR*UF('p')).toFixed(1)+'</td><td>'+(q.gr.qm*UF('p')).toFixed(1)+'</td><td>'+(Math.max(q.gr.mu,q.gr.mv)*UF('FL')/UF('L')).toFixed(1)+'</td></tr>').join('')+'</table>'
+   +pp.map(([i,q])=>'<div class="m" style="font-size:11px">MT'+(i+1)+': '+(q.okQ?'q≤qa ✓':'<span class="er">q&gt;qa ✗</span>')+' · '+(q.okN?'contacto total ✓':'<span class="er">despegue ✗</span>')+' · '+(q.okP?'punzonamiento ✓':'<span class="er">punzonamiento ✗</span>')+'</div>').join('')}
  if(ZAPATAS.length){const zz=ZAPATAS.map((z,i)=>[i,zapataCalc(i)]).filter(q=>q[1]);
   if(zz.length)h+='<b>Zapatas · contacto ('+UL('p')+')</b><table><tr><th></th><th>B×L</th><th>q máx</th><th>q mín</th><th>qa</th><th>As cm²/m</th></tr>'
    +zz.map(([i,q])=>'<tr><td>Z'+(i+1)+'</td><td>'+(q.B*UF('L')).toFixed(2)+'×'+(q.L*UF('L')).toFixed(2)+'</td><td>'+(q.qm*UF('p')).toFixed(1)+'</td><td>'+(q.qn*UF('p')).toFixed(1)+'</td><td>'+(q.qa*UF('p')).toFixed(0)+'</td><td>'+(q.AsL/Math.max(q.B,.01)*1e4).toFixed(1)+'/'+(q.AsB/Math.max(q.L,.01)*1e4).toFixed(1)+'</td></tr>').join('')+'</table>'
@@ -1006,16 +1020,17 @@ function run(){res=analyze();const o=$('out');if(res.err){o.innerHTML='<span cla
  if(res.avisos&&res.avisos.length)h+='<div class="er" style="margin-top:6px">'+res.avisos.join('<br>')+'</div>';
  o.innerHTML=h;setM('def')}
 $('t_sel').onclick=()=>setT('sel');$('t_bar').onclick=()=>setT('bar');$('t_wal').onclick=()=>setT('wal');$('t_slb').onclick=()=>setT('slb');$('t_are').onclick=()=>setT('are');$('t_zap').onclick=()=>setT('zap');$('t_pla').onclick=()=>setT('pla');$('b_del').onclick=del;$('b_run').onclick=run;$('b_fit').onclick=()=>{fit();draw()};$('zi').onclick=()=>{zoomAt(cv.clientWidth/2,cv.clientHeight/2,1.25);draw()};$('zo').onclick=()=>{zoomAt(cv.clientWidth/2,cv.clientHeight/2,.8);draw()};$('b_an').onclick=()=>{if(anim){stopAnim();return}if(!res)run();if(!res)return;setM('def');$('b_an').textContent='■ Detener';anim=requestAnimationFrame(tick)};$('b_clr').onclick=()=>load([],[]);
-$('md').innerHTML=[['model','Modelo'],['def','Deformada'],['sw','σ muro'],['sMx','Mx losa'],['sMy','My losa'],['N','N'],['Vy','Vy'],['Vz','Vz'],['T','T'],['My','My'],['Mz','Mz'],['Sz','Suelo z'],['Sy','Suelo y']].map(([k,l])=>'<button data-m="'+k+'"'+(k=='model'?' class="on"':'')+'>'+l+'</button>').join('');
+$('md').innerHTML=[['model','Modelo'],['def','Deformada'],['sw','σ muro'],['mq','q matre'],['mMx','Mx matre'],['mMy','My matre'],['sMx','Mx losa'],['sMy','My losa'],['N','N'],['Vy','Vy'],['Vz','Vz'],['T','T'],['My','My'],['Mz','Mz'],['Sz','Suelo z'],['Sy','Suelo y']].map(([k,l])=>'<button data-m="'+k+'"'+(k=='model'?' class="on"':'')+'>'+l+'</button>').join('');
 document.querySelectorAll('#md button').forEach(b=>b.onclick=()=>{const k=b.dataset.m;if(k!='model'&&!res)run();if(res||k=='model')setM(k)});
 $('v_iso').onclick=()=>view(-.6,.45);$('v_xy').onclick=()=>view(0,Math.PI/2,'XY');$('v_xz').onclick=()=>view(0,0,'XZ');$('v_yz').onclick=()=>view(-Math.PI/2,0,'YZ');
 ['pl','lv','gs','df'].forEach(i=>$(i).onchange=draw);$('vs').onchange=draw;$('cm').onchange=draw;
 function informeSismo(r){
  const f=(v,d=3)=>(+v).toPrecision(d),u=UF('L'),Fq=UF('F');
- let h='<b>Sismo ASCE 7-22 · fuerza lateral equivalente</b>';
+ let h='<b>Sismo '+(r.cod=='prbc18'?'PRBC 2018 (ASCE 7-16)':'ASCE 7-22')+' · fuerza lateral equivalente</b>';
  h+='<div class="m" style="font-size:11px;line-height:1.5">S<sub>s</sub>='+f(SISMO.ss,3)+' S<sub>1</sub>='+f(SISMO.s1,3)+' · Clase '+SISMO.clase+' · Fa='+f(r.Fa)+' Fv='+f(r.Fv)+'<br>S<sub>MS</sub>='+f(r.SMS,3)+' S<sub>M1</sub>='+f(r.SM1,3)+' → S<sub>DS</sub>='+f(r.SDS,3)+' S<sub>D1</sub>='+f(r.SD1,3)+'<br>T<sub>0</sub>='+f(r.T0,2)+' s · T<sub>s</sub>='+f(r.Ts,2)+' s · T<sub>L</sub>='+SISMO.TL+' s</div>';
  h+='<div class="m" style="font-size:11px">'+r.nom+'<br>R='+r.R+' · C<sub>d</sub>='+r.Cd+' · Ω<sub>0</sub>='+r.O0+' · I<sub>e</sub>='+r.Ie+'</div>';
  h+='<b>Período y cortante</b>T<sub>a</sub>='+f(r.Ta,3)+' s · T calculado='+f(r.Tcalc,3)+' s · C<sub>u</sub>T<sub>a</sub>='+f(r.Cu*r.Ta,3)+' s<br><b>T = '+f(r.T,3)+' s</b> · k='+f(r.k,2)+'<br>C<sub>s</sub>='+f(r.Cs,4)+' · <b>V = '+f(r.V*Fq)+' '+UL('F')+'</b> ('+f(r.Cs*100,1)+'% de W = '+f(r.W*Fq)+' '+UL('F')+')';
+ h+='<div class="m" style="font-size:11px">Torsión accidental: ±'+r.ecc.toFixed(1)+'% de la dimensión perpendicular a la fuerza (mínimo reglamentario 5%); 4 casos (±X, ±Y), se usa el más desfavorable.'+(r.cod=='prbc18'&&(SISMO.clase=='F'||(SISMO.clase=='E'&&+SISMO.s1>=.2)||(SISMO.clase=='D'&&+SISMO.s1>=.2))?'<br><span class="er">ASCE 7-16 §11.4.8: puede requerirse un análisis de peligro sísmico específico del sitio.</span>':'')+'</div>';
  h+='<b>Distribución por nivel</b><table><tr><th>z</th><th>W</th><th>F</th><th>V</th></tr>'+
   r.niveles.map((L,i)=>'<tr><td>'+(L.z*u).toFixed(2)+'</td><td>'+(L.w*Fq).toFixed(0)+'</td><td>'+(L.F*Fq).toFixed(1)+'</td></tr>').join('')+'</table>';
  h+='<b>Derivas y estabilidad</b><table><tr><th>entrepiso</th><th>Δ</th><th>Δa</th><th>θ</th></tr>'+
@@ -1027,8 +1042,9 @@ function informeSismo(r){
 let SMW=null;
 function informeModal(r){
  const e=r.e,f=(v,d=3)=>(+v).toPrecision(d),Fq=UF('F');
- let h='<b>Sismo ASCE 7-22 · modal espectral (CQC, \u03b6=5%)</b>';
+ let h='<b>Sismo '+(e.p.cod=='prbc18'?'PRBC 2018 (ASCE 7-16)':'ASCE 7-22')+' · modal espectral (CQC, \u03b6=5%)</b>';
  h+='<div class="m" style="font-size:11px;line-height:1.5">'+e.nom+'<br>R='+e.R+' · C<sub>d</sub>='+e.Cd+' · I<sub>e</sub>='+e.Ie+' · S<sub>DS</sub>='+f(e.SDS,3)+' S<sub>D1</sub>='+f(e.SD1,3)+'</div>';
+ h+='<div class="m" style="font-size:11px">La torsión accidental (5%) está incluida en el método de fuerza lateral equivalente; el modal espectral todavía no la incorpora.</div>';
  h+='<b>Modos calculados</b><table><tr><th>#</th><th>T (s)</th><th>Sa (g)</th></tr>'+
   r.modos.map((m,i)=>'<tr><td>'+(i+1)+'</td><td>'+f(m.T,3)+'</td><td>'+f(saDis(m.T,e),3)+'</td></tr>').join('')+'</table>';
  for(const d of ['X','Y']){
@@ -1056,7 +1072,8 @@ function abreSismo(){
  if(!SMW){const d=SMW=document.createElement('div');d.id='smw';
   d.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.35);z-index:9;display:flex;align-items:flex-start;justify-content:center';
   d.innerHTML='<div style="background:var(--bg);border:1px solid var(--bd);border-radius:10px;max-width:380px;margin:7vh 12px;padding:14px;box-shadow:0 12px 40px rgba(0,0,0,.3)">'
-   +'<b style="font-size:14px">Análisis sísmico · ASCE 7-22</b>'
+   +'<b style="font-size:14px">Análisis sísmico</b>'
+   +'<label>Norma<select id="smCod" style="width:100%"><option value="asce22">ASCE 7-22</option><option value="prbc18">PRBC 2018 (IBC 2018 · ASCE 7-16)</option></select></label>'
    +'<div class="m" style="font-size:11px;margin:4px 0 8px">Fuerza lateral equivalente (§12.8). El peso sísmico se toma de las cargas verticales del modelo.</div>'
    +'<label>S<sub>s</sub> (0,2 s)<input id="smSs" type="number" step="any" style="width:80px"></label>'
    +'<label>S<sub>1</sub> (1,0 s)<input id="smS1" type="number" step="any" style="width:80px"></label>'
@@ -1065,6 +1082,7 @@ function abreSismo(){
    +'<label>Sistema resistente<select id="smSi" style="width:100%">'+SISTEMAS.map((q,i)=>'<option value="'+i+'">'+q[0]+'</option>').join('')+'</select></label>'
    +'<label>T<sub>L</sub> (s)<input id="smTL" type="number" step="any" style="width:80px"></label>'
    +'<label>Fracción de cargas de área en W<input id="smFA" type="number" step="0.05" min="0" max="1" style="width:80px"></label>'
+   +'<label>Excentricidad accidental (%, mín. 5)<input id="smEc" type="number" min="5" step="0.5" style="width:80px"></label>'
    +'<label>Método<select id="smMet" style="width:100%"><option value="elf">Fuerza lateral equivalente</option><option value="mod">Modal espectral (CQC)</option></select></label>'
    +'<label>Nº de modos<input id="smNMo" type="number" min="1" max="12" step="1" style="width:80px"></label>'
    +'<div style="display:flex;gap:6px;margin-top:10px"><button class="go" id="smOk" style="flex:1">Calcular sismo</button><button id="smNo">Cerrar</button></div>'
@@ -1075,17 +1093,17 @@ function abreSismo(){
  SMW.style.display='flex';
  $('smSs').value=SISMO.ss;$('smS1').value=SISMO.s1;$('smCl').value=SISMO.clase;
  $('smRz').value=SISMO.riesgo;$('smSi').value=SISMO.sis;$('smTL').value=SISMO.TL;$('smFA').value=SISMO.fA;
- $('smMet').value=SISMO.met||'elf';$('smNMo').value=SISMO.nmo||10}
+ $('smMet').value=SISMO.met||'elf';$('smNMo').value=SISMO.nmo||10;$('smCod').value=SISMO.cod||'asce22';$('smEc').value=Math.max(5,+SISMO.ecc||5)}
 function runSismo(){
  SISMO={ss:+$('smSs').value||1,s1:+$('smS1').value||.4,clase:$('smCl').value||'D',
   riesgo:+$('smRz').value||1,sis:+$('smSi').value||0,TL:+$('smTL').value||8,fA:+$('smFA').value||0,
-  nmo:+$('smNMo').value||10,met:$('smMet').value||'elf'};
+  nmo:+$('smNMo').value||10,met:$('smMet').value||'elf',cod:$('smCod').value||'asce22',ecc:Math.max(5,+$('smEc').value||5)};
  if(SISMO.met=='mod')return runModal();
  const r=sismoCalc(),o=$('out');
  if(r.err){o.innerHTML='<span class="er">'+r.err+'</span>';return}
  sismoRes=r;res=r.res;setM('def');
  o.innerHTML=informeSismo(r);
- $('hint').textContent='Caso sísmico aplicado (ASCE 7-22). Pulsa ▶ Calcular para volver al caso gravitatorio.'}
+ $('hint').textContent='Caso sísmico aplicado ('+(SISMO.cod=='prbc18'?'PRBC 2018':'ASCE 7-22')+'). Pulsa ▶ Calcular para volver al caso gravitatorio.'}
 
 function saveModel(){const d={app:'zapel-3d',v:4,units:cu,N,B,MUROS,LOSAS,CARGAS,ZAPATAS,PLATEAS},blob=new Blob([JSON.stringify(d,null,1)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='zapel-3d-modelo.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 function openModel(f){const rd=new FileReader();rd.onload=()=>{try{const d=JSON.parse(rd.result);if(d.app!='zapel-3d'||!Array.isArray(d.N)||!Array.isArray(d.B))throw 0;
@@ -1158,5 +1176,5 @@ $('wt').onchange=()=>{const v=+$('wt').value/UF('s');if(v>0)DEF.wt=v};
 $('wh').onchange=()=>{const v=+$('wh').value/UF('L');if(v>0)DEF.wh=v};
 $('st').onchange=()=>{const v=+$('st').value/UF('s');if(v>0)DEF.st=v};
 $('aq').onchange=()=>{const v=+$('aq').value/UF('p');if(isFinite(v))DEF.aq=v};
-addEventListener('resize',draw);$('b_ex4').click();setM('model');syncDef();
+addEventListener('resize',draw);$('un').value=cu;$('gs').value=1;document.querySelectorAll('[data-u]').forEach(s=>s.textContent=UL(s.dataset.u));$('b_ex4').click();setM('model');syncDef();
 </script></body></html>
