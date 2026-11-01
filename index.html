@@ -31,7 +31,7 @@ table{border-collapse:collapse;width:100%}td,th{padding:1px 3px;text-align:right
 <span class="sp"></span><label>Plano <select id="pl"><option>XY</option><option>XZ</option><option>YZ</option></select></label>
 <select id="un"><option value="IM" selected>kip · ft (Imperial)</option><option value="SI">kN · m (SI)</option></select><label>Nivel <input id="lv" type="number" value="0" step="0.5" style="width:60px"> <span class="gu" data-u="L">m</span></label><label>Malla <input id="gs" type="number" value="0.5" step="0.1" min="0.05" style="width:55px"> <span class="gu" data-u="L">m</span></label>
 <span class="sp"></span><label><input type="checkbox" id="vs" checked> Ver sección</label><label><input type="checkbox" id="cm" checked> Cotas</label><button id="v_iso">Iso</button><button id="v_xy">Planta</button><button id="v_xz">Frente</button><button id="v_yz">Lateral</button><button id="b_fit">Encuadrar</button><button id="zi">＋</button><button id="zo">－</button>
-<span class="sp"></span><button id="b_ex4">Ej. edificio</button><button id="b_ex">Ej. pórtico</button><button id="b_ex2">Ej. viga sobre suelo</button><button id="b_ex3">Ej. viga de acero</button><button id="b_sismo">Sismo ASCE 7-22 / PRBC 2018</button><button class="go" id="b_run">▶ Calcular</button>
+<span class="sp"></span><button id="b_ex4">Ej. edificio</button><button id="b_ex">Ej. pórtico</button><button id="b_ex2">Ej. viga sobre suelo</button><button id="b_ex3">Ej. viga de acero</button><button id="b_sismo">Sismo ASCE 7-22 / PRBC 2018</button><button id="b_rep">📄 Reporte</button><button class="go" id="b_run">▶ Calcular</button>
 <span class="sp"></span><span id="md"></span><label>×<input id="df" type="number" value="1" step="0.5" min="0.1" style="width:50px"></label><button id="b_an">▶ Animar</button>
 </div>
 <div id="tb2">
@@ -468,8 +468,36 @@ function modosPropios(K,rs,m,nmax){
   if(!(lam>1e-12))break;
   modos.push({phi:x,lam,T:2*Math.PI/Math.sqrt(lam)})}
  return {modos,dyn,Mc}}
+/* extensión de la planta perpendicular a la dirección de la fuerza */
+function extPlan(dir){let a=1e9,b=-1e9;
+ N.forEach(n=>{const v=dir=='X'?n.y:n.x;if(v<a)a=v;if(v>b)b=v});
+ return Math.max(b-a,0)}
+/* corrección por excentricidad accidental sobre un vector de fuerzas nodal */
+function torsCorr(fv,lv,dir,e){
+ if(!(Math.abs(e)>1e-12))return fv;
+ const r=dir=='X'?0:1,out=fv.slice();
+ lv.forEach(L=>{
+  let Fq=0;L.ms.forEach(m=>{Fq+=fv[6*m.i+r]});
+  if(!(Math.abs(Fq)>1e-12)||!(L.w>0))return;
+  let xm=0,ym=0;L.ms.forEach(m=>{xm+=m.w*N[m.i].x;ym+=m.w*N[m.i].y});xm/=L.w;ym/=L.w;
+  let J=0;L.ms.forEach(m=>{const q=N[m.i];J+=m.w*((q.x-xm)*(q.x-xm)+(q.y-ym)*(q.y-ym))});
+  const al=J>1e-9?Fq*e/J:0;
+  L.ms.forEach(m=>{const q=N[m.i],rx=q.x-xm,ry=q.y-ym;
+   if(dir=='X'){out[6*m.i]-=m.w*al*ry;out[6*m.i+1]+=m.w*al*rx}
+   else{out[6*m.i+1]-=m.w*al*rx;out[6*m.i]+=m.w*al*ry}})});
+ return out}
+/* envolvente de dos resultados */
+function maxRes(a,b){
+ if(!a)return b;if(!b)return a;
+ const pick=(x,y)=>Math.abs(x)>=Math.abs(y)?x:y;
+ return {u:a.u.map((v,i)=>pick(v,b.u[i]||0)),R:a.R.map((v,i)=>pick(v,b.R[i]||0)),
+  smp:a.smp.map((bb,bi)=>bb.map((o,qi)=>{const o2=b.smp[bi]&&b.smp[bi][qi];if(!o2)return o;
+   const q={...o};['N','Vy','Vz','T','My','Mz','Sy','Sz'].forEach(k=>q[k]=pick(o[k],o2[k]));
+   q.d=o.d.map((v,c)=>pick(v,o2.d[c]));return q})),
+  ext:Object.fromEntries(Object.entries(a.ext).map(([k,v])=>[k,Math.max(v,b.ext[k]||0)])),
+  dmax:Math.max(a.dmax,b.dmax)}}
 /* respuesta modal en una dirección: f = M φ Γ Sa */
-function modalDir(mp,dir,e){
+function modalDir(mp,dir,e,ee,lv){
  const r=dir=='X'?0:1,nmax=mp.modos.length;
  const part=mp.modos.map(M0=>{let s=0;for(let i=0;i<mp.dyn.length;i++)if(mp.dyn[i]%6==r)s+=M0.phi[i]*mp.Mc[i];return s});
  const base=mp.modos.map((M0,i)=>({T:M0.T,Sa:saDis(M0.T,e),G:part[i],i}));
@@ -479,7 +507,7 @@ function modalDir(mp,dir,e){
   if(!(q.Sa>0)||q.V<0.02*vmax)return {T:q.T,Sa:q.Sa,G:q.G,V:q.V,f:null,r:null};
   const M0=mp.modos[q.i],f=new Float64Array(N.length*6);
   for(let k=0;k<mp.dyn.length;k++)f[mp.dyn[k]]=mp.Mc[k]*M0.phi[k]*q.G*q.Sa*9.81;
-  const rr=aplicaModal(f);
+  const rr=aplicaModal(torsCorr(f,lv,dir,ee));
   let V=0;N.forEach((qq,j)=>{if(qq.r.some(v=>v))V+=rr.R[6*j+r]});
   return {T:q.T,Sa:q.Sa,G:q.G,V:Math.abs(V),f,r:rr}});
  return {dir,part,resp}}
@@ -525,29 +553,37 @@ function modalCalc(){
  const MT=[0,0];mu.dyn.forEach(d=>{if(d%6===0)MT[0]+=m[d];else if(d%6===1)MT[1]+=m[d]});
  const out={e,modos:mu.modos,dirs:{}};
  for(const dir of ['X','Y']){
-  const r=dir=='X'?0:1,md=modalDir(mu,dir,e),mods=md.resp;
-  let comb=combinaCQC(mods);
+  const r=dir=='X'?0:1;
+  const eccPct=Math.max(5,+e.p.ecc||5),ee=eccPct/100*extPlan(dir);
+  const modsA=modalDir(mu,dir,e,+ee,lv).resp,modsB=modalDir(mu,dir,e,-ee,lv).resp,mods=modsA;
   const meff=mods.reduce((s2,q)=>s2+(q?q.G*q.G:0),0)/Math.max(MT[r],1e-12);
   const Vmod=Math.sqrt(Math.max(mods.reduce((s2,q)=>s2+(q?q.V*q.V:0),0),0));
   let kesc=1;
   if(sismoRes&&sismoRes.V>0&&Vmod>1e-9&&Vmod<.85*sismoRes.V)kesc=.85*sismoRes.V/Vmod;
-  if(comb)comb=escalaRes(comb,kesc);
-  const tab=[];
-  for(let iL=1;iL<lv.length;iL++){
-   const L=lv[iL],hs=Math.max(L.z-lv[iL-1].z,1e-6),da=([.02,.02,.015,.01][+e.p.riesgo-1]||.02)*hs;
-   const drm=mods.map(a=>a&&a.r?despNivel(a.r,L.nodos,dir)-despNivel(a.r,lv[iL-1].nodos,dir):0);
-   let sdr=0;
-   for(let i=0;i<mods.length;i++)for(let j=0;j<mods.length;j++){if(!mods[i]||!mods[j])continue;sdr+=rhoCQC(mods[i].T,mods[j].T,.05)*drm[i]*drm[j]}
-   const dr=Math.sqrt(Math.max(sdr,0))*kesc,dd=e.Cd/e.Ie*dr;
-   const Vm=mods.map(a=>{if(!a||!a.f)return 0;let s2=0;
-    for(let k=0;k<mu.dyn.length;k++){const d=mu.dyn[k];if(d%6!=r)continue;if(N[(d-d%6)/6].z>=L.z-1e-6)s2+=a.f[d]}
-    return s2});
-   let sV=0;
-   for(let i=0;i<mods.length;i++)for(let j=0;j<mods.length;j++){if(!mods[i]||!mods[j])continue;sV+=rhoCQC(mods[i].T,mods[j].T,.05)*Vm[i]*Vm[j]}
-   const Vx=Math.sqrt(Math.max(sV,0))*kesc,Pab=lv.slice(iL).reduce((s2,q)=>s2+q.w,0);
-   const th=Pab*dd/(Math.max(Vx,1e-9)*hs*e.Cd);
-   tab.push({z:L.z,dr,dd,da,theta:th,V:Vx,ok:dd<=da+.0005,ok2:th<=.1})}
-  out.dirs[dir]={mods,comb,meff,V:Vmod*kesc,kesc,tab}}
+  const cA=combinaCQC(modsA),cB=combinaCQC(modsB);
+  const comb=maxRes(cA&&escalaRes(cA,kesc),cB&&escalaRes(cB,kesc));
+  const tabDe=(ms)=>{
+   const tab=[];
+   for(let iL=1;iL<lv.length;iL++){
+    const L=lv[iL],hs=Math.max(L.z-lv[iL-1].z,1e-6),da=([.02,.02,.015,.01][+e.p.riesgo-1]||.02)*hs;
+    const drm=ms.map(a=>a&&a.r?despNivel(a.r,L.nodos,dir)-despNivel(a.r,lv[iL-1].nodos,dir):0);
+    let sdr=0;
+    for(let i=0;i<ms.length;i++)for(let j=0;j<ms.length;j++){if(!ms[i]||!ms[j])continue;sdr+=rhoCQC(ms[i].T,ms[j].T,.05)*drm[i]*drm[j]}
+    const dr=Math.sqrt(Math.max(sdr,0))*kesc,dd=e.Cd/e.Ie*dr;
+    const Vm=ms.map(a=>{if(!a||!a.f)return 0;let s2=0;
+     for(let k=0;k<mu.dyn.length;k++){const d=mu.dyn[k];if(d%6!=r)continue;if(N[(d-d%6)/6].z>=L.z-1e-6)s2+=a.f[d]}
+     return s2});
+    let sV=0;
+    for(let i=0;i<ms.length;i++)for(let j=0;j<ms.length;j++){if(!ms[i]||!ms[j])continue;sV+=rhoCQC(ms[i].T,ms[j].T,.05)*Vm[i]*Vm[j]}
+    const Vx=Math.sqrt(Math.max(sV,0))*kesc,Pab=lv.slice(iL).reduce((s2,q)=>s2+q.w,0);
+    const th=Pab*dd/(Math.max(Vx,1e-9)*hs*e.Cd);
+    tab.push({z:L.z,dr,dd,da,theta:th,V:Vx,ok:dd<=da+.0005,ok2:th<=.1})}
+   return tab};
+  const tA=tabDe(modsA),tB=tabDe(modsB);
+  const tab=tA.map((q,i)=>{const b=tB[i];if(!b)return q;
+   const dd=Math.max(q.dd,b.dd),th=Math.max(q.theta,b.theta);
+   return {z:q.z,dr:Math.max(q.dr,b.dr),dd,da:q.da,theta:th,V:Math.max(q.V,b.V),ok:dd<=q.da+.0005,ok2:th<=.1}});
+  out.dirs[dir]={mods,comb,meff,V:Vmod*kesc,kesc,tab,ecc:eccPct}}
  out.res=out.dirs.X.comb&&out.dirs.Y.comb?
   (out.dirs.X.comb.dmax>=out.dirs.Y.comb.dmax?out.dirs.X.comb:out.dirs.Y.comb):(out.dirs.X.comb||out.dirs.Y.comb);
  return out}
@@ -1034,7 +1070,7 @@ function informeSismo(r){
  h+='<b>Distribución por nivel</b><table><tr><th>z</th><th>W</th><th>F</th><th>V</th></tr>'+
   r.niveles.map((L,i)=>'<tr><td>'+(L.z*u).toFixed(2)+'</td><td>'+(L.w*Fq).toFixed(0)+'</td><td>'+(L.F*Fq).toFixed(1)+'</td></tr>').join('')+'</table>';
  h+='<b>Derivas y estabilidad</b><table><tr><th>entrepiso</th><th>Δ</th><th>Δa</th><th>θ</th></tr>'+
-  r.tab.map(L=>'<tr><td>'+(L.z*u).toFixed(2)+'</td><td'+(L.ok?'':' class="er"')+'>'+f(L.dd*u*1000,3)+'</td><td>'+f(L.da*u*1000,1)+'</td><td'+(L.ok2?'':' class="er"')+'>'+f(L.theta,3)+'</td></tr>').join('')+'</table>'+
+  r.tab.map(L=>'<tr><td>'+(L.z*u).toFixed(2)+'</td><td'+(L.ok?'':' class="er"')+'>'+f(L.dd*UF('d'),3)+'</td><td>'+f(L.da*UF('d'),1)+'</td><td'+(L.ok2?'':' class="er"')+'>'+f(L.theta,3)+'</td></tr>').join('')+'</table>'+
   '<div class="m" style="font-size:11px">Δ en mm (amplificada C<sub>d</sub>/I<sub>e</sub>) · Δa según tabla 12.12-1 · θ≤0,10</div>';
  h+='<b>Equilibrio</b>Cargas ΣF = ('+r.res.ap.map(v=>f(v*Fq)).join(', ')+') · residuo = ('+r.res.resid.map(v=>f(v*Fq,2)).join(', ')+')';
  h+=r.tab.every(L=>L.ok&&L.ok2)?'<div class="m" style="margin-top:4px">Cumple derivas y estabilidad.</div>':'<div class="er" style="margin-top:4px">Revisa las celdas marcadas: deriva o estabilidad excedidas.</div>';
@@ -1044,15 +1080,15 @@ function informeModal(r){
  const e=r.e,f=(v,d=3)=>(+v).toPrecision(d),Fq=UF('F');
  let h='<b>Sismo '+(e.p.cod=='prbc18'?'PRBC 2018 (ASCE 7-16)':'ASCE 7-22')+' · modal espectral (CQC, \u03b6=5%)</b>';
  h+='<div class="m" style="font-size:11px;line-height:1.5">'+e.nom+'<br>R='+e.R+' · C<sub>d</sub>='+e.Cd+' · I<sub>e</sub>='+e.Ie+' · S<sub>DS</sub>='+f(e.SDS,3)+' S<sub>D1</sub>='+f(e.SD1,3)+'</div>';
- h+='<div class="m" style="font-size:11px">La torsión accidental (5%) está incluida en el método de fuerza lateral equivalente; el modal espectral todavía no la incorpora.</div>';
+ h+='<div class="m" style="font-size:11px">La torsión accidental (5% mínimo) se aplica en ambos métodos: en el estático con cuatro casos (±X, ±Y) y en el modal como corrección torsional de cada modo, con envolvente de los dos signos.</div>';
  h+='<b>Modos calculados</b><table><tr><th>#</th><th>T (s)</th><th>Sa (g)</th></tr>'+
   r.modos.map((m,i)=>'<tr><td>'+(i+1)+'</td><td>'+f(m.T,3)+'</td><td>'+f(saDis(m.T,e),3)+'</td></tr>').join('')+'</table>';
  for(const d of ['X','Y']){
   const D=r.dirs[d];
-  h+='<b>Dirección '+d+'</b>Masa efectiva '+(D.meff*100).toFixed(1)+'%'+(D.meff<.9?' <span class="er">(&lt;90%: aumenta el nº de modos)</span>':' ✓')
+  h+='<b>Dirección '+d+'</b>Torsión accidental ±'+(D.ecc||5).toFixed(0)+'% · Masa efectiva '+(D.meff*100).toFixed(1)+'%'+(D.meff<.9?' <span class="er">(&lt;90%: aumenta el nº de modos)</span>':' ✓')
    +' · <b>V = '+f(D.V*Fq)+' '+UL('F')+'</b>'+(D.kesc>1.0001?' (escalado ×'+D.kesc.toFixed(2)+' por 0,85·V<sub>ELF</sub>)':'');
-  h+='<table><tr><th>entrepiso</th><th>Δ (mm)</th><th>Δa</th><th>θ</th></tr>'+
-   D.tab.map(l=>'<tr><td>'+(l.z*UF('L')).toFixed(2)+'</td><td'+(l.ok?'':' class="er"')+'>'+f(l.dd*UF('L')*1000,3)+'</td><td>'+f(l.da*UF('L')*1000,1)+'</td><td'+(l.ok2?'':' class="er"')+'>'+f(l.theta,3)+'</td></tr>').join('')+'</table>';
+  h+='<table><tr><th>entrepiso</th><th>Δ ('+UL('d')+')</th><th>Δa</th><th>θ</th></tr>'+
+   D.tab.map(l=>'<tr><td>'+(l.z*UF('L')).toFixed(2)+'</td><td'+(l.ok?'':' class="er"')+'>'+f(l.dd*UF('d'),3)+'</td><td>'+f(l.da*UF('d'),1)+'</td><td'+(l.ok2?'':' class="er"')+'>'+f(l.theta,3)+'</td></tr>').join('')+'</table>';
  }
  if(sismoRes&&sismoRes.V)h+='<div class="m" style="font-size:11px">V<sub>ELF</sub> = '+f(sismoRes.V*Fq)+' '+UL('F')+' · la respuesta espectral se escala si no alcanza 0,85·V<sub>ELF</sub> (§12.9.4).</div>';
  h+=(r.dirs.X.tab.every(l=>l.ok&&l.ok2)&&r.dirs.Y.tab.every(l=>l.ok&&l.ok2))?'<div class="m" style="margin-top:4px">Cumple derivas y estabilidad en ambas direcciones.</div>':'<div class="er" style="margin-top:4px">Revisa las celdas marcadas.</div>';
@@ -1105,6 +1141,58 @@ function runSismo(){
  o.innerHTML=informeSismo(r);
  $('hint').textContent='Caso sísmico aplicado ('+(SISMO.cod=='prbc18'?'PRBC 2018':'ASCE 7-22')+'). Pulsa ▶ Calcular para volver al caso gravitatorio.'}
 
+/* Memoria de cálculo imprimible (Guardar como PDF desde el diálogo de impresión) */
+function reportePDF(){
+ if(!res){run();if(!res)return}
+ const C0={a:C.a,p:C.p,S:C.S,ox:C.ox,oy:C.oy},m0=mode,s0=sel;
+ const uL=UL('L'),Fq=UL('F'),Mq=UL('FL'),Pq=UL('p');
+ sel=null;C.a=-.6;C.p=.45;fit();
+ const cap={model:'Modelo tridimensional',def:'Deformada ampliada',sw:'Tensiones \u03c3 en muros',
+  mq:'Presión de contacto en la matre',mMx:'Momentos Mx en la matre',mMy:'Momentos My en la matre',
+  sMx:'Momentos Mx en las losas',sMy:'Momentos My en las losas',
+  N:'Diagrama de fuerza axial N',My:'Diagrama de momento My',Vz:'Diagrama de cortante Vz',Mz:'Diagrama de momento Mz'};
+ const orden=['model','def','sw','mq','mMx','mMy','sMx','sMy','N','My','Vz'];
+ const figs=[];
+ orden.forEach(md=>{
+  if((md=='mq'||md=='mMx'||md=='mMy')&&!PLATEAS.length)return;
+  if((md=='sMx'||md=='sMy')&&!LOSAS.length)return;
+  if((md=='sw')&&!MUROS.length)return;
+  if(['N','My','Vz','Mz'].indexOf(md)>=0&&!B.length)return;
+  try{mode=md;draw();figs.push('<div class="fig"><img src="'+cv.toDataURL('image/png')+'"><div class="cap">'+cap[md]+'</div></div>')}catch(e){}
+ });
+ mode=m0;sel=s0;Object.assign(C,C0);draw();
+ const hoy=new Date().toLocaleString('es-PR',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
+ const inv='Barras '+B.length+' · Muros '+MUROS.length+' · Losas '+LOSAS.length+' · Cargas de área '+CARGAS.length
+  +' · Zapatas '+ZAPATAS.length+' · Matres '+PLATEAS.length+' · Nodos '+N.length;
+ const css='@page{size:A4 portrait;margin:13mm 12mm}'+
+  'body{font:9.5pt/1.4 "Segoe UI",system-ui,sans-serif;color:#111;margin:0}'+
+  'h1{font-size:17pt;margin:0 0 1mm;color:#1f3864}'+
+  'h2{font-size:11pt;margin:6mm 0 2mm;color:#1f3864;border-bottom:1.2pt solid #1f3864;padding-bottom:1mm;page-break-after:avoid}'+
+  '.meta{color:#555;font-size:8.5pt;margin-bottom:3mm}'+
+  'table{border-collapse:collapse;width:100%;font-size:8.5pt;margin:1mm 0 3mm}'+
+  'th,td{border:.6pt solid #aaa;padding:.8mm 1.4mm;text-align:right}'+
+  'th{background:#eef2f7;font-weight:600}td:first-child,th:first-child{text-align:left}'+
+  'b{display:block;margin-top:2.5mm;font-size:9.5pt}'+
+  '.fig{page-break-inside:avoid;margin:0 0 5mm}'+
+  '.fig img{width:100%;border:.6pt solid #bbb}'+
+  '.cap{font-size:8pt;color:#555;font-style:italic;margin-top:1mm;text-align:center}'+
+  '.er{color:#b02a2a}.m{color:#666;font-size:8pt}'+
+  '.pie{margin-top:6mm;border-top:.6pt solid #ccc;padding-top:2mm;color:#777;font-size:7.5pt}';
+ let h='<!doctype html><html lang="es"><head><meta charset="utf-8"><title>ZAPEL 3D · Memoria de cálculo</title><style>'+css+'</style></head><body>';
+ h+='<h1>ZAPEL 3D · Memoria de cálculo</h1>';
+ h+='<div class="meta">'+hoy+' · Unidades: '+(cu=='SI'?'kN · m (SI)':'kip · ft (Imperial)')+'<br>'+inv+'</div>';
+ h+='<h2>Resultados del análisis</h2>'+$('out').innerHTML;
+ if(figs.length)h+='<h2>Figuras</h2>'+figs.join('');
+ h+='<div class="pie">Generado por ZAPEL 3D (Etapa 7). Las figuras corresponden a la vista del modelo con la deformada y los contornos calculados. Para guardar en PDF use «Guardar como PDF» en el diálogo de impresión.</div>';
+ h+='</body></html>';
+ const w=window.open('','_blank');
+ if(!w){alert('El navegador bloqueó la ventana del reporte. Permita las ventanas emergentes para este archivo.');return}
+ w.document.open();w.document.write(h);w.document.close();
+ let k=0,tid=0;
+ tid=setInterval(()=>{k++;
+  let listo=true;try{const ims=w.document.images;for(let i=0;i<ims.length;i++)if(!ims[i].complete)listo=false}catch(e){listo=true}
+  if(listo||k>40){clearInterval(tid);w.focus();w.print()}},150)}
+
 function saveModel(){const d={app:'zapel-3d',v:4,units:cu,N,B,MUROS,LOSAS,CARGAS,ZAPATAS,PLATEAS},blob=new Blob([JSON.stringify(d,null,1)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='zapel-3d-modelo.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 function openModel(f){const rd=new FileReader();rd.onload=()=>{try{const d=JSON.parse(rd.result);if(d.app!='zapel-3d'||!Array.isArray(d.N)||!Array.isArray(d.B))throw 0;
  const a6=v=>Array.from({length:6},(_,k)=>+(v&&v[k])||0),n=d.N.map(q=>({x:+q.x||0,y:+q.y||0,z:+q.z||0,r:a6(q.r),f:a6(q.f)})),b=d.B.map(q=>({...D,...q})).filter(q=>n[q.i]&&n[q.j]);
@@ -1118,7 +1206,7 @@ function openModel(f){const rd=new FileReader();rd.onload=()=>{try{const d=JSON.
  const pt=(d.PLATEAS||[]).filter(q=>q&&Array.isArray(q.pts)&&q.pts.length>2).map(q=>({...DEFPL,...q}));
  load(n,b,mw,ls,cs,zp,pt);if(b.length||mw.length)run()}
  catch(e){$('out').innerHTML='<span class="er">El archivo no es un modelo válido de ZAPEL 3D.</span>'}};rd.readAsText(f)}
-$('b_sismo').onclick=abreSismo;$('b_save').onclick=saveModel;$('b_open').onclick=()=>$('fo').click();$('fo').onchange=e=>{const f=e.target.files[0];if(f)openModel(f);e.target.value=''};
+$('b_sismo').onclick=abreSismo;$('b_rep').onclick=reportePDF;$('b_save').onclick=saveModel;$('b_open').onclick=()=>$('fo').click();$('fo').onchange=e=>{const f=e.target.files[0];if(f)openModel(f);e.target.value=''};
 $('un').onchange=()=>{cu=$('un').value;$('gs').value=cu=='SI'?.5:1;$('lv').value=0;document.querySelectorAll('[data-u]').forEach(s=>s.textContent=UL(s.dataset.u));syncDef();form();if(res){const m=mode;run();setM(m)}else draw()};
 $('b_ex4').onclick=()=>{
  const ns=[];[0,3,6].forEach(z=>[[0,0],[6,0],[6,4],[0,4]].forEach(p=>ns.push(mk(p[0],p[1],z))));
