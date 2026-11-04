@@ -16,7 +16,7 @@ button{cursor:pointer}button.on{background:var(--ac);color:#fff;border-color:var
 #pn label{display:flex;justify-content:space-between;align-items:center;gap:6px;margin:3px 0}#pn label.ck{display:inline-flex;gap:2px;margin:2px 6px 2px 0}#pn input[type=number],#pn select{width:105px}#pn select[data-m=ty]{width:150px}
 .m{color:var(--mut)}#out{margin-top:8px;font-size:12px;line-height:1.5}#out b{display:block;margin-top:6px}.er{color:var(--er)}
 table{border-collapse:collapse;width:100%}td,th{padding:1px 3px;text-align:right;border-bottom:1px solid var(--bd)}th{color:var(--mut);font-weight:500}
-#st{position:absolute;left:8px;bottom:6px;color:var(--mut);font-size:12px;pointer-events:none}
+#stz{position:absolute;left:8px;bottom:6px;color:var(--mut);font-size:12px;pointer-events:none;max-width:calc(100% - 24px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #tb2{display:flex;flex-wrap:wrap;gap:12px;padding:4px 8px;border-bottom:1px solid var(--bd);background:var(--pn);align-items:center;font-size:12px;color:var(--mut)}
 #tb2 input{width:64px;padding:2px 5px}
 #tb2 b{color:var(--fg);font-weight:600}
@@ -101,10 +101,10 @@ button,select,input{touch-action:manipulation}
 <span class="grup"><b>Pantalla</b><select id="devsel"><option value="auto">Automático</option><option value="pc">Computadora</option><option value="tab">Tableta</option><option value="mov">Celular</option></select></span>
 <span class="grup">Nivel <input id="lv" type="number" value="0" step="0.5" style="width:62px"> <span class="gu" data-u="L">m</span></span>
 <span class="grup">Malla <input id="gs" type="number" value="0.5" step="0.1" min="0.05" style="width:55px"> <span class="gu" data-u="L">m</span></span>
-<span class="grup"><label class="ck" style="color:var(--mut)"><input type="checkbox" id="ort" checked> Orto</label></span>
+<span class="grup"><label class="ck" style="color:var(--mut)" title="Mantiene las cotas y trazos horizontales o verticales"><input type="checkbox" id="ort" checked> Orto</label><label class="ck" style="color:var(--mut)" title="Cota alineada entre los dos puntos, aunque sea diagonal"><input type="checkbox" id="cdiag"> Cota diag.</label></span>
 <span class="sp"></span>
 <span class="grup"><b>Muro</b> t <input id="wt" type="number" step="any" min="0.01"> <span data-u="s">mm</span> · H <input id="wh" type="number" step="any" min="0.1"> <span data-u="L">m</span></span>
-<span class="grup"><b>Losa</b> t <input id="st" type="number" step="any" min="0.01"> <span data-u="s">mm</span></span>
+<span class="grup"><b>Losa</b> t <input id="sth" type="number" step="any" min="0.01"> <span data-u="s">mm</span></span>
 <span class="grup"><b>Carga</b> q <input id="aq" type="number" step="any"> <span data-u="p">kN/m²</span></span>
 <span id="hint"></span>
 </div>
@@ -156,7 +156,7 @@ const D={ty:'rect',b:.3,h:.5,bf:.15,hf:.12,bw:.25,Dm:.4,d:.3,tf:.01,tw:.007,tt:.
 let cu='IM';const UN={SI:{L:['m',1],F:['kN',1],FL:['kN·m',1],q:['kN/m',1],E:['GPa',1],k:['kN/m³',1],d:['mm',1000],s:['mm',1000],fc:['MPa',1],A:['cm²',1e4],I:['cm⁴',1e8],p:['kN/m²',1],gw:['kN/m³',1],ar:['m²',1]},IM:{L:['ft',3.28084],F:['kip',.224809],FL:['kip·ft',.737562],q:['kip/ft',.068522],E:['ksi',145.038],k:['kip/ft³',.006366],d:['in',39.3701],s:['in',39.3701],fc:['ksi',.145038],A:['in²',1550.003],I:['in⁴',2402510],p:['ksf',.0208854],gw:['kip/ft³',.00636588],ar:['ft²',10.7639]}},UF=k=>k?UN[cu][k][1]:1,UL=k=>UN[cu][k][0],fmtv=v=>+v.toPrecision(6),KM={N:'F',Vy:'F',Vz:'F',T:'FL',My:'FL',Mz:'FL',Sy:'q',Sz:'q'};
 let N=[],B=[],MUROS=[],LOSAS=[],CARGAS=[],ZAPATAS=[],PLATEAS=[],ANOT=[],sismoRes=null,MODAL=null,tool='sel',sel=null,res=null,mode='model',chain=null,poly=null,drag=null,ms=null,C={a:-.6,p:.45,S:40,ox:300,oy:300},dpr=devicePixelRatio||1;
 /* estado de dibujo: muro poligonal, cotas y guías */
-let WGRP=0,wchain=null,widx=[],dimA=null,aline=null,ortho=true;
+let WGRP=0,wchain=null,widx=[],dimA=null,aline=null,ortho=true,cdiag=false,SNAP=null;
 /* valores por defecto de los objetos nuevos (siempre en unidades internas: m, kN, kN/m²) */
 const DEF={wt:.15,wh:2.8,st:.20,aq:2},GAM={H:24,A:78.5,O:24};
 const mk=(x,y,z,r=[0,0,0,0,0,0])=>({x,y,z,r,f:[0,0,0,0,0,0]}),bk=(i,j,o={})=>({...D,i,j,...o});
@@ -811,8 +811,26 @@ const pj=()=>{const ca=Math.cos(C.a),sa=Math.sin(C.a),cp=Math.cos(C.p),sp=Math.s
 function proj(x,y,z){const P=pj();return[C.ox+C.S*(x*P[0][0]+y*P[1][0]),C.oy-C.S*(x*P[0][1]+y*P[1][1]+z*P[2][1])]}
 function planePt(px,py){const P=pj(),[k1,k2,k3]=PLS[$('pl').value],c=(+$('lv').value||0)/UF('L'),u=(px-C.ox)/C.S,v=(C.oy-py)/C.S,a=P[k1],b=P[k2],d=P[k3],ru=u-c*d[0],rv=v-c*d[1],det=a[0]*b[1]-a[1]*b[0];
  if(Math.abs(det)<.05)return null;const p=[0,0,0];p[k1]=(ru*b[1]-rv*b[0])/det;p[k2]=(a[0]*rv-a[1]*ru)/det;p[k3]=c;return p}
-function snap(px,py){for(let i=0;i<N.length;i++){const s=proj(N[i].x,N[i].y,N[i].z);if(Math.hypot(s[0]-px,s[1]-py)<12)return[N[i].x,N[i].y,N[i].z]}
- const p=planePt(px,py);if(!p)return null;const st=(+$('gs').value||.5)/UF('L');return p.map((v,k)=>k==PLS[$('pl').value][2]?v:Math.round(v/st)*st)}
+/* Pinzamiento a extremos (END snap): nudos, vértices de losas/cargas/matres y extremos de cotas y guías */
+function snapEnds(px,py){
+ const P=pj(),pr=(x,y,z)=>[C.ox+C.S*(x*P[0][0]+y*P[1][0]),C.oy-C.S*(x*P[0][1]+y*P[1][1]+z*P[2][1])];
+ let best=null,bd=12;
+ const add=(x,y,z,ty)=>{const s=pr(x,y,z),d=Math.hypot(s[0]-px,s[1]-py);
+  if(d<bd){bd=d;best={p:[x,y,z],type:ty||'end',scr:s}}};
+ const addPoly=o=>{if(!o||!o.pts||o.pts.length<3)return;const Z=slabZs(o);o.pts.forEach((p,k)=>add(p[0],p[1],Z[k]))};
+ N.forEach(n=>add(n.x,n.y,n.z));
+ LOSAS.forEach(addPoly);CARGAS.forEach(addPoly);PLATEAS.forEach(addPoly);
+ ANOT.forEach(a=>{if(a.t=='dim'){add(a.a[0],a.a[1],a.a[2]||0);add(a.b[0],a.b[1],a.b[2]||0)}
+  else if(a.t=='line'&&a.pts)a.pts.forEach(p=>add(p[0],p[1],p[2]||0))});
+ if(Array.isArray(poly))poly.forEach(p=>add(p[0],p[1],p[2]));
+ if(Array.isArray(aline))aline.forEach(p=>add(p[0],p[1],p[2]));
+ return best}
+function snap(px,py){
+ const e=snapEnds(px,py);
+ if(e){SNAP={type:'end',p:e.p.slice()};return e.p.slice()}
+ const p=planePt(px,py);if(!p){SNAP=null;return null}
+ SNAP={type:'grid',p:p.slice()};
+ const st=(+$('gs').value||.5)/UF('L');return p.map((v,k)=>k==PLS[$('pl').value][2]?v:Math.round(v/st)*st)}
 function nodeAt(p){let i=N.findIndex(n=>Math.hypot(n.x-p[0],n.y-p[1],n.z-p[2])<1e-6);if(i<0)i=N.push(mk(...p))-1;return i}
 const hitN=(px,py)=>N.findIndex(n=>{const s=proj(n.x,n.y,n.z);return Math.hypot(s[0]-px,s[1]-py)<10});
 function hitB(px,py){return B.findIndex(r=>{const a=N[r.i],z=N[r.j],[x1,y1]=proj(a.x,a.y,a.z),[x2,y2]=proj(z.x,z.y,z.z),dx=x2-x1,dy=y2-y1,t=Math.max(0,Math.min(1,((px-x1)*dx+(py-y1)*dy)/(dx*dx+dy*dy||1)));return Math.hypot(px-x1-t*dx,py-y1-t*dy)<7})}
@@ -888,6 +906,43 @@ const ortoPt=(a,p)=>{if(!a||!p||!ortho)return p;const dx=Math.abs(p[0]-a[0]),dy=
 function dimTxt(a){const pl=Math.hypot(a.b[0]-a.a[0],a.b[1]-a.a[1]),dz=a.b[2]-a.a[2];
  if(a.txt&&a.txt.trim())return a.txt;
  return (pl*UF('L')).toFixed(2)+' '+UL('L')+(Math.abs(dz)>1e-6?' · Δz '+(dz*UF('L')).toFixed(2):'')}
+/* Etiqueta girada a lo largo de un tramo (medidas de la guía) */
+function rotLabel(sx,sy,ang,tx,col,bg){
+ let a=ang;if(a>Math.PI/2||a<-Math.PI/2)a+=Math.PI;
+ g.save();g.translate(sx,sy);g.rotate(a);
+ g.font='11px system-ui';g.textAlign='center';g.textBaseline='middle';
+ const w=g.measureText(tx).width;
+ g.globalAlpha=.94;g.fillStyle=bg;g.fillRect(-w/2-4,-8,w+8,15);g.globalAlpha=1;
+ g.fillStyle=col;g.fillText(tx,0,0);
+ g.restore();g.textAlign='left';g.textBaseline='alphabetic';g.font='11px system-ui'}
+/* Recuadro de texto junto al cursor (total acumulado, medida en curso) */
+function badge(sx,sy,tx,col,bg){
+ g.font='11px system-ui';g.textAlign='left';g.textBaseline='middle';
+ const w=g.measureText(tx).width;
+ g.globalAlpha=.96;g.fillStyle=bg;g.fillRect(sx,sy-9,w+10,18);g.globalAlpha=1;
+ g.strokeStyle=col;g.lineWidth=1;g.strokeRect(sx,sy-9,w+10,18);
+ g.fillStyle=col;g.fillText(tx,sx+5,sy);
+ g.textAlign='left';g.textBaseline='alphabetic';g.font='11px system-ui'}
+/* Medidas de la guía: cada tramo y el total, mientras se dibuja o al seleccionarla */
+function drawGuiaDims(Cc){
+ const bg=Cc('--bg'),col='#0f766e';
+ let pts=null,live=false;
+ if(tool=='lin'&&aline&&aline.length){pts=aline.slice();if(ms&&ms.p)pts.push(ms.p);live=true}
+ else if(sel&&sel.t=='a'){const a=ANOT[sel.i];if(a&&a.t=='line'&&a.pts)pts=a.pts}
+ if(!pts||pts.length<2)return;
+ let tot=0;
+ for(let k=1;k<pts.length;k++){
+  const A=pts[k-1],B=pts[k],pa=proj(A[0],A[1],A[2]),pb=proj(B[0],B[1],B[2]);
+  const dx=pb[0]-pa[0],dy=pb[1]-pa[1],L=Math.hypot(dx,dy),pl=Math.hypot(B[0]-A[0],B[1]-A[1]);
+  tot+=pl;if(L<16)continue;
+  const nx=-dy/L,ny=dx/L,sx=(pa[0]+pb[0])/2+nx*11,sy=(pa[1]+pb[1])/2+ny*11;
+  rotLabel(sx,sy,Math.atan2(dy,dx),(pl*UF('L')).toFixed(2)+' '+UL('L'),col,bg)}
+ if(live&&ms&&ms.p){
+  const p=proj(ms.p[0],ms.p[1],ms.p[2]);
+  badge(p[0]+14,p[1]-14,'Total '+(tot*UF('L')).toFixed(2)+' '+UL('L'),col,bg)}else if(pts.length>=2){
+  const q=proj(pts[pts.length-1][0],pts[pts.length-1][1],pts[pts.length-1][2]);
+  badge(q[0]+12,q[1]-12,'Total '+(tot*UF('L')).toFixed(2)+' '+UL('L'),col,bg)}
+}
 function drawAnot(Cc){
  const ac=Cc('--ac'),bg=Cc('--bg');
  ANOT.forEach((a,i)=>{
@@ -928,8 +983,7 @@ function drawAnot(Cc){
   const a=dimA,b=ms.p,p0=proj(a[0],a[1],a[2]),p1=proj(b[0],b[1],b[2]);
   g.strokeStyle='#0f766e';g.setLineDash([4,4]);g.beginPath();g.moveTo(p0[0],p0[1]);g.lineTo(p1[0],p1[1]);g.stroke();g.setLineDash([]);
   const L=Math.hypot(b[0]-a[0],b[1]-a[1]),dz=b[2]-a[2];
-  g.fillStyle='#0f766e';g.font='12px system-ui';
-  g.fillText((L*UF('L')).toFixed(2)+' '+UL('L')+(Math.abs(dz)>1e-6?'  Δz '+(dz*UF('L')).toFixed(2):''),p0[0]+8,p0[1]-8);g.font='11px system-ui'}
+  badge(p1[0]+14,p1[1]-14,(L*UF('L')).toFixed(2)+' '+UL('L')+(Math.abs(dz)>1e-6?' · Δz '+(dz*UF('L')).toFixed(2):''),'#0f766e',bg)}
 }
 function hitAnot(px,py){
  for(let i=ANOT.length-1;i>=0;i--){const a=ANOT[i];
@@ -941,13 +995,13 @@ function hitAnot(px,py){
   }else if(a.t=='line'){for(let k=1;k<a.pts.length;k++){if(dSeg2(px,py,proj(...a.pts[k-1]),proj(...a.pts[k]))<7)return i}}
   else if(a.t=='txt'){const q=proj(a.p[0],a.p[1],a.p[2]);if(Math.hypot(px-q[0]+4,py-q[1]+6)<30)return i}
  }return -1}
-function cerrarGuia(){if(aline&&aline.length>=2){ANOT.push({t:'line',pts:aline.map(p=>p.slice())});sel={t:'a',i:ANOT.length-1}}aline=null;form();draw()}
+function cerrarGuia(){if(aline&&aline.length>=2){ANOT.push({t:'line',pts:aline.map(p=>p.slice())});sel={t:'a',i:ANOT.length-1}}aline=null;SNAP=null;form();draw()}
 function cerrarMuroPoli(){
  if(wchain&&wchain.length>=2&&widx.length>=2){const grp=++WGRP;
   widx.forEach((wi,k)=>{if(MUROS[wi]){MUROS[wi].grp=grp;MUROS[wi].gk=k;MUROS[wi].gn=widx.length}});
   sel={t:'w',i:widx[0]};res=null;$('out').innerHTML=''}
  else if(widx.length==1){sel={t:'w',i:widx[0]}}
- wchain=null;widx=[];form();setM('model')}
+ wchain=null;widx=[];SNAP=null;form();setM('model')}
 
 function draw(){
  const w=cv.clientWidth,h=cv.clientHeight;cv.width=w*dpr;cv.height=h*dpr;g.setTransform(dpr,0,0,dpr,0,0);
@@ -1084,9 +1138,25 @@ function draw(){
   if(res&&(mode=='sMx'||mode=='sMy')&&LOSAS.length){
    const nc=placas().filter(Boolean).length;
    if(nc<LOSAS.length){g.fillStyle=mt;g.fillText((LOSAS.length-nc)+' losa(s) sin Mx/My: se requiere losa rectangular, plana y con 4 vértices.',10,16)}};
- drawAnot(Cc);
+ drawAnot(Cc);drawGuiaDims(Cc);
+ if(SNAP&&SNAP.type=='end'&&ms&&ms.p&&tool!='sel'){
+  const s=proj(SNAP.p[0],SNAP.p[1],SNAP.p[2]);
+  g.strokeStyle='#d946ef';g.fillStyle='#d946ef';g.lineWidth=2;
+  g.strokeRect(s[0]-5,s[1]-5,10,10);
+  g.font='10px system-ui';g.fillText('FIN',s[0]+8,s[1]+16);g.font='11px system-ui'}
  const P=pj();[['X','#dc2626'],['Y','#16a34a'],['Z','#2563eb']].forEach(([l,col],k)=>{g.strokeStyle=g.fillStyle=col;g.lineWidth=2;const x=40+P[k][0]*28,y=h-40-P[k][1]*28;g.beginPath();g.moveTo(40,h-40);g.lineTo(x,y);g.stroke();g.fillText(l,x+3,y-3)});
- if(ms&&ms.p)$('stz').textContent='Plano '+$('pl').value+' · x = '+(ms.p[0]*UF('L')).toFixed(2)+'  y = '+(ms.p[1]*UF('L')).toFixed(2)+'  z = '+(ms.p[2]*UF('L')).toFixed(2)+' '+UL('L')}
+ if(ms&&ms.p){
+  const u=UF('L'),f=v=>(v*u).toFixed(2),base='x = '+f(ms.p[0])+'  y = '+f(ms.p[1])+'  z = '+f(ms.p[2])+' '+UL('L');
+  let msg='Plano '+$('pl').value+' · '+base;
+  if(tool=='lin'&&aline&&aline.length){
+   const last=aline[aline.length-1],seg=Math.hypot(ms.p[0]-last[0],ms.p[1]-last[1]);
+   let tot=seg;for(let k=1;k<aline.length;k++)tot+=Math.hypot(aline[k][0]-aline[k-1][0],aline[k][1]-aline[k-1][1]);
+   msg='Guía · tramo '+f(seg)+' '+UL('L')+' · total '+f(tot)+' '+UL('L')+'   |   '+base
+  }else if(tool=='cot'&&dimA){
+   msg='Cota · '+f(Math.hypot(ms.p[0]-dimA[0],ms.p[1]-dimA[1]))+' '+UL('L')+'   |   '+base}
+  if(SNAP&&SNAP.type=='end')msg+=' · snap FIN';
+  $('stz').textContent=msg}
+}
 
 /* ---------- Interfaz ---------- */
 function resumenContorno(){
@@ -1235,14 +1305,18 @@ function formA(p){
  const refresh=()=>{form();draw()};
  let h='';
  if(a.t=='dim'){
+  const dxm=a.b[0]-a.a[0],dym=a.b[1]-a.a[1],dzm=a.b[2]-a.a[2],lp=Math.hypot(dxm,dym),l3=Math.hypot(lp,dzm),ang=Math.atan2(dym,dxm)*180/Math.PI;
   h='<b>Cota '+(sel.i+1)+'</b> <span class="m">('+dimTxt(a)+')</span>'
+   +'<div class="m" style="line-height:1.55;margin-top:4px">Δx = '+fmtv(dxm*u)+'  ·  Δy = '+fmtv(dym*u)+'<br>Ángulo = '+ang.toFixed(1)+'° · longitud en planta = '+(lp*u).toFixed(2)+' '+UL('L')+'<br>Longitud 3D = '+(l3*u).toFixed(2)+' '+UL('L')+'</div>'
    +'<div class="m" style="margin-top:4px">Punto A</div>'+['x','y','z'].map((k,i)=>num3('a',k.toUpperCase(),i)).join('')
    +'<div class="m">Punto B</div>'+['x','y','z'].map((k,i)=>num3('b',k.toUpperCase(),i)).join('')
    +'<label>Separación de la línea ('+UL('L')+')<input type="number" step="any" data-off value="'+fmtv(a.off*u)+'"></label>'
    +'<label>Texto (vacío = medida)<input id="aTxt" data-txt value="'+(a.txt||'').replace(/"/g,'&quot;')+'"></label>'
    +'<button style="width:100%" id="bInv">Invertir lado</button>';
  }else if(a.t=='line'){
+  let tot=0;for(let k=1;k<a.pts.length;k++)tot+=Math.hypot(a.pts[k][0]-a.pts[k-1][0],a.pts[k][1]-a.pts[k-1][1]);
   h='<b>Guía '+(sel.i+1)+'</b> <span class="m">('+a.pts.length+' puntos)</span>'
+   +'<div class="m" style="line-height:1.55;margin-top:4px">'+(a.pts.length-1)+(a.pts.length==2?' tramo':' tramos')+' · longitud total '+(tot*u).toFixed(2)+' '+UL('L')+'</div>'
    +'<label style="display:block">Puntos x, y, z ('+UL('L')+'), uno por línea<textarea data-pts rows="'+Math.max(4,a.pts.length)+'" style="width:100%;box-sizing:border-box">'+a.pts.map(q=>fmtv(q[0]*u)+', '+fmtv(q[1]*u)+', '+fmtv(q[2]*u)).join('\n')+'</textarea></label>'
    +'<label>Etiqueta<input data-tag value="'+(a.tag||'').replace(/"/g,'&quot;')+'"></label>';
  }else{
@@ -1291,8 +1365,8 @@ function cerrarPoly(){
   else if(tool=='pla'){PLATEAS.push({z,pts:P,H:DEFPL.H,ks:DEFPL.ks,qa:DEFPL.qa,fc:DEFPL.fc,fy:DEFPL.fy,s:DEFPL.s});sel={t:'p',i:PLATEAS.length-1}}
   else{CARGAS.push({z,pts:P,q:DEF.aq});sel={t:'c',i:CARGAS.length-1}}
   res=null;$('out').innerHTML=''}
- poly=null;form();draw()}
-function syncDef(){$('wt').value=fmtv(DEF.wt*UF('s'));$('wh').value=fmtv(DEF.wh*UF('L'));$('st').value=fmtv(DEF.st*UF('s'));$('aq').value=fmtv(DEF.aq*UF('p'))}
+ poly=null;SNAP=null;form();draw()}
+function syncDef(){$('wt').value=fmtv(DEF.wt*UF('s'));$('wh').value=fmtv(DEF.wh*UF('L'));$('sth').value=fmtv(DEF.st*UF('s'));$('aq').value=fmtv(DEF.aq*UF('p'))}
 /* ---------- Zapatas aisladas (ACI 318) ---------- */
 const DEFZ={B:1.6,L:1.6,H:.45,fc:28,fy:420,qa:150,c1:.3,c2:.3,fu:1.4};
 function columnAt(i){let r=[.3,.3];
@@ -1378,9 +1452,9 @@ function del(){if(!sel)return;
  sel=null;res=null;chain=null;poly=null;wchain=null;widx=[];dimA=null;aline=null;$('out').innerHTML='';form();setM('model')}
 
 function setM(m){mode=m;const q=$('mdsel');if(q&&q.value!==m)q.value=m;draw();if(!sel)form()}
-function setT(t){tool=t;chain=null;poly=null;wchain=null;widx=[];dimA=null;aline=null;
+function setT(t){tool=t;chain=null;poly=null;wchain=null;widx=[];dimA=null;aline=null;SNAP=null;
  ['sel','bar','wal','walp','slb','are','zap','pla','cot','lin','txt'].forEach(k=>{const b=$('t_'+k);if(b)b.classList.toggle('on',t==k)});
- const h={sel:'',bar:'Barra: clic en cada nodo; clic derecho o Esc termina la cadena.',wal:'Muro: clic en el inicio y en el fin del muro (en planta); se levanta desde el nivel actual.',walp:'Muro poligonal: clic en cada vértice de la planta; clic derecho, Esc o doble clic termina. Vuelve al primer vértice para cerrar el polígono.',slb:'Losa: clic en los vértices; cambia el Nivel entre clics para darle desnivel. Clic derecho, Esc o doble clic cierra el polígono.',zap:'Zapata: clic en un nodo con apoyo para crear o seleccionar su zapata aislada.',pla:'Matre: dibuja el rectángulo en planta; calcula con las reacciones de los pilares que caen dentro.',are:'Carga de área: clic sobre una losa para aplicarla, o dibuja el polígono de la carga.',cot:'Cota: clic en el punto de inicio y en el de fin. Orto mantiene la cota horizontal o vertical; la rueda y el arrastre siguen funcionando.',lin:'Guía: clic en cada punto de la línea; clic derecho, Esc o doble clic termina.',txt:'Texto: clic donde quieras la nota y escribe el texto en el panel.'}[t]||'';
+ const h={sel:'',bar:'Barra: clic en cada nodo; clic derecho o Esc termina la cadena.',wal:'Muro: clic en el inicio y en el fin del muro (en planta); se levanta desde el nivel actual.',walp:'Muro poligonal: clic en cada vértice de la planta; clic derecho, Esc o doble clic termina. Vuelve al primer vértice para cerrar el polígono.',slb:'Losa: clic en los vértices; cambia el Nivel entre clics para darle desnivel. Clic derecho, Esc o doble clic cierra el polígono.',zap:'Zapata: clic en un nodo con apoyo para crear o seleccionar su zapata aislada.',pla:'Matre: dibuja el rectángulo en planta; calcula con las reacciones de los pilares que caen dentro.',are:'Carga de área: clic sobre una losa para aplicarla, o dibuja el polígono de la carga.',cot:'Cota: clic en el inicio y en el fin. «Orto» la mantiene horizontal o vertical; «Cota diag.» la alinea entre los dos puntos; el pinzamiento FIN engancha nudos y extremos.',lin:'Guía: clic en cada punto; mientras dibujas se muestran el tramo y el total. Clic derecho, Esc o doble clic termina.',txt:'Texto: clic donde quieras la nota y escribe el texto en el panel.'}[t]||'';
  $('hint').textContent=h;draw()}
 function view(a,p,pl){C.a=a;C.p=p;if(pl)$('pl').value=pl;fit();draw()}
 function load(n,b,ms,ls,cs,zs,pt,an){N=n;B=b;MUROS=ms||[];LOSAS=ls||[];CARGAS=cs||[];ZAPATAS=zs||[];PLATEAS=pt||[];ANOT=an||[];sel=null;res=null;chain=null;poly=null;wchain=null;widx=[];dimA=null;aline=null;$('out').innerHTML='';form();mode='model';fit();setM('model')}
@@ -1404,6 +1478,7 @@ function run(){res=analyze();const o=$('out');if(res.err){o.innerHTML='<span cla
  o.innerHTML=h;setM('def')}
 $('t_sel').onclick=()=>setT('sel');$('t_bar').onclick=()=>setT('bar');$('t_wal').onclick=()=>setT('wal');$('t_walp').onclick=()=>setT('walp');$('t_slb').onclick=()=>setT('slb');$('t_are').onclick=()=>setT('are');$('t_zap').onclick=()=>setT('zap');$('t_pla').onclick=()=>setT('pla');$('t_cot').onclick=()=>setT('cot');$('t_lin').onclick=()=>setT('lin');$('t_txt').onclick=()=>setT('txt');$('b_del').onclick=del;$('b_run').onclick=run;$('b_fit').onclick=()=>{fit();draw()};$('zi').onclick=()=>{zoomAt(cv.clientWidth/2,cv.clientHeight/2,1.25);draw()};$('zo').onclick=()=>{zoomAt(cv.clientWidth/2,cv.clientHeight/2,.8);draw()};$('b_an').onclick=()=>{if(anim){stopAnim();return}if(!res)run();if(!res)return;setM('def');$('b_an').textContent='■ Detener';anim=requestAnimationFrame(tick)};$('b_clr').onclick=()=>load([],[]);
 if($('ort'))$('ort').onchange=()=>{ortho=$('ort').checked;draw()};
+if($('cdiag'))$('cdiag').onchange=()=>{cdiag=$('cdiag').checked;draw()};
 $('mdsel').innerHTML=[['model','Modelo'],['def','Deformada'],['sw','σ en muros'],['mq','q en la matre'],['mMx','Mx en la matre'],['mMy','My en la matre'],['zq','q en zapatas'],['sMx','Mx en losas'],['sMy','My en losas'],['N','Axial N'],['Vy','Cortante Vy'],['Vz','Cortante Vz'],['T','Torsión T'],['My','Momento My'],['Mz','Momento Mz'],['Sz','Suelo z'],['Sy','Suelo y']].map(([k,l])=>'<option value="'+k+'">'+l+'</option>').join('');
 $('mdsel').onchange=()=>{const k=$('mdsel').value;if(k!='model'&&!res)run();if(res||k=='model')setM(k);else $('mdsel').value=mode};
 $('v_iso').onclick=()=>view(-.6,.45);$('v_xy').onclick=()=>view(0,Math.PI/2,'XY');$('v_xz').onclick=()=>view(0,0,'XZ');$('v_yz').onclick=()=>view(-Math.PI/2,0,'YZ');
@@ -1418,8 +1493,9 @@ function verAyuda(t){
   '<tr><td><b>Muro</b></td><td>Dos clics en planta; se levanta desde el nivel actual.</td></tr>'+
   '<tr><td><b>Muro poli</b></td><td>Clic en cada vértice de la planta; clic derecho, Esc o doble clic termina. Vuelve al primer vértice para cerrarlo. En el panel puedes dar una altura distinta a cada vértice (pared a dos aguas).</td></tr>'+
   '<tr><td><b>Losa / carga</b></td><td>Polígono en planta; se cierra con clic derecho, Esc o doble clic. Cambia el <b>Nivel</b> entre clics para crear una losa inclinada (rampa, escalera, techo a un agua).</td></tr>'+
-  '<tr><td><b>Cota</b></td><td>Dos clics: inicio y fin. «Orto» la mantiene horizontal o vertical. En el panel ajustas la separación y el texto.</td></tr>'+
-  '<tr><td><b>Guía / Texto</b></td><td>La guía marca ejes o líneas de referencia; el texto rotula la planta (por ejemplo «P1», «Muro cortina»).</td></tr>'+
+  '<tr><td><b>Cota</b></td><td>Dos clics: inicio y fin. «Orto» la mantiene horizontal o vertical; «Cota diag.» la alinea entre los dos puntos para medir diagonales. En el panel ves Δx, Δy, ángulo y longitud, y ajustas la separación y el texto.</td></tr>'+
+  '<tr><td><b>Guía / Texto</b></td><td>La guía marca ejes o líneas de referencia y, mientras la dibujas, muestra la medida de cada tramo y el total acumulado. El texto rotula la planta (por ejemplo «P1», «Muro cortina»).</td></tr>'+
+  '<tr><td><b>Pinzamiento FIN</b></td><td>Con cualquier herramienta, al acercarte a un nudo, vértice de losa/carga o extremo de cota/guía aparece un cuadro «FIN». Al hacer clic engancha ese punto exacto, aunque esté en diagonal (tiene prioridad sobre «Orto»).</td></tr>'+
   '<tr><td><b>Desnivel</b></td><td>En la losa seleccionada usa «Desnivel / rampa» o edita x, y, z de cada vértice. Las vigas de borde inclinadas reciben el peso.</td></tr>'+
   '<tr><td><b>Zapata</b></td><td>Clic sobre un nudo con apoyo.</td></tr>'+
   '<tr><td><b>Girar</b></td><td>Arrastrar con el botón izquierdo en Seleccionar (o botón derecho).</td></tr>'+
@@ -1770,12 +1846,14 @@ cv.onpointerdown=e=>{const r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e
   if(ni==wchain[0]&&wchain.length>=2){const k=addWall(last,ni,{quiet:true});if(k>=0)widx.push(k);cerrarMuroPoli();return}
   const k=addWall(last,ni,{quiet:true});if(k>=0)widx.push(k);
   wchain.push(ni);sel={t:'w',i:k};form();draw();return}
- if(tool=='cot'){const p0=snap(px,py);if(!p0)return;const z=(+$('lv').value||0)/UF('L'),p=[p0[0],p0[1],z];let q=dimA?ortoPt(dimA,p):p;
+ if(tool=='cot'){const p0=snap(px,py);if(!p0)return;const z=(SNAP&&SNAP.type=='end'&&p0[2]!=null)?p0[2]:(+$('lv').value||0)/UF('L'),p=[p0[0],p0[1],z];
+  const diag=cdiag||(SNAP&&SNAP.type=='end');
+  let q=dimA?(diag?p:ortoPt(dimA,p)):p;
   if(!dimA){dimA=q;draw();return}
   if(Math.hypot(q[0]-dimA[0],q[1]-dimA[1])<1e-9)return;
   ANOT.push({t:'dim',a:dimA.slice(),b:q.slice(),off:.6,txt:''});sel={t:'a',i:ANOT.length-1};dimA=null;form();draw();return}
- if(tool=='lin'){const p0=snap(px,py);if(!p0)return;const z=(+$('lv').value||0)/UF('L');if(!aline)aline=[];aline.push([p0[0],p0[1],z]);draw();return}
- if(tool=='txt'){const p0=snap(px,py);if(!p0)return;const z=(+$('lv').value||0)/UF('L');ANOT.push({t:'txt',p:[p0[0],p0[1],z],s:'Texto'});sel={t:'a',i:ANOT.length-1};form();draw();
+ if(tool=='lin'){const p0=snap(px,py);if(!p0)return;const z=(SNAP&&SNAP.type=='end'&&p0[2]!=null)?p0[2]:(+$('lv').value||0)/UF('L');if(!aline)aline=[];if(aline.length){const q=aline[aline.length-1];if(Math.hypot(p0[0]-q[0],p0[1]-q[1])<1e-9){draw();return}}aline.push([p0[0],p0[1],z]);draw();return}
+ if(tool=='txt'){const p0=snap(px,py);if(!p0)return;const z=(SNAP&&SNAP.type=='end'&&p0[2]!=null)?p0[2]:(+$('lv').value||0)/UF('L');ANOT.push({t:'txt',p:[p0[0],p0[1],z],s:'Texto'});sel={t:'a',i:ANOT.length-1};form();draw();
   const ti=$('aTxt');if(ti){ti.focus();ti.select()}return}
  if(tool=='slb'||tool=='are'||tool=='pla'){const p=snap(px,py);if(!p)return;const lv=(+$('lv').value||0)/UF('L');
   if(tool=='are'&&!poly){const li=hitSlab(px,py);if(li>=0){const sl=LOSAS[li];CARGAS.push({z:sl.z,pts:sl.pts.map(q=>q.slice()),zs:slabZs(sl).slice(),q:DEF.aq});sel={t:'c',i:CARGAS.length-1};res=null;$('out').innerHTML='';form();draw();return}}
@@ -1794,10 +1872,10 @@ cv.onpointerdown=e=>{const r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e
       if(hs>=0)sel={t:'s',i:hs};else{const hp=hitPlatea(px,py);if(hp>=0)sel={t:'p',i:hp};else{sel=null;drag={t:e.shiftKey?'p':'o',x:px,y:py,a:C.a,p:C.p,ox:C.ox,oy:C.oy,mv:0}}}}}}}}}
  form();draw()};
 cv.onpointermove=e=>{const r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top;ms={p:snap(px,py)};
- if(ms.p&&(tool=='cot'||tool=='lin'||tool=='txt'))ms.p=[ms.p[0],ms.p[1],(+$('lv').value||0)/UF('L')];
- if(dimA&&ms.p)ms.p=ortoPt(dimA,ms.p);if(PT.has(e.pointerId))PT.set(e.pointerId,[px,py]);if(PT.size==2){pinchMove();return}
+ if(ms.p&&(tool=='cot'||tool=='lin'||tool=='txt')&&!(SNAP&&SNAP.type=='end'))ms.p=[ms.p[0],ms.p[1],(+$('lv').value||0)/UF('L')];
+ if(dimA&&ms.p&&!cdiag&&!(SNAP&&SNAP.type=='end'))ms.p=ortoPt(dimA,ms.p);if(PT.has(e.pointerId))PT.set(e.pointerId,[px,py]);if(PT.size==2){pinchMove();return}
  if(drag){drag.mv+=Math.abs(px-drag.x)+Math.abs(py-drag.y)>0?1:0;if(drag.t=='o'){C.a=drag.a+(px-drag.x)*.01;C.p=Math.max(0,Math.min(Math.PI/2,drag.p+(py-drag.y)*.01))}else{C.ox=drag.ox+px-drag.x;C.oy=drag.oy+py-drag.y}}draw()};
-cv.onpointerup=cv.onpointercancel=e=>{PT.delete(e.pointerId);pin=null;if(drag&&drag.mv<3&&tool=='bar')chain=null;drag=null;draw()};cv.oncontextmenu=e=>e.preventDefault();cv.ondblclick=()=>{if(poly)cerrarPoly();else if(aline)cerrarGuia();else if(wchain)cerrarMuroPoli()};
+cv.onpointerup=cv.onpointercancel=e=>{PT.delete(e.pointerId);pin=null;if(drag&&drag.mv<3&&tool=='bar')chain=null;drag=null;draw()};cv.onpointerleave=()=>{SNAP=null;draw()};cv.oncontextmenu=e=>e.preventDefault();cv.ondblclick=()=>{if(poly)cerrarPoly();else if(aline)cerrarGuia();else if(wchain)cerrarMuroPoli()};
 cv.onwheel=e=>{e.preventDefault();const r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top,k=e.deltaY<0?1.15:1/1.15;C.ox=px-(px-C.ox)*k;C.oy=py-(py-C.oy)*k;C.S*=k;draw()};
 addEventListener('keydown',e=>{if(e.target.tagName=='INPUT'||e.target.tagName=='SELECT')return;
  if(e.key=='Escape'){if(poly)cerrarPoly();else if(aline)cerrarGuia();else if(wchain)cerrarMuroPoli();else{dimA=null;chain=null;draw()}}
@@ -1805,7 +1883,7 @@ addEventListener('keydown',e=>{if(e.target.tagName=='INPUT'||e.target.tagName=='
 $('b_ex3').onclick=()=>{const q=PRE[7];load([mk(0,0,0,[1,1,1,1,0,0]),mk(6,0,0,[0,1,1,1,0,0])],[bk(0,1,{ty:'I',d:q[1],bf:q[2],tf:q[3],tw:q[4],mat:'A',E:200,wa:20,wb:20,div:6})])};
 $('wt').onchange=()=>{const v=+$('wt').value/UF('s');if(v>0)DEF.wt=v};
 $('wh').onchange=()=>{const v=+$('wh').value/UF('L');if(v>0)DEF.wh=v};
-$('st').onchange=()=>{const v=+$('st').value/UF('s');if(v>0)DEF.st=v};
+$('sth').onchange=()=>{const v=+$('sth').value/UF('s');if(v>0)DEF.st=v};
 $('aq').onchange=()=>{const v=+$('aq').value/UF('p');if(isFinite(v))DEF.aq=v};
 addEventListener('resize',draw);$('un').value=cu;$('gs').value=1;document.querySelectorAll('[data-u]').forEach(s=>s.textContent=UL(s.dataset.u));$('b_ex4').click();setM('model');syncDef();
 </script></body></html>
