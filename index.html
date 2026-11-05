@@ -75,6 +75,13 @@ button,select,input{touch-action:manipulation}
 #tb2 label.ck{display:inline-flex;gap:3px;align-items:center;margin:0 2px;color:var(--mut)}
 #tb2 input{width:62px}
 @media(max-width:760px){.lb{display:none}#tb,#tb2{gap:6px}}
+
+#prog{position:fixed;inset:0;background:rgba(15,23,42,.35);z-index:300;display:none;align-items:center;justify-content:center;padding:16px}
+#prog .pbox{background:var(--bg);border:1px solid var(--bd);border-radius:10px;width:min(380px,92vw);padding:14px;box-shadow:0 16px 50px rgba(0,0,0,.35)}
+#prog .pbar{height:12px;background:var(--g);border-radius:6px;overflow:hidden;margin-top:10px}
+#prog .pbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--ac),#22d3ee);border-radius:6px;transition:width .2s;position:relative;overflow:hidden}
+#prog .pbar i:after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 0 40%,rgba(255,255,255,.4) 50%,transparent 60% 100%);animation:progmove 1.1s linear infinite}
+@keyframes progmove{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
 </style></head><body>
 <div id="tb">
 <span id="brand">ZAPEL 3D</span>
@@ -114,6 +121,7 @@ button,select,input{touch-action:manipulation}
 <div id="hm"><div id="hmb"><b id="hmt">Ayuda</b><div id="hmc"></div><button type="button" id="hmx" style="width:100%">Cerrar</button></div></div>
 <div id="mn"><div id="cw"><canvas id="cv"></canvas><div id="stz"></div></div>
 <div id="pn"><div id="prop"></div><div id="out"></div><div class="m" style="margin-top:14px;padding-top:8px;border-top:1px solid var(--bd);font-size:11px;line-height:1.5">ZAPEL 3D · Etapa 7<br>Barras · muros · losas · zapatas y matres<br>Cargas de área · contornos · sismo ASCE 7-22 / PRBC 2018 (ELF y modal)<br>Basado en ZAPEL77P<br>Autor: Dr. Bernardo Deschapelles<br>Actualizado por el Prof. Raymond Rosa Ávila</div></div></div>
+<div id="prog"><div class="pbox"><b id="progT">Calculando…</b><div class="m" id="progS" style="font-size:11px;min-height:15px"></div><div class="pbar"><i id="progB"></i></div><div class="m" style="display:flex;justify-content:space-between;font-size:11px;margin-top:4px"><span id="progE">0 s</span><span id="progP">0 %</span></div></div></div>
 <script>
 const $=id=>document.getElementById(id),cv=$('cv'),g=cv.getContext('2d');
 /* aviso visible si algo falla al iniciar (antes de morir en silencio) */
@@ -452,6 +460,9 @@ const SISTEMAS=[
  ['Muros especiales de hormigón',6,5,2.5,.0488,.75],
  ['Muros de hormigón (ordinarios)',4,4,2.5,.0488,.75],
  ['Combinación pórtico-muro especial',7,5.5,2.5,.0488,.75]];
+/* ---- Espectros de escenario (USGS ShakeMap, punto de mayor PGA) ---- */
+const SISMOS_ESC=[{"code":"VE2026","eid":"us6000t7zp","nom":"Venezuela 2026 · doblete (M7.5)","mw":7.5,"fecha":"2026-06-24","lugar":"20 km W of Catia La Mar, Venezuela","pga":0.8780954309205613,"T":[0.01,0.3,0.6,1.0,3.0],"Sa":[0.8780954309205613,1.2336780599567432,1.0618365465453596,0.7557837414557255,0.12873490358780423],"lat":10.592648900245052,"lon":-66.91048021338776,"fuente":"USGS ShakeMap","url":"https://earthquake.usgs.gov/earthquakes/eventpage/us6000t7zp/shakemap"},{"code":"TR2023","eid":"us6000jllz","nom":"Turquía 2023 · Kahramanmaraş (M7.8)","mw":7.8,"fecha":"2023-02-06","lugar":"Pazarcık, Kahramanmaraş","pga":1.0512710963760241,"T":[0.01,0.3,0.6,1.0,3.0],"Sa":[1.0512710963760241,1.6652911949458864,1.7332530178673953,1.2840254166877414,0.39062783535852114],"lat":37.1,"lon":36.666666666666664,"fuente":"USGS ShakeMap","url":"https://earthquake.usgs.gov/earthquakes/eventpage/us6000jllz/shakemap"},{"code":"NOTO2024","eid":"us6000m0xl","nom":"Japón 2024 · Noto (M7.5)","mw":7.5,"fecha":"2024-01-01","lugar":"Noto Peninsula, Japan","pga":1.336427488025472,"T":[0.01,0.3,1.0,3.0],"Sa":[1.336427488025472,2.2704998375324057,0.631283645506926,0.17033298882540943],"lat":37.083333333333336,"lon":136.68333333333334,"fuente":"USGS ShakeMap","url":"https://earthquake.usgs.gov/earthquakes/eventpage/us6000m0xl/shakemap"},{"code":"KAIKOURA2016","eid":"us1000778i","nom":"Nueva Zelanda 2016 · Kaikoura (M7.8)","mw":7.8,"fecha":"2016-11-13","lugar":"Kaikoura, New Zealand","pga":0.835270211411272,"T":[0.01,0.3,1.0,3.0],"Sa":[0.835270211411272,1.552707218511336,0.7117703227626097,0.20597509820488344],"lat":-41.91666666666667,"lon":174.16666666666666,"fuente":"USGS ShakeMap","url":"https://earthquake.usgs.gov/earthquakes/eventpage/us1000778i/shakemap"},{"code":"TOHOKU2011","eid":"official20110311054624120_30","nom":"Japón 2011 · Tohoku (M9.1)","mw":9.1,"fecha":"2011-03-11","lugar":"Tohoku, Japan","pga":1.1735108709918103,"T":[0.01,0.3,1.0,3.0],"Sa":[1.1735108709918103,2.718281828459045,0.7557837414557255,0.13945685621505094],"lat":36.0,"lon":143.0,"fuente":"USGS ShakeMap","url":"https://earthquake.usgs.gov/earthquakes/eventpage/official20110311054624120_30/shakemap"},{"code":"MAULE2010","eid":"official20100227063411530_30","nom":"Chile 2010 · Maule (M8.8)","mw":8.8,"fecha":"2010-02-27","lugar":"Maule, Chile","pga":0.7408182206817179,"T":[0.01,0.3,1.0,3.0],"Sa":[0.7408182206817179,1.1972173631218102,0.7788007830714049,0.14370394977770293],"lat":-33.63333333333333,"lon":-72.98333333333333,"fuente":"USGS ShakeMap","url":"https://earthquake.usgs.gov/earthquakes/eventpage/official20100227063411530_30/shakemap"},{"code":"WENCHUAN2008","eid":"usp000g650","nom":"China 2008 · Wenchuan (M7.9)","mw":7.9,"fecha":"2008-05-12","lugar":"Wenchuan, China","pga":0.9417645335842487,"T":[0.01,0.3,1.0,3.0],"Sa":[0.9417645335842487,1.768267051433735,0.8187307530779818,0.1939800422908919],"lat":32.05,"lon":104.66666666666667,"fuente":"USGS ShakeMap","url":"https://earthquake.usgs.gov/earthquakes/eventpage/usp000g650/shakemap"}];
+let ESC_CUSTOM=null;
 const DEFSIS={ss:1,s1:.4,clase:'D',riesgo:1,sis:3,TL:8,fA:.25,nmo:10,met:'elf',cod:'asce22',ecc:5};
 /* Coeficientes de sitio IBC 2018 / ASCE 7-16 (tablas 1613.2.3 y 11.4-1/11.4-2): base del PRBC 2018 */
 const SX6=[.25,.5,.75,1,1.25,1.5],SY6=[.1,.2,.3,.4,.5,.6];
@@ -460,6 +471,47 @@ const SITIO16={A:{fa:[.8,.8,.8,.8,.8,.8],fv:[.8,.8,.8,.8,.8,.8]},B:{fa:[.9,.9,.9
  E:{fa:[2.4,1.7,1.3,1.2,1.2,1.2],fv:[4.2,3.3,2.8,2.4,2.2,2]},F:{fa:[2.4,1.7,1.3,1.2,1.2,1.2],fv:[4.2,3.3,2.8,2.4,2.2,2]}};
 function coefSitio(p,Si){if(p.cod=='prbc18'){const S=SITIO16[p.clase]||SITIO16.D;return {Fa:interp(SX6,S.fa,+p.ss),Fv:interp(SY6,S.fv,+p.s1)}}return {Fa:interp(SX,Si.fa,+p.ss),Fv:interp(SY,Si.fv,+p.s1)}}
 let SISMO={...DEFSIS};
+/* --- Espectros de escenario / importados --- */
+function escById(id){
+ const r=(SISMOS_ESC||[]).find(q=>q.code===id);
+ if(r)return r;
+ if(ESC_CUSTOM&&(!id||id==='custom'))return ESC_CUSTOM;
+ return SISMOS_ESC[0]}
+function escPga(r){return +r.pga||Math.max(...r.Sa)||1}
+/* Sa(T) en g, interpolación log-log; por encima del último período decae 1/T² */
+function escSa(T,r,scale){
+ if(!(T>0)||!r||!r.T||!r.T.length)return 0;
+ const ts=r.T,sa=r.Sa;
+ if(T<=ts[0])return sa[0]*scale;
+ if(T>=ts[ts.length-1]){const t0=ts[ts.length-1],s0=sa[sa.length-1];return s0*scale*Math.pow(t0/T,2)}
+ for(let i=1;i<ts.length;i++)if(T<=ts[i]){
+  const t0=ts[i-1],t1=ts[i],s0=Math.max(sa[i-1],1e-9),s1=Math.max(sa[i],1e-9);
+  const f=Math.log(T/t0)/Math.log(t1/t0);
+  return Math.exp(Math.log(s0)+f*(Math.log(s1)-Math.log(s0)))*scale}
+ return 0}
+function escSel(recArg){
+ const p={...DEFSIS,...(SISMO||{})},rec=recArg||p.rec||{},r=escById(rec.code);
+ const target=Math.max(0,+rec.pga||0),pga0=escPga(r),scale=target>0?target/pga0:1;
+ return {r,scale,target,pga:pga0*scale,pga0}}
+function escParse(txt,name){
+ let T=[],Sa=[];
+ const s=(txt||'').trim();
+ try{
+  const j=JSON.parse(s);
+  if(Array.isArray(j)){j.forEach(q=>{if(Array.isArray(q)&&q.length>=2){T.push(+q[0]);Sa.push(+q[1])}})}
+  else if(j&&Array.isArray(j.T)&&Array.isArray(j.Sa)){T=j.T.map(Number);Sa=j.Sa.map(Number)}
+  else if(j&&Array.isArray(j.pts)){j.pts.forEach(q=>{T.push(+q[0]);Sa.push(+q[1])})}
+ }catch(e){}
+ if(!T.length){
+  s.split(/\r?\n/).forEach(l=>{
+   l=l.trim();if(!l||/^[#;]/.test(l))return;
+   const q=l.split(/[,;\s]+/).map(Number).filter(Number.isFinite);
+   if(q.length>=2&&q[0]>0&&q[1]>=0){T.push(q[0]);Sa.push(q[1])}})}
+ const rows=T.map((t,i)=>[t,Sa[i]]).filter(q=>q[0]>0&&Number.isFinite(q[1])).sort((a,b)=>a[0]-b[0]);
+ if(rows.length<3)return null;
+ const TT=rows.map(q=>q[0]),SS=rows.map(q=>q[1]);
+ return {code:'custom',nom:name||'Espectro importado',mw:null,fecha:'',lugar:'Espectro importado',pga:SS[0],
+  T:TT,Sa:SS,fuente:'Importado por el usuario',url:''}};
 function interp(xs,ys,x){if(x<=xs[0])return ys[0];if(x>=xs[xs.length-1])return ys[ys.length-1];
  for(let i=1;i<xs.length;i++)if(x<=xs[i]){const t=(x-xs[i-1])/(xs[i]-xs[i-1]);return ys[i-1]+(ys[i]-ys[i-1])*t}
  return ys[ys.length-1]}
@@ -541,6 +593,8 @@ function sismoCalc(){
 /* ---------- Análisis modal espectral (ASCE 7-22, §12.9) ---------- */
 function espectro(){
  const p={...DEFSIS,...(SISMO||{})},Si=SITIO[p.clase]||SITIO.D;
+ if(p.met=='rec'){const sel=escSel();
+  return {p,rec:sel.r,recScale:sel.scale,recPga:sel.pga,recPga0:sel.pga0,Fa:0,Fv:0,SMS:0,SM1:0,SDS:0,SD1:0,T0:.1,Ts:.5,Ie:1,R:1,Cd:1,O0:1,nom:'Escenario sísmico',TL:+p.TL||8}}
  const {Fa,Fv}=coefSitio(p,Si);
  const SMS=Fa*p.ss,SM1=Fv*p.s1,SDS=2*SMS/3,SD1=2*SM1/3;
  const Ie=[1,1,1.25,1.5][+p.riesgo]||1;
@@ -548,6 +602,7 @@ function espectro(){
  return {p,Fa,Fv,SMS,SM1,SDS,SD1,T0:.2*SD1/SDS,Ts:SD1/SDS,Ie,R:sis[1],Cd:sis[2],O0:sis[3],nom:sis[0],TL:+p.TL||8}}
 function saDis(T,e){
  if(!(T>0))return 0;
+ if(e.rec)return escSa(T,e.rec,e.recScale);
  const R=Math.max(e.R/e.Ie,1e-6);
  if(T<=e.T0)return e.SDS*(.4+.6*T/e.T0)/R;
  if(T<=e.Ts)return e.SDS/R;
@@ -703,7 +758,7 @@ function modalCalc(){
   const meff=mods.reduce((s2,q)=>s2+(q?q.G*q.G:0),0)/Math.max(MT[r],1e-12);
   const Vmod=Math.sqrt(Math.max(mods.reduce((s2,q)=>s2+(q?q.V*q.V:0),0),0));
   let kesc=1;
-  if(sismoRes&&sismoRes.V>0&&Vmod>1e-9&&Vmod<.85*sismoRes.V)kesc=.85*sismoRes.V/Vmod;
+  if(!e.rec&&sismoRes&&sismoRes.V>0&&Vmod>1e-9&&Vmod<.85*sismoRes.V)kesc=.85*sismoRes.V/Vmod;
   const cA=combinaCQC(modsA),cB=combinaCQC(modsB);
   const comb=maxRes(cA&&escalaRes(cA,kesc),cB&&escalaRes(cB,kesc));
   const tabDe=(ms)=>{
@@ -827,9 +882,32 @@ function snapEnds(px,py){
  if(Array.isArray(poly))poly.forEach(p=>add(p[0],p[1],p[2]));
  if(Array.isArray(aline))aline.forEach(p=>add(p[0],p[1],p[2]));
  return best}
+/* Pie de perpendicular desde el último punto de la guía hasta una línea del modelo (snap ⊥) */
+function snapPerp(px,py){
+ if(tool!='lin'||!aline||!aline.length)return null;
+ const P=aline[aline.length-1],sx=P[0],sy=P[1],sz=P[2];
+ let best=null,bd=11;
+ const test=(x1,y1,z1,x2,y2,z2)=>{
+  const dx=x2-x1,dy=y2-y1,dz=z2-z1,L2=dx*dx+dy*dy+dz*dz;if(L2<1e-9)return;
+  let t=((sx-x1)*dx+(sy-y1)*dy+(sz-z1)*dz)/L2;if(t<=0||t>=1)return;
+  const qx=x1+dx*t,qy=y1+dy*t,qz=z1+dz*t;
+  if(Math.hypot(qx-sx,qy-sy,qz-sz)<1e-6)return;
+  const s=proj(qx,qy,qz),d=Math.hypot(s[0]-px,s[1]-py);
+  if(d<bd){bd=d;best=[qx,qy,qz]}};
+ const testPoly=o=>{if(!o||!o.pts||o.pts.length<3)return;const Z=slabZs(o),Q=o.pts;
+  for(let k=0;k<Q.length;k++){const j=(k+1)%Q.length;test(Q[k][0],Q[k][1],Z[k],Q[j][0],Q[j][1],Z[j])}};
+ B.forEach(b=>{const a=N[b.i],c=N[b.j];if(a&&c)test(a.x,a.y,a.z,c.x,c.y,c.z)});
+ MUROS.forEach(w=>{if(!w.n||w.n.length<2)return;const a=N[w.n[0]],c=N[w.n[1]];if(a&&c)test(a.x,a.y,a.z,c.x,c.y,c.z)});
+ LOSAS.forEach(testPoly);CARGAS.forEach(testPoly);PLATEAS.forEach(testPoly);
+ ANOT.forEach(a=>{if(a.t=='dim')test(a.a[0],a.a[1],a.a[2]||0,a.b[0],a.b[1],a.b[2]||0);
+  else if(a.t=='line'&&a.pts)for(let k=1;k<a.pts.length;k++){const p=a.pts[k-1],q=a.pts[k];test(p[0],p[1],p[2]||0,q[0],q[1],q[2]||0)}});
+ for(let k=1;k<aline.length;k++){const a=aline[k-1],c=aline[k];test(a[0],a[1],a[2],c[0],c[1],c[2])}
+ return best}
 function snap(px,py){
  const e=snapEnds(px,py);
  if(e){SNAP={type:'end',p:e.p.slice()};return e.p.slice()}
+ const pp=snapPerp(px,py);
+ if(pp){SNAP={type:'perp',p:pp};return pp.slice()}
  const p=planePt(px,py);if(!p){SNAP=null;return null}
  SNAP={type:'grid',p:p.slice()};
  const st=(+$('gs').value||.5)/UF('L');return p.map((v,k)=>k==PLS[$('pl').value][2]?v:Math.round(v/st)*st)}
@@ -1169,11 +1247,14 @@ function draw(){
    const nc=placas().filter(Boolean).length;
    if(nc<LOSAS.length){g.fillStyle=mt;g.fillText((LOSAS.length-nc)+' losa(s) sin Mx/My: se requiere losa rectangular, plana y con 4 vértices.',10,16)}};
  drawAnot(Cc);drawGuiaDims(Cc);
- if(SNAP&&SNAP.type=='end'&&ms&&ms.p&&tool!='sel'){
-  const s=proj(SNAP.p[0],SNAP.p[1],SNAP.p[2]);
-  g.strokeStyle='#d946ef';g.fillStyle='#d946ef';g.lineWidth=2;
-  g.strokeRect(s[0]-5,s[1]-5,10,10);
-  g.font='10px system-ui';g.fillText('FIN',s[0]+8,s[1]+16);g.font='11px system-ui'}
+ if(SNAP&&ms&&ms.p&&tool!='sel'&&(SNAP.type=='end'||SNAP.type=='perp')){
+  const s=proj(SNAP.p[0],SNAP.p[1],SNAP.p[2]),perp=SNAP.type=='perp';
+  g.strokeStyle=g.fillStyle=perp?'#0891b2':'#d946ef';g.lineWidth=2;
+  if(perp){
+   g.beginPath();g.moveTo(s[0]-5,s[1]+5);g.lineTo(s[0]-5,s[1]-5);g.lineTo(s[0]+5,s[1]-5);g.stroke();
+   g.beginPath();g.arc(s[0],s[1],3.2,0,7);g.fill();
+  }else g.strokeRect(s[0]-5,s[1]-5,10,10);
+  g.font='10px system-ui';g.fillText(perp?'⊥':'FIN',s[0]+8,s[1]+16);g.font='11px system-ui'}
  const P=pj();[['X','#dc2626'],['Y','#16a34a'],['Z','#2563eb']].forEach(([l,col],k)=>{g.strokeStyle=g.fillStyle=col;g.lineWidth=2;const x=40+P[k][0]*28,y=h-40-P[k][1]*28;g.beginPath();g.moveTo(40,h-40);g.lineTo(x,y);g.stroke();g.fillText(l,x+3,y-3)});
  if(ms&&ms.p){
   const u=UF('L'),f=v=>(v*u).toFixed(2),base='x = '+f(ms.p[0])+'  y = '+f(ms.p[1])+'  z = '+f(ms.p[2])+' '+UL('L');
@@ -1185,6 +1266,7 @@ function draw(){
   }else if(tool=='cot'&&dimA){
    msg='Cota · '+f(Math.hypot(ms.p[0]-dimA[0],ms.p[1]-dimA[1]))+' '+UL('L')+'   |   '+base}
   if(SNAP&&SNAP.type=='end')msg+=' · snap FIN';
+  else if(SNAP&&SNAP.type=='perp')msg+=' · snap ⊥';
   $('stz').textContent=msg}
 }
 
@@ -1485,10 +1567,44 @@ function del(){if(!sel)return;
 function setM(m){mode=m;const q=$('mdsel');if(q&&q.value!==m)q.value=m;draw();if(!sel)form()}
 function setT(t){tool=t;chain=null;poly=null;wchain=null;widx=[];dimA=null;aline=null;SNAP=null;
  ['sel','bar','wal','walp','slb','are','zap','pla','cot','lin','txt','supf','supp','supr','supn'].forEach(k=>{const b=$('t_'+k);if(b)b.classList.toggle('on',t==k)});
- const h={sel:'',bar:'Barra: clic en cada nodo; clic derecho o Esc termina la cadena.',wal:'Muro: clic en el inicio y en el fin del muro (en planta); se levanta desde el nivel actual.',walp:'Muro poligonal: clic en cada vértice de la planta; clic derecho, Esc o doble clic termina. Vuelve al primer vértice para cerrar el polígono.',slb:'Losa: clic en los vértices; cambia el Nivel entre clics para darle desnivel. Clic derecho, Esc o doble clic cierra el polígono.',zap:'Zapata: clic en un nodo con apoyo para crear o seleccionar su zapata aislada.',pla:'Matre: dibuja el rectángulo en planta; calcula con las reacciones de los pilares que caen dentro.',are:'Carga de área: clic sobre una losa para aplicarla, o dibuja el polígono de la carga.',cot:'Cota: clic en el inicio y en el fin. «Orto» la mantiene horizontal o vertical; «Cota diag.» la alinea entre los dos puntos; el pinzamiento FIN engancha nudos y extremos.',lin:'Guía: clic en cada punto; mientras dibujas se muestran el tramo y el total. Clic derecho, Esc o doble clic termina.',txt:'Texto: clic donde quieras la nota y escribe el texto en el panel.',supf:'Apoyo fijo: clic en cada nudo que quieras empotrar (Ux, Uy, Uz, Rx, Ry, Rz).',supp:'Apoyo articulado: clic en los nudos; restringe las traslaciones y deja libres los giros.',supr:'Apoyo de rodillo: clic en los nudos; restringe Uz (apoyo vertical).',supn:'Quitar apoyo: clic en los nudos para dejarlos libres.'}[t]||'';
+ const h={sel:'',bar:'Barra: clic en cada nodo; clic derecho o Esc termina la cadena.',wal:'Muro: clic en el inicio y en el fin del muro (en planta); se levanta desde el nivel actual.',walp:'Muro poligonal: clic en cada vértice de la planta; clic derecho, Esc o doble clic termina. Vuelve al primer vértice para cerrar el polígono.',slb:'Losa: clic en los vértices; cambia el Nivel entre clics para darle desnivel. Clic derecho, Esc o doble clic cierra el polígono.',zap:'Zapata: clic en un nodo con apoyo para crear o seleccionar su zapata aislada.',pla:'Matre: dibuja el rectángulo en planta; calcula con las reacciones de los pilares que caen dentro.',are:'Carga de área: clic sobre una losa para aplicarla, o dibuja el polígono de la carga.',cot:'Cota: clic en el inicio y en el fin. «Orto» la mantiene horizontal o vertical; «Cota diag.» la alinea entre los dos puntos; el pinzamiento FIN engancha nudos y extremos.',lin:'Guía: clic en cada punto; mientras dibujas se muestran el tramo y el total. Cerca de una línea aparece el snap perpendicular ⊥. Clic derecho, Esc o doble clic termina.',txt:'Texto: clic donde quieras la nota y escribe el texto en el panel.',supf:'Apoyo fijo: clic en cada nudo que quieras empotrar (Ux, Uy, Uz, Rx, Ry, Rz).',supp:'Apoyo articulado: clic en los nudos; restringe las traslaciones y deja libres los giros.',supr:'Apoyo de rodillo: clic en los nudos; restringe Uz (apoyo vertical).',supn:'Quitar apoyo: clic en los nudos para dejarlos libres.'}[t]||'';
  $('hint').textContent=h;draw()}
 function view(a,p,pl){C.a=a;C.p=p;if(pl)$('pl').value=pl;fit();draw()}
 function load(n,b,ms,ls,cs,zs,pt,an){N=n;B=b;MUROS=ms||[];LOSAS=ls||[];CARGAS=cs||[];ZAPATAS=zs||[];PLATEAS=pt||[];ANOT=an||[];sel=null;res=null;chain=null;poly=null;wchain=null;widx=[];dimA=null;aline=null;$('out').innerHTML='';form();mode='model';fit();setM('model')}
+
+/* --- Barra de progreso global --- */
+let PROG_T0=0,PROG_TIMER=null;
+function progShow(t,s){
+ const d=document.getElementById('prog');if(!d)return;
+ d.style.display='flex';PROG_T0=performance.now();
+ if(document.getElementById('progT'))document.getElementById('progT').textContent=t||'Calculando…';
+ if(document.getElementById('progS'))document.getElementById('progS').textContent=s||'';
+ progSet(0);
+ clearInterval(PROG_TIMER);
+ PROG_TIMER=setInterval(()=>{const e=document.getElementById('progE');if(e)e.textContent=((performance.now()-PROG_T0)/1000).toFixed(0)+' s'},250);
+}
+function progSet(p,t,s){
+ const b=document.getElementById('progB');if(b)b.style.width=Math.max(0,Math.min(100,+p||0))+'%';
+ if(t&&document.getElementById('progT'))document.getElementById('progT').textContent=t;
+ if(s&&document.getElementById('progS'))document.getElementById('progS').textContent=s;
+ if(document.getElementById('progP'))document.getElementById('progP').textContent=Math.round(+p||0)+' %';
+}
+function progHide(){const d=document.getElementById('prog');if(d)d.style.display='none';clearInterval(PROG_TIMER);PROG_TIMER=null}
+const nextFrame=()=>new Promise(r=>{let done=false;const f=()=>{if(!done){done=true;r()}};requestAnimationFrame(()=>requestAnimationFrame(f));setTimeout(f,250)});
+const uiTick=()=>new Promise(r=>setTimeout(r,0));
+async function runUI(){
+ progShow('Análisis estructural','Ensamblando el modelo y resolviendo el sistema…');
+ await nextFrame();await uiTick();
+ progSet(12,'Análisis estructural','Resolviendo el sistema de ecuaciones…');
+ await uiTick();
+ try{run()}catch(e){console.error(e)}
+ progSet(85,'Análisis estructural','Preparando reacciones y diagramas…');
+ await nextFrame();await uiTick();
+ progSet(100,'Listo');await uiTick();
+ progHide();
+ return !!res;
+}
+
 function run(){res=analyze();const o=$('out');if(res.err){o.innerHTML='<span class="er">'+res.err+'</span>';res=null;setM('model');return}
  const f=(v,d=3)=>Math.abs(v)<1e-9?'0':(+v).toPrecision(d),rows=[],F_=UF('F'),M_=UF('FL');
  N.forEach((n,i)=>{if(n.r.some(v=>v))rows.push('<tr><td>N'+(i+1)+'</td>'+[0,1,2,3,4,5].map(k=>'<td>'+f(res.R[6*i+k]*UF(k<3?'F':'FL'))+'</td>').join('')+'</tr>')});
@@ -1507,11 +1623,11 @@ function run(){res=analyze();const o=$('out');if(res.err){o.innerHTML='<span cla
  h+='<b>Equilibrio</b>Cargas ΣF = ('+res.ap.map(v=>f(v*F_)).join(', ')+') · residuo = ('+res.resid.map(v=>f(v*F_,2)).join(', ')+') '+UL('F');
  if(res.avisos&&res.avisos.length)h+='<div class="er" style="margin-top:6px">'+res.avisos.join('<br>')+'</div>';
  o.innerHTML=h;setM('def')}
-$('t_sel').onclick=()=>setT('sel');$('t_bar').onclick=()=>setT('bar');$('t_wal').onclick=()=>setT('wal');$('t_walp').onclick=()=>setT('walp');$('t_slb').onclick=()=>setT('slb');$('t_are').onclick=()=>setT('are');$('t_zap').onclick=()=>setT('zap');$('t_pla').onclick=()=>setT('pla');$('t_supf').onclick=()=>setT('supf');$('t_supp').onclick=()=>setT('supp');$('t_supr').onclick=()=>setT('supr');$('t_supn').onclick=()=>setT('supn');$('t_cot').onclick=()=>setT('cot');$('t_lin').onclick=()=>setT('lin');$('t_txt').onclick=()=>setT('txt');$('b_del').onclick=del;$('b_run').onclick=run;$('b_fit').onclick=()=>{fit();draw()};$('zi').onclick=()=>{zoomAt(cv.clientWidth/2,cv.clientHeight/2,1.25);draw()};$('zo').onclick=()=>{zoomAt(cv.clientWidth/2,cv.clientHeight/2,.8);draw()};$('b_an').onclick=()=>{if(anim){stopAnim();return}if(!res)run();if(!res)return;setM('def');$('b_an').textContent='■ Detener';anim=requestAnimationFrame(tick)};$('b_clr').onclick=()=>load([],[]);
+$('t_sel').onclick=()=>setT('sel');$('t_bar').onclick=()=>setT('bar');$('t_wal').onclick=()=>setT('wal');$('t_walp').onclick=()=>setT('walp');$('t_slb').onclick=()=>setT('slb');$('t_are').onclick=()=>setT('are');$('t_zap').onclick=()=>setT('zap');$('t_pla').onclick=()=>setT('pla');$('t_supf').onclick=()=>setT('supf');$('t_supp').onclick=()=>setT('supp');$('t_supr').onclick=()=>setT('supr');$('t_supn').onclick=()=>setT('supn');$('t_cot').onclick=()=>setT('cot');$('t_lin').onclick=()=>setT('lin');$('t_txt').onclick=()=>setT('txt');$('b_del').onclick=del;$('b_run').onclick=runUI;$('b_fit').onclick=()=>{fit();draw()};$('zi').onclick=()=>{zoomAt(cv.clientWidth/2,cv.clientHeight/2,1.25);draw()};$('zo').onclick=()=>{zoomAt(cv.clientWidth/2,cv.clientHeight/2,.8);draw()};$('b_an').onclick=async()=>{if(anim){stopAnim();return}if(!res)await runUI();if(!res)return;setM('def');$('b_an').textContent='■ Detener';anim=requestAnimationFrame(tick)};$('b_clr').onclick=()=>load([],[]);
 if($('ort'))$('ort').onchange=()=>{ortho=$('ort').checked;draw()};
 if($('cdiag'))$('cdiag').onchange=()=>{cdiag=$('cdiag').checked;draw()};
 $('mdsel').innerHTML=[['model','Modelo'],['def','Deformada'],['sw','σ en muros'],['mq','q en la matre'],['mMx','Mx en la matre'],['mMy','My en la matre'],['zq','q en zapatas'],['sMx','Mx en losas'],['sMy','My en losas'],['N','Axial N'],['Vy','Cortante Vy'],['Vz','Cortante Vz'],['T','Torsión T'],['My','Momento My'],['Mz','Momento Mz'],['Sz','Suelo z'],['Sy','Suelo y']].map(([k,l])=>'<option value="'+k+'">'+l+'</option>').join('');
-$('mdsel').onchange=()=>{const k=$('mdsel').value;if(k!='model'&&!res)run();if(res||k=='model')setM(k);else $('mdsel').value=mode};
+$('mdsel').onchange=async()=>{const k=$('mdsel').value;if(k!='model'&&!res)await runUI();if(res||k=='model')setM(k);else $('mdsel').value=mode};
 $('v_iso').onclick=()=>view(-.6,.45);$('v_xy').onclick=()=>view(0,Math.PI/2,'XY');$('v_xz').onclick=()=>view(0,0,'XZ');$('v_yz').onclick=()=>view(-Math.PI/2,0,'YZ');
 ['pl','lv','gs','df'].forEach(i=>{const e2=$(i);if(e2)e2.onchange=draw});$('vs').onchange=draw;$('cm').onchange=draw;
 /* --- pantalla, ayuda y utilidades --- */
@@ -1526,7 +1642,9 @@ function verAyuda(t){
   '<tr><td><b>Losa / carga</b></td><td>Polígono en planta; se cierra con clic derecho, Esc o doble clic. Cambia el <b>Nivel</b> entre clics para crear una losa inclinada (rampa, escalera, techo a un agua).</td></tr>'+
   '<tr><td><b>Apoyos</b></td><td><b>Fijo</b> (empotra los 6 grados de libertad), <b>Artic.</b> (restringe traslaciones y deja libres los giros) y <b>Rodillo</b> (restringe Uz): elige el tipo y haz clic en cada nudo. <b>Libre</b> quita el apoyo. El panel del nudo permite ajustar grado por grado.</td></tr>'+
   '<tr><td><b>Cota</b></td><td>Dos clics: inicio y fin. «Orto» la mantiene horizontal o vertical; «Cota diag.» la alinea entre los dos puntos para medir diagonales. En el panel ves Δx, Δy, ángulo y longitud, y ajustas la separación y el texto.</td></tr>'+
-  '<tr><td><b>Guía / Texto</b></td><td>La guía marca ejes o líneas de referencia y, mientras la dibujas, muestra la medida de cada tramo y el total acumulado. El texto rotula la planta (por ejemplo «P1», «Muro cortina»).</td></tr>'+
+  '<tr><td><b>Guía / Texto</b></td><td>La guía marca ejes o líneas de referencia y, mientras la dibujas, muestra la medida de cada tramo y el total acumulado. Al acercarte a una barra, muro, borde de losa, cota o guía aparece el pinzamiento perpendicular <b>⊥</b> (el pie de la perpendicular desde el último punto). El texto rotula la planta (por ejemplo «P1», «Muro cortina»).</td></tr>'+
+  '<tr><td><b>Sismo de escenario</b></td><td>En «Sismo…» elige «Espectro de evento sísmico». La lista incluye espectros 5% de USGS ShakeMap (Venezuela 2026, Turquía 2023, Noto 2024, Kaikoura 2016, Tohoku 2011, Maule 2010, Wenchuan 2008) en el punto de mayor PGA. Puedes escalar a un PGA objetivo o importar tu propio espectro (CSV/JSON: T, Sa en g). Es un escenario modelado, no un registro instrumental, y no ajusta por Vs30.</td></tr>'+
+  '<tr><td><b>Progreso</b></td><td>Al calcular aparece una barra de progreso con la fase y el porcentaje; no cierres la ventana hasta que termine.</td></tr>'+
   '<tr><td><b>Pinzamiento FIN</b></td><td>Con cualquier herramienta, al acercarte a un nudo, vértice de losa/carga o extremo de cota/guía aparece un cuadro «FIN». Al hacer clic engancha ese punto exacto, aunque esté en diagonal (tiene prioridad sobre «Orto»).</td></tr>'+
   '<tr><td><b>Desnivel</b></td><td>En la losa seleccionada usa «Desnivel / rampa» o edita x, y, z de cada vértice. Las vigas de borde inclinadas reciben el peso.</td></tr>'+
   '<tr><td><b>Zapata</b></td><td>Clic sobre un nudo con apoyo.</td></tr>'+
@@ -1572,9 +1690,17 @@ function informeModal(r){
  const e=r.e,f=(v,d=3)=>(+v).toPrecision(d),Fq=UF('F');
  let h='<b>Sismo '+(e.p.cod=='prbc18'?'PRBC 2018 (ASCE 7-16)':'ASCE 7-22')+' · modal espectral (CQC, \u03b6=5%)</b>';
  h+='<div class="m" style="font-size:11px;line-height:1.5">'+e.nom+'<br>R='+e.R+' · C<sub>d</sub>='+e.Cd+' · I<sub>e</sub>='+e.Ie+' · S<sub>DS</sub>='+f(e.SDS,3)+' S<sub>D1</sub>='+f(e.SD1,3)+'</div>';
+ if(e.rec){
+  h='<b>Escenario sísmico · '+e.rec.nom+'</b>';
+  h+='<div class="m" style="font-size:11px;line-height:1.5">'+(e.rec.mw?'Mw '+e.rec.mw+' · ':'')+e.rec.fecha+' · '+e.rec.lugar+
+   '<br>PGA del evento '+e.recPga0.toFixed(3)+' g · escala ×'+e.recScale.toFixed(3)+' → PGA aplicado '+e.recPga.toFixed(3)+' g'+
+   '<br>Espectro elástico 5% · '+(e.rec.url?'<a href="'+e.rec.url+'" target="_blank">'+e.rec.fuente+'</a>':e.rec.fuente)+'</div>';
+  h+='<div class="er" style="font-size:11px">'+(/ShakeMap/i.test(e.rec.fuente||'')?'Escenario modelado (USGS ShakeMap), no un registro instrumental; no ajusta por Vs30. Resultados elásticos (R=1).':'Espectro importado; verifica su origen, unidades y sitio. Resultados elásticos (R=1).')+'</div>';
+ }
  h+='<div class="m" style="font-size:11px">La torsión accidental (5% mínimo) se aplica en ambos métodos: en el estático con cuatro casos (±X, ±Y) y en el modal como corrección torsional de cada modo, con envolvente de los dos signos.</div>';
  h+='<b>Modos calculados</b><table><tr><th>#</th><th>T (s)</th><th>Sa (g)</th></tr>'+
   r.modos.map((m,i)=>'<tr><td>'+(i+1)+'</td><td>'+f(m.T,3)+'</td><td>'+f(saDis(m.T,e),3)+'</td></tr>').join('')+'</table>';
+ if(e.rec)h+='<b>Espectro aplicado</b><table><tr><th>T (s)</th><th>Sa (g)</th></tr>'+e.rec.T.map((t,i)=>'<tr><td>'+t.toFixed(2)+'</td><td>'+(e.rec.Sa[i]*e.recScale).toFixed(3)+'</td></tr>').join('')+'</table>';
  for(const d of ['X','Y']){
   const D=r.dirs[d];
   h+='<b>Dirección '+d+'</b>Torsión accidental ±'+(D.ecc||5).toFixed(0)+'% · Masa efectiva '+(D.meff*100).toFixed(1)+'%'+(D.meff<.9?' <span class="er">(&lt;90%: aumenta el nº de modos)</span>':' ✓')
@@ -1585,24 +1711,72 @@ function informeModal(r){
  if(sismoRes&&sismoRes.V)h+='<div class="m" style="font-size:11px">V<sub>ELF</sub> = '+f(sismoRes.V*Fq)+' '+UL('F')+' · la respuesta espectral se escala si no alcanza 0,85·V<sub>ELF</sub> (§12.9.4).</div>';
  h+=(r.dirs.X.tab.every(l=>l.ok&&l.ok2)&&r.dirs.Y.tab.every(l=>l.ok&&l.ok2))?'<div class="m" style="margin-top:4px">Cumple derivas y estabilidad en ambas direcciones.</div>':'<div class="er" style="margin-top:4px">Revisa las celdas marcadas.</div>';
  return h}
-function runModal(){
- const o=$('out');o.innerHTML='<span class="m">Calculando modos y combinación CQC…</span>';
+async function runModal(){
+ const o=$('out'),rec=SISMO.met=='rec';
+ progShow('Sismo · análisis modal',rec?'Espectro de escenario sísmico…':'Calculando modos y combinación CQC…');
+ o.innerHTML='<span class="m">Calculando modos y combinación CQC…</span>';
  $('hint').textContent='Análisis modal en curso…';
- setTimeout(()=>{
-  sismoRes=sismoCalc();
-  const r=modalCalc();
-  if(r.err){o.innerHTML='<span class="er">'+r.err+'</span>';$('hint').textContent='';return}
-  res=r.res;MODAL=r;setM('def');o.innerHTML=informeModal(r);
-  $('hint').textContent='Caso sísmico modal aplicado. Pulsa ▶ Calcular para volver al caso gravitatorio.'},30)}
+ await nextFrame();await uiTick();
+ progSet(8,'Sismo · análisis modal',rec?'Leyendo el espectro del evento…':'Peso sísmico y matriz de rigidez…');
+ await uiTick();
+ sismoRes=rec?null:sismoCalc();
+ progSet(38,'Sismo · análisis modal','Modos propios y combinación CQC…');
+ await uiTick();
+ const r=modalCalc();
+ progSet(88,'Sismo · análisis modal','Preparando resultados…');
+ await uiTick();
+ if(r.err){o.innerHTML='<span class="er">'+r.err+'</span>';$('hint').textContent='';progHide();return}
+ res=r.res;MODAL=r;setM('def');o.innerHTML=informeModal(r);
+ progSet(100,'Listo');await uiTick();progHide();
+ $('hint').textContent='Caso sísmico modal aplicado. Pulsa ▶ Calcular para volver al caso gravitatorio.'}
+
+
+/* --- Espectro de escenario: información, gráfica y actualización de la UI --- */
+function escInfoHTML(sel){
+ const r=sel.r,pga0=sel.pga0,pga=sel.pga;
+ return '<b>'+r.nom+'</b><br>'+(r.mw?'Mw '+r.mw+' · ':'')+r.fecha+(r.lugar?' · '+r.lugar:'')+
+  '<br>PGA del evento '+pga0.toFixed(3)+' g · escala ×'+sel.scale.toFixed(3)+' → PGA aplicado '+pga.toFixed(3)+' g'+
+  '<br>Fuente: '+(r.url?'<a href="'+r.url+'" target="_blank">'+r.fuente+'</a>':r.fuente)+
+  '<br><span class="er">'+(/ShakeMap/i.test(r.fuente||'')?'Escenario modelado (USGS ShakeMap), no un registro instrumental; sin ajuste por Vs30. Resultados elásticos (R=1).':'Espectro importado por el usuario; verifica su origen, unidades (g) y sitio. Resultados elásticos (R=1).')+'</span>'}
+function plotEspectro(){
+ const c=document.getElementById('smPlot');if(!c)return;
+ const sel=escSel({code:$('smRec')?$('smRec').value:'',pga:$('smPga')?+$('smPga').value:0}),r=sel.r,W=340,H=110,ctx=c.getContext('2d');
+ c.width=680;c.height=220;ctx.setTransform(2,0,0,2,0,0);ctx.clearRect(0,0,W,H);
+ const cs=getComputedStyle(document.documentElement),bd=cs.getPropertyValue('--bd').trim()||'#d0d7de',
+  mut=cs.getPropertyValue('--mut').trim()||'#6b7280';
+ const maxT=5,maxS=Math.max(.15,...r.Sa.map(v=>v*sel.scale))*1.1;
+ const x0=34,x1=W-8,y0=8,y1=H-18;
+ ctx.strokeStyle=bd;ctx.lineWidth=1;ctx.font='9px system-ui';ctx.fillStyle=mut;ctx.textAlign='center';
+ for(let i=0;i<=5;i++){const x=x0+(x1-x0)*i/5;ctx.beginPath();ctx.moveTo(x,y0);ctx.lineTo(x,y1);ctx.stroke();
+  if(i%1==0)ctx.fillText(String(i),x,y1+10)}
+ ctx.textAlign='right';
+ for(let j=0;j<=3;j++){const y=y1-(y1-y0)*j/3;ctx.beginPath();ctx.moveTo(x0,y);ctx.lineTo(x1,y);ctx.stroke();
+  ctx.fillText((maxS*j/3).toFixed(2),x0-3,y+3)}
+ ctx.textAlign='left';ctx.fillStyle=mut;ctx.fillText('Sa (g)',4,H-4);ctx.fillText('T (s)',x1-10,H-4);
+ ctx.beginPath();
+ for(let i=0;i<=240;i++){const t=0.01+(maxT-0.01)*i/240,sa=escSa(t,r,sel.scale);
+  const x=x0+(x1-x0)*t/maxT,y=y1-(y1-y0)*Math.min(sa/maxS,1);i?ctx.lineTo(x,y):ctx.moveTo(x,y)}
+ ctx.strokeStyle='#0891b2';ctx.lineWidth=1.6;ctx.stroke();
+ ctx.fillStyle='#0891b2';
+ r.T.forEach((t,i)=>{if(t>0&&t<=maxT){const x=x0+(x1-x0)*t/maxT,y=y1-(y1-y0)*Math.min((r.Sa[i]*sel.scale)/maxS,1);
+  ctx.beginPath();ctx.arc(x,y,2.2,0,7);ctx.fill()}});
+ const info=document.getElementById('smRecInfo');if(info)info.innerHTML=escInfoHTML(sel);
+ c.title=r.nom+': PGA '+sel.pga.toFixed(3)+' g, escala '+sel.scale.toFixed(2)+'×'}
+function actualizarRecUI(){
+ const box=document.getElementById('smRecBox'),met=document.getElementById('smMet');
+ if(!box||!met)return;const on=met.value=='rec';box.style.display=on?'block':'none';
+ const note=document.getElementById('smNote');
+ if(note)note.textContent=on?'Espectro de evento sísmico: análisis modal elástico (R=1). Ss, S1, sitio y sistema no intervienen; el PGA objetivo y la escala sí.':(met.value=='mod'?'Análisis modal espectral (CQC) con el espectro de diseño de la norma.':'Fuerza lateral equivalente (§12.8). El peso sísmico se toma de las cargas verticales del modelo.');
+ if(on)plotEspectro()}
 
 function abreSismo(){
  SISMO=SISMO||{...DEFSIS};
  if(!SMW){const d=SMW=document.createElement('div');d.id='smw';
   d.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.35);z-index:9;display:flex;align-items:flex-start;justify-content:center';
-  d.innerHTML='<div style="background:var(--bg);border:1px solid var(--bd);border-radius:10px;max-width:380px;margin:7vh 12px;padding:14px;box-shadow:0 12px 40px rgba(0,0,0,.3)">'
+  d.innerHTML='<div style="background:var(--bg);border:1px solid var(--bd);border-radius:10px;max-width:380px;max-height:88vh;overflow:auto;margin:7vh 12px;padding:14px;box-shadow:0 12px 40px rgba(0,0,0,.3)">'
    +'<b style="font-size:14px">Análisis sísmico</b>'
    +'<label>Norma<select id="smCod" style="width:100%"><option value="asce22">ASCE 7-22</option><option value="prbc18">PRBC 2018 (IBC 2018 · ASCE 7-16)</option></select></label>'
-   +'<div class="m" style="font-size:11px;margin:4px 0 8px">Fuerza lateral equivalente (§12.8). El peso sísmico se toma de las cargas verticales del modelo.</div>'
+   +'<div class="m" id="smNote" style="font-size:11px;margin:4px 0 8px">Fuerza lateral equivalente (§12.8). El peso sísmico se toma de las cargas verticales del modelo.</div>'
    +'<label>S<sub>s</sub> (0,2 s)<input id="smSs" type="number" step="any" style="width:80px"></label>'
    +'<label>S<sub>1</sub> (1,0 s)<input id="smS1" type="number" step="any" style="width:80px"></label>'
    +'<label>Clase de sitio<select id="smCl" style="width:80px">'+['A','B','C','D','E','F'].map(q=>'<option>'+q+'</option>').join('')+'</select></label>'
@@ -1611,26 +1785,57 @@ function abreSismo(){
    +'<label>T<sub>L</sub> (s)<input id="smTL" type="number" step="any" style="width:80px"></label>'
    +'<label>Fracción de cargas de área en W<input id="smFA" type="number" step="0.05" min="0" max="1" style="width:80px"></label>'
    +'<label>Excentricidad accidental (%, mín. 5)<input id="smEc" type="number" min="5" step="0.5" style="width:80px"></label>'
-   +'<label>Método<select id="smMet" style="width:100%"><option value="elf">Fuerza lateral equivalente</option><option value="mod">Modal espectral (CQC)</option></select></label>'
+   +'<label>Método<select id="smMet" style="width:100%"><option value="elf">Fuerza lateral equivalente</option><option value="mod">Modal espectral (CQC)</option><option value="rec">Espectro de evento sísmico</option></select></label>'
+   +'<div id="smRecBox" style="display:none;border:1px solid var(--bd);border-radius:8px;padding:8px;margin:6px 0">'
+   +'<label>Evento<select id="smRec" style="width:100%"></select></label>'
+   +'<label>PGA objetivo (g)<input id="smPga" type="number" min="0" step="0.01" style="width:80px" value="0"></label>'
+   +'<canvas id="smPlot" width="680" height="220" style="width:100%;height:110px;margin-top:5px;border:1px solid var(--bd);border-radius:6px"></canvas>'
+   +'<div class="m" id="smRecInfo" style="font-size:10.5px;line-height:1.45;margin-top:4px"></div>'
+   +'<button type="button" id="smImp" style="width:100%;margin-top:5px">Importar espectro (CSV/JSON: T, Sa en g)…</button>'
+   +'<input type="file" id="smFile" accept=".csv,.txt,.json" style="display:none">'
+   +'</div>'
    +'<label>Nº de modos<input id="smNMo" type="number" min="1" max="12" step="1" style="width:80px"></label>'
    +'<div style="display:flex;gap:6px;margin-top:10px"><button class="go" id="smOk" style="flex:1">Calcular sismo</button><button id="smNo">Cerrar</button></div>'
    +'</div>';
   document.body.appendChild(d);
+  $('smRec').innerHTML=SISMOS_ESC.map(r=>'<option value="'+r.code+'">'+r.nom+' · '+r.fecha+'</option>').join('');
+  if(ESC_CUSTOM){const o=document.createElement('option');o.value='custom';o.textContent=ESC_CUSTOM.nom+' · importado';$('smRec').appendChild(o)}
+  $('smMet').onchange=actualizarRecUI;
+  $('smRec').onchange=plotEspectro;
+  $('smPga').oninput=plotEspectro;
+  $('smImp').onclick=()=>$('smFile').click();
+  $('smFile').onchange=()=>{const f=$('smFile').files[0];if(!f)return;
+   const rd=new FileReader();rd.onload=()=>{const rec=escParse(rd.result,f.name);
+    if(!rec){$('smRecInfo').innerHTML='<span class="er">No se pudo leer el espectro: usa líneas «T, Sa» (s, g) con al menos 3 puntos.</span>';return}
+    ESC_CUSTOM=rec;let o=$('smRec').querySelector('option[value=custom]');
+    if(!o){o=document.createElement('option');o.value='custom';$('smRec').appendChild(o)}
+    o.textContent=rec.nom+' · importado';$('smRec').value='custom';plotEspectro()};
+   rd.readAsText(f);$('smFile').value=''};
+
   $('smNo').onclick=()=>{d.style.display='none'};
   $('smOk').onclick=()=>{d.style.display='none';runSismo()}}
  SMW.style.display='flex';
  $('smSs').value=SISMO.ss;$('smS1').value=SISMO.s1;$('smCl').value=SISMO.clase;
  $('smRz').value=SISMO.riesgo;$('smSi').value=SISMO.sis;$('smTL').value=SISMO.TL;$('smFA').value=SISMO.fA;
- $('smMet').value=SISMO.met||'elf';$('smNMo').value=SISMO.nmo||10;$('smCod').value=SISMO.cod||'asce22';$('smEc').value=Math.max(5,+SISMO.ecc||5)}
-function runSismo(){
+ $('smMet').value=SISMO.met||'elf';$('smNMo').value=SISMO.nmo||10;$('smCod').value=SISMO.cod||'asce22';$('smEc').value=Math.max(5,+SISMO.ecc||5);
+  const rc=SISMO.rec||{};$('smRec').value=rc.code||SISMOS_ESC[0].code;$('smPga').value=rc.pga||0;actualizarRecUI()}
+async function runSismo(){
  SISMO={ss:+$('smSs').value||1,s1:+$('smS1').value||.4,clase:$('smCl').value||'D',
   riesgo:+$('smRz').value||1,sis:+$('smSi').value||0,TL:+$('smTL').value||8,fA:+$('smFA').value||0,
-  nmo:+$('smNMo').value||10,met:$('smMet').value||'elf',cod:$('smCod').value||'asce22',ecc:Math.max(5,+$('smEc').value||5)};
- if(SISMO.met=='mod')return runModal();
+  nmo:+$('smNMo').value||10,met:$('smMet').value||'elf',cod:$('smCod').value||'asce22',ecc:Math.max(5,+$('smEc').value||5),
+   rec:{code:($('smRec')&&$('smRec').value)||'',pga:($('smPga')?+$('smPga').value:0)||0}};
+ if(SISMO.met=='mod'||SISMO.met=='rec')return runModal();
+ progShow('Sismo · fuerza lateral','Peso sísmico y períodos…');
+ await nextFrame();await uiTick();
+ progSet(10,'Sismo · fuerza lateral','Casos de torsión accidental…');
+ await uiTick();
  const r=sismoCalc(),o=$('out');
- if(r.err){o.innerHTML='<span class="er">'+r.err+'</span>';return}
+ if(r.err){o.innerHTML='<span class="er">'+r.err+'</span>';progHide();return}
+ progSet(88,'Sismo · fuerza lateral','Preparando el informe…');
+ await uiTick();
  sismoRes=r;res=r.res;setM('def');
  o.innerHTML=informeSismo(r);
+ progSet(100,'Listo');await uiTick();progHide();
  $('hint').textContent='Caso sísmico aplicado ('+(SISMO.cod=='prbc18'?'PRBC 2018':'ASCE 7-22')+'). Pulsa ▶ Calcular para volver al caso gravitatorio.'}
 
 /* ---------------- Memoria de cálculo (PDF por impresión) ---------------- */
@@ -1703,6 +1908,13 @@ function tablaSismo(){
  }
  if(MODAL&&MODAL.dirs){
   h+='<h3>Análisis modal espectral (CQC, ζ = 5 %)</h3>';
+  if(MODAL.e&&MODAL.e.rec){const rr=MODAL.e.rec;
+   h+='<table><tr><th>Evento</th><td>'+rr.nom+'</td></tr><tr><th>Mw / fecha</th><td>'+rr.mw+' / '+rr.fecha+'</td></tr>'+
+    '<tr><th>Lugar</th><td>'+rr.lugar+'</td></tr><tr><th>PGA del evento</th><td>'+MODAL.e.recPga0.toFixed(3)+' g</td></tr>'+
+    '<tr><th>Escala aplicada</th><td>×'+MODAL.e.recScale.toFixed(3)+' → PGA '+MODAL.e.recPga.toFixed(3)+' g</td></tr>'+
+    '<tr><th>Fuente</th><td>'+(rr.url?'<a href="'+rr.url+'">'+rr.fuente+'</a>':rr.fuente)+'</td></tr></table>';
+   h+='<div class="m">'+(/ShakeMap/i.test(rr.fuente||'')?'Escenario modelado (USGS ShakeMap), no un registro instrumental; sin ajuste por Vs30. Resultados elásticos (R=1).':'Espectro importado; verifica su origen, unidades y sitio. Resultados elásticos (R=1).')+'</div>';
+   h+='<table><tr><th>T (s)</th><th>Sa (g)</th></tr>'+rr.T.map((t,i)=>'<tr><td>'+t.toFixed(2)+'</td><td>'+(rr.Sa[i]*MODAL.e.recScale).toFixed(3)+'</td></tr>').join('')+'</table>'}
   if(MODAL.modos&&MODAL.modos.length){h+='<table><tr><th>Modo</th><th>T ('+ (cu=='SI'?'s':'s') +')</th><th>Sa (g)</th></tr>';
    MODAL.modos.slice(0,10).forEach((q,i)=>{h+='<tr><td>'+(i+1)+'</td><td>'+f(q.T,4)+'</td><td>'+f(q.Sa,4)+'</td></tr>'});
    h+='</table>'}
@@ -1885,7 +2097,7 @@ cv.onpointerdown=e=>{const r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e
   if(!dimA){dimA=q;draw();return}
   if(Math.hypot(q[0]-dimA[0],q[1]-dimA[1])<1e-9)return;
   ANOT.push({t:'dim',a:dimA.slice(),b:q.slice(),off:.6,txt:''});sel={t:'a',i:ANOT.length-1};dimA=null;form();draw();return}
- if(tool=='lin'){const p0=snap(px,py);if(!p0)return;const z=(SNAP&&SNAP.type=='end'&&p0[2]!=null)?p0[2]:(+$('lv').value||0)/UF('L');if(!aline)aline=[];if(aline.length){const q=aline[aline.length-1];if(Math.hypot(p0[0]-q[0],p0[1]-q[1])<1e-9){draw();return}}aline.push([p0[0],p0[1],z]);draw();return}
+ if(tool=='lin'){const p0=snap(px,py);if(!p0)return;const z=(SNAP&&(SNAP.type=='end'||SNAP.type=='perp')&&p0[2]!=null)?p0[2]:(+$('lv').value||0)/UF('L');if(!aline)aline=[];if(aline.length){const q=aline[aline.length-1];if(Math.hypot(p0[0]-q[0],p0[1]-q[1])<1e-9){draw();return}}aline.push([p0[0],p0[1],z]);draw();return}
  if(tool=='txt'){const p0=snap(px,py);if(!p0)return;const z=(SNAP&&SNAP.type=='end'&&p0[2]!=null)?p0[2]:(+$('lv').value||0)/UF('L');ANOT.push({t:'txt',p:[p0[0],p0[1],z],s:'Texto'});sel={t:'a',i:ANOT.length-1};form();draw();
   const ti=$('aTxt');if(ti){ti.focus();ti.select()}return}
  if(tool=='slb'||tool=='are'||tool=='pla'){const p=snap(px,py);if(!p)return;const lv=(+$('lv').value||0)/UF('L');
@@ -1914,7 +2126,7 @@ cv.onpointerdown=e=>{const r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e
       if(hs>=0)sel={t:'s',i:hs};else{const hp=hitPlatea(px,py);if(hp>=0)sel={t:'p',i:hp};else{sel=null;drag={t:e.shiftKey?'p':'o',x:px,y:py,a:C.a,p:C.p,ox:C.ox,oy:C.oy,mv:0}}}}}}}}}
  form();draw()};
 cv.onpointermove=e=>{const r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top;ms={p:snap(px,py)};
- if(ms.p&&(tool=='cot'||tool=='lin'||tool=='txt')&&!(SNAP&&SNAP.type=='end'))ms.p=[ms.p[0],ms.p[1],(+$('lv').value||0)/UF('L')];
+ if(ms.p&&(tool=='cot'||tool=='lin'||tool=='txt')&&!(SNAP&&(SNAP.type=='end'||SNAP.type=='perp')))ms.p=[ms.p[0],ms.p[1],(+$('lv').value||0)/UF('L')];
  if(dimA&&ms.p&&!cdiag&&!(SNAP&&SNAP.type=='end'))ms.p=ortoPt(dimA,ms.p);if(PT.has(e.pointerId))PT.set(e.pointerId,[px,py]);if(PT.size==2){pinchMove();return}
  if(drag){drag.mv+=Math.abs(px-drag.x)+Math.abs(py-drag.y)>0?1:0;if(drag.t=='o'){C.a=drag.a+(px-drag.x)*.01;C.p=Math.max(0,Math.min(Math.PI/2,drag.p+(py-drag.y)*.01))}else{C.ox=drag.ox+px-drag.x;C.oy=drag.oy+py-drag.y}}draw()};
 cv.onpointerup=cv.onpointercancel=e=>{PT.delete(e.pointerId);pin=null;if(drag&&drag.mv<3&&tool=='bar')chain=null;drag=null;draw()};cv.onpointerleave=()=>{SNAP=null;draw()};cv.oncontextmenu=e=>e.preventDefault();cv.ondblclick=()=>{if(poly)cerrarPoly();else if(aline)cerrarGuia();else if(wchain)cerrarMuroPoli()};
