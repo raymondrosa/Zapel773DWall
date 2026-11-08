@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="es" data-dev="auto"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ZAPEL 3D · Pórticos, muros, losas, fundaciones y sismo (Etapa 7)</title>
+<title>Zapel773DWall · Pórticos, muros, losas, fundaciones y sismo (Etapa 7)</title>
 <style>
 :root{--bg:#fff;--fg:#1f2328;--mut:#6b7280;--bd:#d0d7de;--pn:#f6f8fa;--ac:#2563eb;--g:#d8dee4;--ok:#16a34a;--er:#dc2626;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0d1117;--fg:#e6edf3;--mut:#9aa4af;--bd:#30363d;--pn:#161b22;--ac:#58a6ff;--g:#2a313a;--ok:#3fb950;--er:#f85149}}
@@ -101,7 +101,8 @@ button,select,input{touch-action:manipulation}
 }
 </style></head><body>
 <div id="tb">
-<span id="brand">ZAPEL 3D</span>
+<span id="brand">Zapel773DWall</span>
+<span class="grup"><b id="langLbl">Idioma</b><select id="lang" title="Idioma de la interfaz"><option value="es">Español</option><option value="en">English</option></select></span>
 <span class="grup"><span class="lb">Dibujar</span><button type="button" id="t_sel" class="on">Seleccionar</button><button type="button" id="t_bar">Barra</button><button type="button" id="t_wal">Muro</button><button type="button" id="t_walp">Muro poli</button><button type="button" id="t_slb">Losa</button><button type="button" id="t_are">Carga de área</button><button type="button" id="t_zap">Zapata</button><button type="button" id="t_pla">Matre</button><button type="button" id="b_del">Eliminar</button></span>
 <span class="sp"></span>
 <span class="grup"><span class="lb">Apoyos</span><button type="button" id="t_supf" title="Apoyo fijo (empotrado): restringe Ux, Uy, Uz, Rx, Ry y Rz">Fijo</button><button type="button" id="t_supp" title="Apoyo articulado: restringe las traslaciones y deja libres los giros">Artic.</button><button type="button" id="t_supr" title="Apoyo de rodillo: restringe el descenso vertical Uz">Rodillo</button><button type="button" id="t_supn" title="Quita el apoyo del nudo (lo deja libre)">Libre</button></span>
@@ -117,6 +118,7 @@ button,select,input{touch-action:manipulation}
 <button type="button" id="b_rep">📄 Reporte</button>
 <button type="button" id="b_rep3" title="Descargar el reporte como archivo HTML">⬇</button>
 <button type="button" id="b_sismo">Sismo…</button>
+<button type="button" id="b_guide" title="Guía rápida de uso">Guía</button>
 <button type="button" id="b_help" title="Ayuda y atajos">?</button>
 </div>
 <div id="tb2">
@@ -127,7 +129,7 @@ button,select,input{touch-action:manipulation}
 <span class="grup"><b>Pantalla</b><select id="devsel"><option value="auto">Automático</option><option value="pc">Computadora</option><option value="tab">Tableta</option><option value="mov">Celular</option></select></span>
 <span class="grup">Nivel <input id="lv" type="number" value="0" step="0.5" style="width:62px"> <span class="gu" data-u="L">m</span></span>
 <span class="grup">Malla <input id="gs" type="number" value="0.5" step="0.1" min="0.05" style="width:55px"> <span class="gu" data-u="L">m</span></span>
-<span class="grup"><label class="ck" style="color:var(--mut)" title="Mantiene las cotas y trazos horizontales o verticales"><input type="checkbox" id="ort" checked> Orto</label><label class="ck" style="color:var(--mut)" title="Cota alineada entre los dos puntos, aunque sea diagonal"><input type="checkbox" id="cdiag"> Cota diag.</label></span>
+<span class="grup"><label class="ck" style="color:var(--mut)" title="Mantiene las cotas, guías y trazos horizontales o verticales (F8)"><input type="checkbox" id="ort" checked> Orto</label><label class="ck" style="color:var(--mut)" title="Seguimiento polar: el trazo se pega a múltiplos del ángulo (F10)">Polar <select id="pol" style="width:74px;padding:1px 3px"><option value="0">—</option><option value="45">45°</option><option value="30">30/60°</option><option value="15">15°</option></select></label><label class="ck" style="color:var(--mut)" title="Cota alineada entre los dos puntos, aunque sea diagonal"><input type="checkbox" id="cdiag"> Cota diag.</label></span>
 <span class="sp"></span>
 <span class="grup"><b>Muro</b> t <input id="wt" type="number" step="any" min="0.01"> <span data-u="s">mm</span> · H <input id="wh" type="number" step="any" min="0.1"> <span data-u="L">m</span></span>
 <span class="grup"><b>Losa</b> t <input id="sth" type="number" step="any" min="0.01"> <span data-u="s">mm</span></span>
@@ -137,13 +139,103 @@ button,select,input{touch-action:manipulation}
 <input type="file" id="fo" accept=".json,application/json" style="display:none">
 <div id="hm"><div id="hmb"><b id="hmt">Ayuda</b><div id="hmc"></div><button type="button" id="hmx" style="width:100%">Cerrar</button></div></div>
 <div id="mn"><div id="cw"><canvas id="cv"></canvas><div id="stz"></div></div>
-<div id="pn"><div id="prop"></div><div id="out"></div><div class="m" style="margin-top:14px;padding-top:8px;border-top:1px solid var(--bd);font-size:11px;line-height:1.5">ZAPEL 3D · Etapa 7<br>Barras · muros · losas · zapatas y matres<br>Cargas de área · contornos · sismo ASCE 7-22 / PRBC 2018 (ELF y modal)<br>Basado en ZAPEL77P<br>Autor: Dr. Bernardo Deschapelles<br>Actualizado por el Prof. Raymond Rosa Ávila</div></div></div>
+<div id="pn"><div id="prop"></div><div id="out"></div><div class="m" style="margin-top:14px;padding-top:8px;border-top:1px solid var(--bd);font-size:11px;line-height:1.5">Zapel773DWall · Etapa 7<br>Barras · muros · losas · zapatas y matres<br>Cargas de área · contornos · sismo ASCE 7-22 / PRBC 2018 (ELF y modal)<br>Basado en ZAPEL77P<br>Autor: Dr. Bernardo Deschapelles<br>Actualizado por el Prof. Raymond Rosa Ávila</div></div></div>
 <div id="prog"><div class="pbox"><b id="progT">Calculando…</b><div class="m" id="progS" style="font-size:11px;min-height:15px"></div><div class="pbar"><i id="progB"></i></div><div class="m" style="display:flex;justify-content:space-between;font-size:11px;margin-top:4px"><span id="progE">0 s</span><span id="progP">0 %</span></div></div></div>
 <script>
 const $=id=>document.getElementById(id),cv=$('cv'),g=cv.getContext('2d');
 /* aviso visible si algo falla al iniciar (antes de morir en silencio) */
 addEventListener('error',ev=>{try{const t=document.getElementById('stz');if(t)t.textContent='⚠ '+ev.message}catch(e){}});
+
+/* ---------- Idioma de la interfaz ---------- */
+const EN_DICT={
+"Dibujar":"Draw","Seleccionar":"Select","Barra":"Beam","Muro":"Wall","Muro poli":"Poly wall","Losa":"Slab","Carga de área":"Area load","Zapata":"Footing","Matre":"Mat","Eliminar":"Delete",
+"Apoyos":"Supports","Fijo":"Fixed","Artic.":"Pin","Rodillo":"Roller","Libre":"Free",
+"Anotar":"Annotate","Cota":"Dimension","Guía":"Guide","Texto":"Text",
+"Archivo":"File","Nuevo":"New","Abrir":"Open","Guardar":"Save",
+"Ejemplos":"Examples","Edificio":"Building","Pórtico":"Frame","Viga suelo":"Grade beam","Viga acero":"Steel beam",
+"Resultados":"Results","Sismo":"Seismic","Calcular":"Calculate","Reporte":"Report","Sismo…":"Seismic…","Guía rápida":"Quick guide",
+"Vista":"View","Iso":"Iso","Planta":"Plan","Frente":"Front","Lateral":"Side","Encuadrar":"Fit","Secciones":"Sections","Cotas":"Dims","Animar":"Animate",
+"Plano":"Plane","Unidades":"Units","Pantalla":"Screen","Automático":"Auto","Computadora":"Desktop","Tableta":"Tablet","Celular":"Phone",
+"Nivel":"Level","Malla":"Grid","Orto":"Ortho","Polar":"Polar","Cota diag.":"Aligned dim.","Idioma":"Language","Español":"Spanish",
+"Modelo":"Model","Deformada":"Deformed","σ en muros":"Wall σ","q en la matre":"Mat pressure","Mx en la matre":"Mat Mx","My en la matre":"Mat My",
+"q en zapatas":"Footing pressure","Mx en losas":"Slab Mx","My en losas":"Slab My","σ1 losa (diafragma)":"Slab σ1 (diaphragm)","σ2 losa (diafragma)":"Slab σ2 (diaphragm)",
+"Axial N":"Axial N","Cortante Vy":"Shear Vy","Cortante Vz":"Shear Vz","Torsión T":"Torsion T","Momento My":"Moment My","Momento Mz":"Moment Mz","Suelo z":"Soil z","Suelo y":"Soil y",
+"Análisis sísmico":"Seismic analysis","Norma":"Code","Clase de sitio":"Site class","Categoría de riesgo":"Risk category","Sistema resistente":"Structural system",
+"Fracción de cargas de área en W":"Area-load fraction in W","Excentricidad accidental (%, mín. 5)":"Accidental eccentricity (%, min. 5)","Método":"Method",
+"Fuerza lateral equivalente":"Equivalent lateral force","Modal espectral (CQC)":"Modal response spectrum (CQC)","Espectro de evento sísmico":"Event response spectrum",
+"Evento":"Event","PGA objetivo (g)":"Target PGA (g)","Importar espectro (CSV/JSON: T, Sa en g)…":"Import spectrum (CSV/JSON: T, Sa in g)…",
+"Nº de modos":"No. of modes","Calcular sismo":"Run seismic","Cerrar":"Close","Ver contornos sísmicos":"View seismic contours",
+"Nudo":"Node","Apoyo":"Support","Material":"Material","Hormigón":"Concrete","Acero":"Steel","Sección":"Section","Base":"Base","Altura":"Height","Espesor":"Thickness",
+"Peso específico":"Unit weight","Módulo E":"Modulus E","Resortes":"Springs","Subdivisiones":"Divisions","Articulaciones":"Hinges","Giro":"Rotation","Cargas nodales":"Nodal loads","Ancho":"Width","Canto":"Depth",
+"Desnivel / rampa":"Slope / ramp","Peso propio":"Self-weight","Cota inicial":"Start level","Cota final":"End level","Vértice inicial":"Start vertex","Vértice final":"End vertex","Aplicar pendiente":"Apply slope",
+"Eliminar losa":"Delete slab","Eliminar barra":"Delete beam","Eliminar muro":"Delete wall","Eliminar zapata":"Delete footing","Eliminar matre":"Delete mat",
+"Carga de área sobre esta losa":"Area load on this slab","Aplicar sección y E a todas":"Apply section and E to all","Aporta rigidez de diafragma":"Contributes diaphragm stiffness",
+"Contornos":"Contours","Contornos · sismo":"Seismic contours","Valores máximos":"Maximum values","Reacciones":"Reactions","Muros · fuerzas en la base":"Walls · base forces",
+"Cargas de superficie":"Surface loads","Matres":"Mats","Zapatas · contacto":"Footings · contact","Modos calculados":"Computed modes","Derivas y estabilidad":"Drifts and stability","Equilibrio":"Equilibrium",
+"Período y cortante":"Period and base shear","Distribución por nivel":"Distribution by level","Torsión accidental":"Accidental torsion","Dirección X":"Direction X","Dirección Y":"Direction Y","Entrepiso":"Story",
+"Ayuda":"Help","Ayuda y atajos":"Help and shortcuts","Atajos y consejos":"Shortcuts and tips","Acerca de Zapel773DWall":"About Zapel773DWall","Guía":"Guide","Idioma":"Language"
+};
+const EN_PH=[
+["Análisis sísmico","Seismic analysis"],["Fracción de cargas de área en W","Area-load fraction in W"],["Fuerza lateral equivalente","Equivalent lateral force"],["Modal espectral (CQC)","Modal response spectrum (CQC)"],["Espectro de evento sísmico","Event response spectrum"],["Sistema resistente","Structural system"],["Clase de sitio","Site class"],["Categoría de riesgo","Risk category"],["PGA objetivo (g)","Target PGA (g)"],["Nº de modos","No. of modes"],["Calcular sismo","Calculate seismic"],["Cerrar","Close"],["Norma","Code"],["Método","Method"],["Evento","Event"],
+["en el plano del muro","in the wall plane"],["tracción","tension"],["compresión","compression"],["Cargas de superficie","Surface loads"],["Dibuja con","Draw with"],["anota con","annotate with"],["Clic derecho","Right-click"],["gira la vista","rotates the view"],["desplaza","pan"],["hace zoom","zooms"],["Reacciones","Reactions"],["Calcular","Calculate"],["Reporte","Report"],["En la losa","In the slab"],["cambia el","change the"],["asigna","assign"],
+["Cargas de área","Area loads"],["cargas de área","area loads"],["Peso específico","Unit weight"],["Peso propio","Self-weight"],
+["Desnivel / rampa","Slope / ramp"],["Vértices","Vertices"],["uno por línea","one per line"],["separada por comas","comma-separated"],
+["Muros","Walls"],["muros","walls"],["Muro","Wall"],["muro","wall"],["Losas","Slabs"],["losas","slabs"],["Losa","Slab"],["losa","slab"],
+["Barras","Beams"],["barras","beams"],["Barra","Beam"],["barra","beam"],["Zapatas","Footings"],["zapatas","footings"],["Zapata","Footing"],["zapata","footing"],
+["Matres","Mats"],["matres","mats"],["Matre","Mat"],["matre","mat"],["Nudos","Nodes"],["nudos","nodes"],["Nudo","Node"],["nudo","node"],
+["Cargas","Loads"],["cargas","loads"],["Carga","Load"],["carga","load"],["Anotaciones","Annotations"],["Contornos","Contours"],["contornos","contours"],
+["sismo","seismic"],["Sismo","Seismic"],["gravedad","gravity"],["mín","min"],["máx","max"],["Mín","Min"],["Máx","Max"],
+["tramo","segment"],["Calculando","Calculating"],["Listo","Ready"],["Cumple","Passes"],["Revisa","Check"],["deriva","drift"],["estabilidad","stability"],
+["Peso","Weight"],["Fuerza","Force"],["Cortante","Shear"],["Momento","Moment"],["Reacción","Reaction"],["Presión","Pressure"],["Nivel","Level"],["Malla","Grid"],
+["Unidades","Units"],["Pantalla","Screen"],["Sección","Section"],["Espesor","Thickness"],["Altura","Height"],["Ancho","Width"],["Canto","Depth"]
+];
+let APPLYING=false,OBS=null,LANG_T=null;
+const TXT_ES=new WeakMap(),ATTR_ES=new WeakMap();
+function tr(s){
+ if(LANG!=='en'||s==null)return s;
+ const key=String(s).trim();if(!key)return s;
+ const exact=EN_DICT[key];if(exact){const lead=s.match(/^\s*/)[0],trail=s.match(/\s*$/)[0];return lead+exact+trail}
+ let out=s;for(const [a,b] of EN_PH)if(out.includes(a))out=out.split(a).join(b);
+ return out}
+function startObs(){
+ if(!OBS)OBS=new MutationObserver(()=>{if(APPLYING)return;clearTimeout(LANG_T);LANG_T=setTimeout(()=>applyLang(document.body),25)});
+ OBS.observe(document.body,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['title','placeholder','aria-label']})}
+function applyLang(root){
+ if(!root||APPLYING)return;APPLYING=true;if(OBS)OBS.disconnect();
+ try{
+  const walk=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null,false);let n;
+  while(n=walk.nextNode()){
+   const p=n.parentElement;if(!p||/^(SCRIPT|STYLE|CANVAS|TEXTAREA)$/.test(p.tagName))continue;
+   let es=TXT_ES.get(n);
+   if(es===undefined){es=n.data;TXT_ES.set(n,es)}
+   else if(LANG==='en'&&n.__en!==undefined&&n.data!==n.__en&&n.data!==es){es=n.data;TXT_ES.set(n,es)}
+   if(LANG==='en'){const en=tr(es);if(n.data!==en)n.data=en;n.__en=en}
+   else{if(n.data!==es)n.data=es;n.__en=es}
+  }
+  root.querySelectorAll&&root.querySelectorAll('[title],[placeholder],[aria-label]').forEach(el=>{
+   let map=ATTR_ES.get(el);if(!map){map={};ATTR_ES.set(el,map)}
+   ['title','placeholder','aria-label'].forEach(a=>{
+    const cur=el.getAttribute(a);if(cur==null)return;let es=map[a];
+    if(es===undefined){es=cur;map[a]=es}
+    else if(LANG==='en'&&el.__enAttr&&el.__enAttr[a]!==undefined&&cur!==el.__enAttr[a]&&cur!==es){es=cur;map[a]=es}
+    if(LANG==='en'){const en=tr(es);if(cur!==en)el.setAttribute(a,en);el.__enAttr=el.__enAttr||{};el.__enAttr[a]=en}
+    else{if(cur!==es)el.setAttribute(a,es);el.__enAttr=el.__enAttr||{};el.__enAttr[a]=es}
+   })
+  })
+ }finally{APPLYING=false;startObs()}
+}
+function setLang(v){
+ LANG=v==='en'?'en':'es';
+ try{localStorage.setItem('zapel-lang',LANG)}catch(e){}
+ document.documentElement.lang=LANG;
+ const s=$('lang');if(s)s.value=LANG;
+ document.title=LANG==='en'?'Zapel773DWall · 3D frames, walls, slabs, foundations and seismic (Stage 7)':'Zapel773DWall · Pórticos, muros, losas, fundaciones y sismo (Etapa 7)';
+ applyLang(document.body);
+ try{if(typeof form==='function')form()}catch(e){}
+}
+
 /*==NUCLEO:INICIO==*/
+let LANG='es';
 const IN=.0254,PRE=[['W12×26',12.2*IN,6.49*IN,.38*IN,.23*IN],['W14×30',13.8*IN,6.73*IN,.385*IN,.27*IN],['W16×40',16*IN,7*IN,.505*IN,.305*IN],['W18×50',18*IN,7.5*IN,.57*IN,.355*IN],['W21×62',21*IN,8.24*IN,.615*IN,.4*IN],['W24×76',23.9*IN,8.99*IN,.68*IN,.44*IN],['IPE 200',.2,.1,.0085,.0056],['IPE 300',.3,.15,.0107,.0071],['IPE 400',.4,.18,.0135,.0086]];
 const SEC={rect:['Rectangular (hormigón / maciza)',['b','Ancho b'],['h','Canto h']],T:['Viga T (hormigón)',['bf','Ancho del ala bf'],['hf','Espesor del ala hf'],['bw','Ancho del alma bw'],['h','Canto total h']],circ:['Circular maciza',['Dm','Diámetro D']],I:['Perfil I (acero)',['d','Canto d'],['bf','Ancho del ala bf'],['tf','Espesor del ala tf'],['tw','Espesor del alma tw']],tubR:['Tubo rectangular (acero)',['b','Ancho b'],['h','Canto h'],['tt','Espesor t']],tubC:['Tubo circular (acero)',['Dm','Diámetro D'],['tt','Espesor t']],poly:['Irregular (polígono)']};
 const circ=(r,n=28)=>Array.from({length:n},(_,i)=>[r*Math.cos(2*Math.PI*i/n),r*Math.sin(2*Math.PI*i/n)]);
@@ -183,9 +275,9 @@ const D={ty:'rect',b:.3,h:.5,bf:.15,hf:.12,bw:.25,Dm:.4,d:.3,tf:.01,tw:.007,tt:.
 let cu='IM';const UN={SI:{L:['m',1],F:['kN',1],FL:['kN·m',1],q:['kN/m',1],E:['GPa',1],k:['kN/m³',1],d:['mm',1000],s:['mm',1000],fc:['MPa',1],A:['cm²',1e4],I:['cm⁴',1e8],p:['kN/m²',1],gw:['kN/m³',1],ar:['m²',1]},IM:{L:['ft',3.28084],F:['kip',.224809],FL:['kip·ft',.737562],q:['kip/ft',.068522],E:['ksi',145.038],k:['kip/ft³',.006366],d:['in',39.3701],s:['in',39.3701],fc:['ksi',.145038],A:['in²',1550.003],I:['in⁴',2402510],p:['ksf',.0208854],gw:['kip/ft³',.00636588],ar:['ft²',10.7639]}},UF=k=>k?UN[cu][k][1]:1,UL=k=>UN[cu][k][0],fmtv=v=>+v.toPrecision(6),KM={N:'F',Vy:'F',Vz:'F',T:'FL',My:'FL',Mz:'FL',Sy:'q',Sz:'q'};
 let N=[],B=[],MUROS=[],LOSAS=[],CARGAS=[],ZAPATAS=[],PLATEAS=[],ANOT=[],sismoRes=null,MODAL=null,tool='sel',sel=null,res=null,resG=null,resS=null,sisOn=false,mode='model',chain=null,poly=null,drag=null,ms=null,C={a:-.6,p:.45,S:40,ox:300,oy:300},dpr=devicePixelRatio||1;
 /* estado de dibujo: muro poligonal, cotas y guías */
-let WGRP=0,wchain=null,widx=[],dimA=null,aline=null,ortho=true,cdiag=false,SNAP=null;
+let WGRP=0,wchain=null,widx=[],dimA=null,aline=null,ortho=true,polar=0,shiftDown=false,cdiag=false,SNAP=null;
 /* valores por defecto de los objetos nuevos (siempre en unidades internas: m, kN, kN/m²) */
-const DEF={wt:.15,wh:2.8,st:.20,aq:2},GAM={H:24,A:78.5,O:24};
+const DEF={wt:5*IN,wh:8*.3048,st:.20,aq:2},GAM={H:24,A:78.5,O:24};
 const mk=(x,y,z,r=[0,0,0,0,0,0])=>({x,y,z,r,f:[0,0,0,0,0,0]}),bk=(i,j,o={})=>({...D,i,j,...o});
 const mul=(A,Bm)=>A.map(r=>Bm[0].map((_,j)=>r.reduce((s,v,k)=>s+v*Bm[k][j],0))),tp=A=>A[0].map((_,j)=>A.map(r=>r[j]));
 const crs=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],nrm=a=>{const l=Math.hypot(...a);return a.map(v=>v/l)},dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
@@ -1139,6 +1231,14 @@ function drawMemb(){
 /* ---------- Anotaciones: cotas, guías y textos ---------- */
 const dSeg2=(px,py,a,b)=>{const dx=b[0]-a[0],dy=b[1]-a[1],L2=dx*dx+dy*dy;let t=L2?((px-a[0])*dx+(py-a[1])*dy)/L2:0;t=t<0?0:t>1?1:t;return Math.hypot(px-a[0]-t*dx,py-a[1]-t*dy)};
 const ortoPt=(a,p)=>{if(!a||!p||!ortho)return p;const dx=Math.abs(p[0]-a[0]),dy=Math.abs(p[1]-a[1]);return dx>=dy?[p[0],a[1],p[2]]:[a[0],p[1],p[2]]};
+function constrainPt(a,p){
+ if(!a||!p)return p;
+ const dx=p[0]-a[0],dy=p[1]-a[1],L=Math.hypot(dx,dy);if(!(L>1e-9))return p;
+ let ang=Math.atan2(dy,dx);
+ if(ortho||shiftDown){const step=Math.PI/2;ang=Math.round(ang/step)*step}
+ else if(polar>0){const step=polar*Math.PI/180;ang=Math.round(ang/step)*step}
+ else return p;
+ return [a[0]+L*Math.cos(ang),a[1]+L*Math.sin(ang),p[2]]}
 function dimTxt(a){const pl=Math.hypot(a.b[0]-a.a[0],a.b[1]-a.a[1]),dz=a.b[2]-a.a[2];
  if(a.txt&&a.txt.trim())return a.txt;
  return (pl*UF('L')).toFixed(2)+' '+UL('L')+(Math.abs(dz)>1e-6?' · Δz '+(dz*UF('L')).toFixed(2):'')}
@@ -1245,7 +1345,7 @@ function draw(){
  const cs=getComputedStyle(document.documentElement),Cc=n=>cs.getPropertyValue(n).trim(),fg=Cc('--fg'),ac=Cc('--ac'),mt=Cc('--mut');g.font='11px system-ui';g.lineWidth=1;
  const [k1,k2,k3]=PLS[$('pl').value],c=(+$('lv').value||0)/UF('L'),st=(+$('gs').value||.5)/UF('L'),xs=N.flatMap(n=>[n.x,n.y,n.z]);let lo=[0,0,0],hi=[10,10,10];
  N.forEach(n=>[n.x,n.y,n.z].forEach((v,k)=>{lo[k]=Math.min(lo[k],v);hi[k]=Math.max(hi[k],v)}));
- const a0=Math.floor(lo[k1]/st)*st-2*st,a1=hi[k1]+2*st,b0=Math.floor(lo[k2]/st)*st-2*st,b1=hi[k2]+2*st,stp=Math.max(st,Math.ceil((a1-a0)/40/st)*st);
+ const gcx=(lo[k1]+hi[k1])/2,gcy=(lo[k2]+hi[k2])/2;let a0=Math.floor(lo[k1]/st)*st-2*st,a1=hi[k1]+2*st,b0=Math.floor(lo[k2]/st)*st-2*st,b1=hi[k2]+2*st;const gh=20;a0=Math.min(a0,gcx-gh);a1=Math.max(a1,gcx+gh);b0=Math.min(b0,gcy-gh);b1=Math.max(b1,gcy+gh);const stp=Math.max(st,Math.ceil((a1-a0)/120/st)*st);
  g.strokeStyle=Cc('--g');g.beginPath();const P3=(a,b)=>{const p=[0,0,0];p[k1]=a;p[k2]=b;p[k3]=c;return proj(...p)};
  for(let a=a0;a<=a1;a+=stp){g.moveTo(...P3(a,b0));g.lineTo(...P3(a,b1))}for(let b=b0;b<=b1;b+=stp){g.moveTo(...P3(a0,b));g.lineTo(...P3(a1,b))}g.stroke();
  const R=mode=='model'?null:res;
@@ -1443,7 +1543,7 @@ function form(){const p=$('prop');
   B.forEach((r,i)=>chips.push(['b',i,'B'+(i+1)]));MUROS.forEach((w,i)=>chips.push(['w',i,wallTag(i)]));
   LOSAS.forEach((s,i)=>chips.push(['s',i,'L'+(i+1)]));CARGAS.forEach((c,i)=>chips.push(['c',i,'Q'+(i+1)]));
   ANOT.forEach((a,i)=>chips.push(['a',i,(a.t=='dim'?'C':a.t=='line'?'G':'T')+(i+1)]));
-  p.innerHTML='<p class="m">Dibuja con <b>Barra</b>, <b>Muro</b>, <b>Muro poli</b>, <b>Losa</b> o <b>Carga de área</b>; anota con <b>Cota</b>, <b>Guía</b> y <b>Texto</b>; con <b>Apoyos</b> asigna fijo, articulado o rodillo a los nudos. En la losa, cambia el <b>Nivel</b> entre clics para darle desnivel. Clic derecho o Esc cierra la cadena, la polilínea o el polígono. Clic derecho arrastrado (o arrastrar en Seleccionar) gira la vista, Mayús+arrastrar desplaza y la rueda hace zoom.</p>'
+  p.innerHTML='<p class="m">'+(LANG==='en'?'Draw with <b>Beam</b>, <b>Wall</b>, <b>Poly wall</b>, <b>Slab</b> or <b>Area load</b>; annotate with <b>Dimension</b>, <b>Guide</b> and <b>Text</b>; use <b>Supports</b> to assign fixed, pin or roller supports to nodes. In the slab, change the <b>Level</b> between clicks for a slope. Right-click or Esc ends the chain, polyline or polygon. Right-drag (or drag in Select) rotates the view; Shift+drag pans; the wheel zooms.</p>':'Dibuja con <b>Barra</b>, <b>Muro</b>, <b>Muro poli</b>, <b>Losa</b> o <b>Carga de área</b>; anota con <b>Cota</b>, <b>Guía</b> y <b>Texto</b>; con <b>Apoyos</b> asigna fijo, articulado o rodillo a los nudos. En la losa, cambia el <b>Nivel</b> entre clics para darle desnivel. Clic derecho o Esc cierra la cadena, la polilínea o el polígono. Clic derecho arrastrado (o arrastrar en Seleccionar) gira la vista, Mayús+arrastrar desplaza y la rueda hace zoom.</p>')
    +'<div class="m">Barras '+B.length+' · Muros '+MUROS.length+' · Losas '+LOSAS.length+' · Cargas de área '+CARGAS.length+' · Anotaciones '+ANOT.length+(ZAPATAS.length?' · Zapatas '+ZAPATAS.length:'')+'</div>'
    +(()=>{const rc=resumenContorno();return rc.length?'<b>Contornos'+(sisOn?' · sismo':'')+'</b><table><tr><th></th><th></th><th>mín</th><th>máx</th></tr>'+rc.map(q=>'<tr><td>'+q[0]+'</td><td>'+q[1]+'</td><td>'+fmtEsc(q[2])+'</td><td>'+fmtEsc(q[3])+'</td></tr>').join('')+'</table><div class="m" style="font-size:11px">'+rc[0][4]+'</div>':''})()
    +(chips.length&&chips.length<=80?'<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:6px">'+chips.map(q=>'<button data-s="'+q[0]+':'+q[1]+'" style="padding:1px 6px">'+q[2]+'</button>').join('')+'</div>':'');
@@ -1811,7 +1911,8 @@ function run(){res=analyze();const o=$('out');if(res.err){o.innerHTML='<span cla
  if(res.avisos&&res.avisos.length)h+='<div class="er" style="margin-top:6px">'+res.avisos.join('<br>')+'</div>';
  o.innerHTML=h;setM('def')}
 $('t_sel').onclick=()=>setT('sel');$('t_bar').onclick=()=>setT('bar');$('t_wal').onclick=()=>setT('wal');$('t_walp').onclick=()=>setT('walp');$('t_slb').onclick=()=>setT('slb');$('t_are').onclick=()=>setT('are');$('t_zap').onclick=()=>setT('zap');$('t_pla').onclick=()=>setT('pla');$('t_supf').onclick=()=>setT('supf');$('t_supp').onclick=()=>setT('supp');$('t_supr').onclick=()=>setT('supr');$('t_supn').onclick=()=>setT('supn');$('t_cot').onclick=()=>setT('cot');$('t_lin').onclick=()=>setT('lin');$('t_txt').onclick=()=>setT('txt');$('b_del').onclick=del;$('b_run').onclick=runUI;$('b_fit').onclick=()=>{fit();draw()};$('zi').onclick=()=>{zoomAt(cv.clientWidth/2,cv.clientHeight/2,1.25);draw()};$('zo').onclick=()=>{zoomAt(cv.clientWidth/2,cv.clientHeight/2,.8);draw()};$('b_an').onclick=async()=>{if(anim){stopAnim();return}if(!res)await runUI();if(!res)return;setM('def');$('b_an').textContent='■ Detener';anim=requestAnimationFrame(tick)};$('b_clr').onclick=()=>load([],[]);
-if($('ort'))$('ort').onchange=()=>{ortho=$('ort').checked;draw()};
+if($('ort'))$('ort').onchange=()=>{ortho=$('ort').checked;if(ortho){polar=0;const p=$('pol');if(p)p.value='0'}draw()};
+if($('pol'))$('pol').onchange=()=>{polar=+$('pol').value||0;if(polar>0){ortho=false;const o=$('ort');if(o)o.checked=false}draw()};
 if($('cdiag'))$('cdiag').onchange=()=>{cdiag=$('cdiag').checked;draw()};
 $('mdsel').innerHTML=[['model','Modelo'],['def','Deformada'],['sw','σ en muros'],['mq','q en la matre'],['mMx','Mx en la matre'],['mMy','My en la matre'],['zq','q en zapatas'],['sMx','Mx en losas'],['sMy','My en losas'],['sS1','σ1 losa (diafragma)'],['sS2','σ2 losa (diafragma)'],['N','Axial N'],['Vy','Cortante Vy'],['Vz','Cortante Vz'],['T','Torsión T'],['My','Momento My'],['Mz','Momento Mz'],['Sz','Suelo z'],['Sy','Suelo y']].map(([k,l])=>'<option value="'+k+'">'+l+'</option>').join('');
 $('mdsel').onchange=async()=>{const k=$('mdsel').value;if(k!='model'&&!res)await runUI();if(res||k=='model')setM(k);else $('mdsel').value=mode};
@@ -1820,16 +1921,47 @@ $('v_iso').onclick=()=>view(-.6,.45);$('v_xy').onclick=()=>view(0,Math.PI/2,'XY'
 ['pl','lv','gs','df'].forEach(i=>{const e2=$(i);if(e2)e2.onchange=draw});$('vs').onchange=draw;$('cm').onchange=draw;
 /* --- pantalla, ayuda y utilidades --- */
 function cierraMenus(){}
+function abreGuia(){
+ const en=LANG==='en';
+ if($('hmt'))$('hmt').textContent=en?'Quick guide':'Guía rápida';
+ if($('hmc'))$('hmc').innerHTML=en?
+  '<table>'+
+  '<tr><td><b>1. Setup</b></td><td>Choose units, grid step and level. Default wall: 5 in thick, 8 ft high. Grid covers at least 130 ft.</td></tr>'+
+  '<tr><td><b>2. Draw</b></td><td>Beam: click nodes; right-click/Esc ends. Wall/Wall poly: plan clicks. Slab/Area: polygon; change Level between clicks for slopes.</td></tr>'+
+  '<tr><td><b>3. Supports</b></td><td>Fixed, Pin, Roller or Free; click nodes. Tune individual DOF in the node panel.</td></tr>'+
+  '<tr><td><b>4. Loads</b></td><td>Nodal loads, beam loads, area loads; wall and slab self-weight are automatic.</td></tr>'+
+  '<tr><td><b>5. Calculate</b></td><td>Press Calculate. Check warnings, reactions, deformed shape and drift.</td></tr>'+
+  '<tr><td><b>6. Seismic</b></td><td>Seismic…: ELF, modal CQC or event spectrum. After analysis use the <b>Seismic</b> button for contours.</td></tr>'+
+  '<tr><td><b>7. Drafting</b></td><td>Ortho (F8), Polar 45°/30°/15° (F10), Shift for temporary Ortho, FIN/⊥ snaps, guides with live dimensions.</td></tr>'+
+  '<tr><td><b>8. Save / report</b></td><td>Save JSON; Report opens the calculation memory (print/PDF).</td></tr>'+
+  '<tr><td><b>Shortcuts</b></td><td>Esc ends; Del deletes; F8 Ortho; F10 Polar; Shift temporary Ortho.</td></tr></table>'
+ :
+  '<table>'+
+  '<tr><td><b>1. Preparar</b></td><td>Elige unidades, malla y nivel. Muro inicial: 5 pulg de espesor y 8 pies de alto. La rejilla cubre al menos 130 pies.</td></tr>'+
+  '<tr><td><b>2. Dibujar</b></td><td>Barra: clic en nudos; clic derecho/Esc termina. Muro/Muro poli: clics en planta. Losa/Carga: polígono; cambia el Nivel entre clics para rampas.</td></tr>'+
+  '<tr><td><b>3. Apoyos</b></td><td>Fijo, Artic., Rodillo o Libre; clic en nudos. Ajusta grados de libertad en el panel del nudo.</td></tr>'+
+  '<tr><td><b>4. Cargas</b></td><td>Cargas nodales, en barras y de área; el peso propio de muros y losas es automático.</td></tr>'+
+  '<tr><td><b>5. Calcular</b></td><td>Pulsa Calcular. Revisa avisos, reacciones, deformada y derivas.</td></tr>'+
+  '<tr><td><b>6. Sismo</b></td><td>Sismo…: fuerza lateral, modal CQC o espectro de evento. Después usa el botón <b>Sismo</b> para los contornos.</td></tr>'+
+  '<tr><td><b>7. Dibujo</b></td><td>Orto (F8), Polar 45°/30°/15° (F10), Shift para Orto temporal, snaps FIN/⊥, guías con medidas en vivo.</td></tr>'+
+  '<tr><td><b>8. Guardar / reporte</b></td><td>Guardar JSON; Reporte abre la memoria (imprimir/PDF).</td></tr>'+
+  '<tr><td><b>Atajos</b></td><td>Esc termina; Supr elimina; F8 Orto; F10 Polar; Shift Orto temporal.</td></tr></table>';
+ if($('hm'))$('hm').style.display='flex'}
+
 function verAyuda(t){
+ if(LANG==='en'){abreGuia();return}
  const c=$('hmc');if(!c)return;
- if(t=='acerca')c.innerHTML='<p><b>ZAPEL 3D · Etapa 7</b></p><p>Análisis estructural tridimensional: pórticos espaciales, muros, losas con cargas de área, zapatas aisladas y matres, contornos de tensiones y análisis sísmico según ASCE 7-22 y PRBC 2018 (fuerza lateral equivalente y modal espectral con CQC).</p><p class="m">Basado en ZAPEL77P, del Dr. Bernardo Deschapelles.<br>Actualización y ampliación: Prof. Raymond Rosa Ávila.</p>';
+ if(t=='acerca')c.innerHTML='<p><b>Zapel773DWall · Etapa 7</b></p><p>Análisis estructural tridimensional: pórticos espaciales, muros, losas con cargas de área, zapatas aisladas y matres, contornos de tensiones y análisis sísmico según ASCE 7-22 y PRBC 2018 (fuerza lateral equivalente y modal espectral con CQC).</p><p class="m">Basado en ZAPEL77P, del Dr. Bernardo Deschapelles.<br>Actualización y ampliación: Prof. Raymond Rosa Ávila.</p>';
  else c.innerHTML='<table>'+
   '<tr><td><b>Dibujar barras</b></td><td>Clic en cada nudo; clic derecho o Esc termina la cadena.</td></tr>'+
   '<tr><td><b>Muro</b></td><td>Dos clics en planta; se levanta desde el nivel actual.</td></tr>'+
   '<tr><td><b>Muro poli</b></td><td>Clic en cada vértice de la planta; clic derecho, Esc o doble clic termina. Vuelve al primer vértice para cerrarlo. En el panel puedes dar una altura distinta a cada vértice (pared a dos aguas).</td></tr>'+
   '<tr><td><b>Losa / carga</b></td><td>Polígono en planta; se cierra con clic derecho, Esc o doble clic. Cambia el <b>Nivel</b> entre clics para crear una losa inclinada (rampa, escalera, techo a un agua).</td></tr>'+
   '<tr><td><b>Apoyos</b></td><td><b>Fijo</b> (empotra los 6 grados de libertad), <b>Artic.</b> (restringe traslaciones y deja libres los giros) y <b>Rodillo</b> (restringe Uz): elige el tipo y haz clic en cada nudo. <b>Libre</b> quita el apoyo. El panel del nudo permite ajustar grado por grado.</td></tr>'+
-  '<tr><td><b>Cota</b></td><td>Dos clics: inicio y fin. «Orto» la mantiene horizontal o vertical; «Cota diag.» la alinea entre los dos puntos para medir diagonales. En el panel ves Δx, Δy, ángulo y longitud, y ajustas la separación y el texto.</td></tr>'+
+  '<tr><td><b>Cota</b></td><td>Dos clics: inicio y fin. «Orto» (F8) la mantiene horizontal o vertical; «Polar» la pega a 45°, 30°/60° o 15°; «Cota diag.» la alinea entre los dos puntos para medir diagonales. En el panel ves Δx, Δy, ángulo y longitud, y ajustas la separación y el texto.</td></tr>'+
+  '<tr><td><b>Escuadra</b></td><td><b>Orto</b> (F8), seguimiento <b>Polar</b> (F10), <b>Shift</b> para Orto temporal y snaps <b>FIN</b>/<b>⊥</b>. Se aplica a guías y cotas; las cotas diagonales y los snaps de nudo tienen prioridad.</td></tr>'+
+  '<tr><td><b>Idioma</b></td><td>El selector <b>Idioma</b> de la barra cambia entre español (predeterminado) e inglés. La preferencia se guarda en el navegador; la guía rápida y los formularios se muestran en el idioma elegido.</td></tr>'+
+  '<tr><td><b>Guía rápida</b></td><td>El botón <b>Guía</b> abre una guía de 8 pasos con los atajos básicos, en español o inglés.</td></tr>'+
   '<tr><td><b>Guía / Texto</b></td><td>La guía marca ejes o líneas de referencia y, mientras la dibujas, muestra la medida de cada tramo y el total acumulado. Al acercarte a una barra, muro, borde de losa, cota o guía aparece el pinzamiento perpendicular <b>⊥</b> (el pie de la perpendicular desde el último punto). El texto rotula la planta (por ejemplo «P1», «Muro cortina»).</td></tr>'+
   '<tr><td><b>Sismo de escenario</b></td><td>En «Sismo…» elige «Espectro de evento sísmico». La lista incluye espectros 5% de USGS ShakeMap (Venezuela 2026, Turquía 2023, Noto 2024, Kaikoura 2016, Tohoku 2011, Maule 2010, Wenchuan 2008) en el punto de mayor PGA. Puedes escalar a un PGA objetivo o importar tu propio espectro (CSV/JSON: T, Sa en g). Es un escenario modelado, no un registro instrumental, y no ajusta por Vs30.</td></tr>'+
   '<tr><td><b>Contornos sísmicos</b></td><td>Después del sismo, pulsa el botón <b>Sismo</b> de Resultados (o «Ver contornos sísmicos» en el informe) y elige σ en muros, q/Mx/My en la matre, q en zapatas, Mx/My en losas o σ1/σ2 de membrana. Muros, zapatas y matres usan la envolvente D+E; en muros, σ es positivo en tracción y negativo en compresión. Las losas usan su rigidez de diafragma y los contornos σ1/σ2 muestran las tensiones principales de membrana.</td></tr>'+
@@ -1845,7 +1977,7 @@ function verAyuda(t){
   '<tr><td><b>Resultados</b></td><td>Lista «Resultados» de la barra: modelo, deformada, contornos y diagramas.</td></tr>'+
   '<tr><td><b>Reporte</b></td><td>«📄 Reporte» abre la memoria; «⬇» la descarga como archivo.</td></tr>'+
   '<tr><td><b>Pantalla</b></td><td>Automático, Computadora, Tableta o Celular.</td></tr></table>';
- if($('hmt'))$('hmt').textContent=(t=='acerca'?'Acerca de ZAPEL 3D':'Atajos y consejos');
+ if($('hmt'))$('hmt').textContent=(t=='acerca'?'Acerca de Zapel773DWall':'Atajos y consejos');
  if($('hm'))$('hm').style.display='flex'}
 function esMov(){try{const d=document.documentElement;return !!(d&&d.dataset&&d.dataset.dev==='mov')}catch(e){return false}}
 function setDev(m){
@@ -1857,6 +1989,7 @@ function setDev(m){
 try{const g=localStorage.getItem('zapel-dev');setDev(g||'auto')}catch(e){setDev('auto')}
 if($('devsel'))$('devsel').onchange=()=>setDev($('devsel').value);
 if($('b_help'))$('b_help').onclick=()=>verAyuda('atajos');
+if($('b_guide'))$('b_guide').onclick=abreGuia;
 if($('b_rep3'))$('b_rep3').onclick=()=>reportePDF(true);
 if($('hmx'))$('hmx').onclick=()=>{$('hm').style.display='none'};
 
@@ -2194,29 +2327,31 @@ function reportePDF(soloDescarga){
   '.noprint{position:fixed;right:16px;bottom:16px;padding:12px 18px;font:600 15px system-ui,sans-serif;background:#1f3864;color:#fff;border:0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.3);cursor:pointer}'+
   '@media print{.noprint{display:none}}'+
   '@media(max-width:700px){body{font-size:11pt;padding:0 2mm}h1{font-size:15pt}table{font-size:8.5pt;table-layout:fixed;word-wrap:break-word}th,td{padding:.6mm .8mm}.portada{padding:5mm}.fig img{width:100%}}';
- let h='<!doctype html><html lang="es"><head><meta charset="utf-8">'
+ let h='<!doctype html><html lang="'+(LANG==='en'?'en':'es')+'"><head><meta charset="utf-8">'
   +'<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">'
-  +'<title>ZAPEL 3D · Memoria de cálculo</title><style>'+css+'</style></head><body>';
- h+='<div class="portada"><div class="t">ZAPEL 3D</div><div class="s">Memoria de cálculo estructural</div>'
-  +'<div class="d"><b style="all:unset;font-weight:600">Proyecto:</b> '+(proj?proj.replace(/[<>&]/g,''):'Sin título')+'<br>'
-  +'<b style="all:unset;font-weight:600">Fecha:</b> '+hoy+'<br>'
-  +'<b style="all:unset;font-weight:600">Unidades:</b> '+(cu=='SI'?'kN · m (SI)':'kip · ft (Imperial)')+'<br>'
-  +'<b style="all:unset;font-weight:600">Contenido:</b> '+inv+'</div></div>';
+  +'<title>Zapel773DWall · '+(LANG==='en'?'Calculation report':'Memoria de cálculo')+'</title><style>'+css+'</style></head><body>';
+ h+='<div class="portada"><div class="t">Zapel773DWall</div><div class="s">'+(LANG==='en'?'Structural calculation report':'Memoria de cálculo estructural')+'</div>'
+  +'<div class="d"><b style="all:unset;font-weight:600">'+(LANG==='en'?'Project:':'Proyecto:')+'</b> '+(proj?proj.replace(/[<>&]/g,''):(LANG==='en'?'Untitled':'Sin título'))+'<br>'
+  +'<b style="all:unset;font-weight:600">'+(LANG==='en'?'Date:':'Fecha:')+'</b> '+hoy+'<br>'
+  +'<b style="all:unset;font-weight:600">'+(LANG==='en'?'Units:':'Unidades:')+'</b> '+(cu=='SI'?'kN · m (SI)':'kip · ft (Imperial)')+'<br>'
+  +'<b style="all:unset;font-weight:600">'+(LANG==='en'?'Contents:':'Contenido:')+'</b> '+inv+'</div></div>';
  if(portada)h+=portada;
- h+='<h2>1. Datos del modelo</h2>'+tablaModelo();
- h+='<h2>2. Resultados del análisis</h2>'+$('out').innerHTML;
+ h+='<h2>1. '+(LANG==='en'?'Model data':'Datos del modelo')+'</h2>'+tablaModelo();
+ h+='<h2>2. '+(LANG==='en'?'Analysis results':'Resultados del análisis')+'</h2>'+$('out').innerHTML;
  const sism=tablaSismo();
- if(sism)h+='<h2>3. Análisis sísmico</h2>'+sism;
- if(figs.length)h+='<h2>'+(sism?'4':'3')+'. Figuras</h2>'+figs.join('');
- h+='<h2>'+(sism?'5':'4')+'. Hipótesis y notas</h2><div style="font-size:8.5pt">';
- h+='<p>El cálculo es lineal elástico, con pequeños desplazamientos y seis grados de libertad por nudo.</p>';
- h+='<p>Los muros se modelan como columna equivalente de sección t×L unida a sus esquinas con brazos rígidos; su peso propio baja axialmente hasta la fundación. Los muros poligonales se dividen en tramos rectos que comparten vértices; la altura puede variar en cada vértice (perfil de la pared).</p>';
- h+='<p>Las losas reparten su peso y las cargas de área por áreas tributarias entre las vigas que yacen en su plano, y no aportan rigidez en su plano. Pueden tener vértices a distinto nivel (losas inclinadas o rampas). El campo Mx/My es un análisis local de placa en el plano de la losa, con la losa apoyada en sus vigas, y requiere planta rectangular y coplanar.</p>';
- h+='<p>Las cotas, guías y textos son anotaciones de dibujo: se guardan con el modelo y se incluyen en la memoria, pero no intervienen en el cálculo.</p>';
- h+='<p>Las matres se resuelven en dos etapas: reacciones del pórtico con apoyo rígido y luego grilla equivalente sobre resortes de balasto.</p>';
- h+='<p>El sismo se calcula con fuerza lateral equivalente y, opcionalmente, con análisis modal espectral y combinación CQC; en ambos casos se aplica la torsión accidental mínima reglamentaria.</p>';
+ if(sism)h+='<h2>3. '+(LANG==='en'?'Seismic analysis':'Análisis sísmico')+'</h2>'+sism;
+ if(figs.length)h+='<h2>'+(sism?'4':'3')+'. '+(LANG==='en'?'Figures':'Figuras')+'</h2>'+figs.join('');
+ h+='<h2>'+(sism?'5':'4')+'. '+(LANG==='en'?'Assumptions and notes':'Hipótesis y notas')+'</h2><div style="font-size:8.5pt">';
+ const note=(es,en)=>'<p>'+(LANG==='en'?en:es)+'</p>';
+ h+=note('El cálculo es lineal elástico, con pequeños desplazamientos y seis grados de libertad por nudo.','The analysis is linear elastic, with small displacements and six degrees of freedom per node.');
+ h+=note('Los muros se modelan como columna equivalente de sección t×L unida a sus esquinas con brazos rígidos; su peso propio baja axialmente hasta la fundación. Los muros poligonales se dividen en tramos rectos que comparten vértices; la altura puede variar en cada vértice (perfil de la pared).','Walls are modeled as an equivalent column of section t×L connected to their corners by rigid arms; self-weight travels axially to the foundation. Polygonal walls are divided into straight segments sharing vertices; height may vary at each vertex (wall profile).');
+ h+=note('Las losas reparten su peso y las cargas de área por áreas tributarias entre las vigas que yacen en su plano, y aportan rigidez de membrana en su plano cuando al menos tres vértices coinciden con nudos de la estructura; el panel de la losa permite desactivar ese diafragma. Pueden tener vértices a distinto nivel (losas inclinadas o rampas). El campo Mx/My es un análisis local de placa en el plano de la losa, con la losa apoyada en sus vigas, y requiere planta rectangular y coplanar; es independiente de la membrana.','Slabs distribute their self-weight and area loads by tributary areas to beams lying in their plane. They also contribute in-plane membrane stiffness when at least three vertices coincide with structural nodes; the slab panel allows disabling the diaphragm. Slabs may have vertices at different levels (sloped slabs or ramps). The local Mx/My field is a plate analysis in the slab plane, with the slab supported on its beams, and requires a rectangular coplanar plan; it is independent of the membrane.');
+ h+=note('Las cotas, guías y textos son anotaciones de dibujo: se guardan con el modelo y se incluyen en la memoria, pero no intervienen en el cálculo.','Dimensions, guides and texts are drafting annotations: they are saved with the model and included in the report, but do not participate in the analysis.');
+ h+=note('La membrana de losa es un elemento triangular de deformación constante, lineal elástico, sin aberturas ni acoplamiento con la flexión fuera del plano; sus resultados son tensiones principales σ1/σ2 para revisión del diafragma.','The slab membrane is a constant-strain triangular element, linear elastic, without openings or coupling to out-of-plane bending; its results are principal stresses σ1/σ2 for diaphragm review.');
+ h+=note('Las matres se resuelven en dos etapas: reacciones del pórtico con apoyo rígido y luego grilla equivalente sobre resortes de balasto.','Mats are solved in two stages: frame reactions with a rigid support, then an equivalent grid on Winkler springs.');
+ h+=note('El sismo se calcula con fuerza lateral equivalente y, opcionalmente, con análisis modal espectral y combinación CQC; en ambos casos se aplica la torsión accidental mínima reglamentaria.','Seismic action is computed with equivalent lateral force and, optionally, modal response spectrum with CQC combination; both apply the minimum code accidental torsion.');
  h+='</div>';
- h+='<div class="pie">Generado por ZAPEL 3D (Etapa 7). Para guardar en PDF use «Guardar como PDF» en el diálogo de impresión.</div>';
+ h+='<div class="pie">Generado por Zapel773DWall (Etapa 7). Para guardar en PDF use «Guardar como PDF» en el diálogo de impresión.</div>';
  h+='<button class="noprint" onclick="window.print()">Imprimir / Guardar PDF</button>';
  h+='</body></html>';
  if(soloDescarga||esTactil()){descargaReporte(h);return}
@@ -2228,7 +2363,7 @@ function reportePDF(soloDescarga){
   let listo=true;try{const ims=w.document.images;for(let i=0;i<ims.length;i++)if(!ims[i].complete)listo=false}catch(e){listo=true}
   if(listo||k>40){clearInterval(tid);w.focus();w.print()}},150)}
 
-function saveModel(){const d={app:'zapel-3d',v:5,units:cu,N,B,MUROS,LOSAS,CARGAS,ZAPATAS,PLATEAS,ANOT},blob=new Blob([JSON.stringify(d,null,1)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='zapel-3d-modelo.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function saveModel(){const d={app:'zapel-3d',v:5,units:cu,N,B,MUROS,LOSAS,CARGAS,ZAPATAS,PLATEAS,ANOT},blob=new Blob([JSON.stringify(d,null,1)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Zapel773DWall-modelo.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 function parseModel(d){
  if(!d||d.app!='zapel-3d'||!Array.isArray(d.N)||!Array.isArray(d.B))throw 0;
  const a6=v=>Array.from({length:6},(_,k)=>+(v&&v[k])||0),n=d.N.map(q=>({x:+q.x||0,y:+q.y||0,z:+q.z||0,r:a6(q.r),f:a6(q.f)})),b=d.B.map(q=>({...D,...q})).filter(q=>n[q.i]&&n[q.j]);
@@ -2247,7 +2382,7 @@ function openModel(f){const rd=new FileReader();rd.onload=()=>{try{
  cu=m.units;$('un').value=cu;$('gs').value=cu=='SI'?.5:1;$('lv').value=0;
  document.querySelectorAll('[data-u]').forEach(s=>s.textContent=UL(s.dataset.u));syncDef();
  load(m.n,m.b,m.mw,m.ls,m.cs,m.zp,m.pt,m.an);if(m.b.length||m.mw.length)run()}
- catch(e){$('out').innerHTML='<span class="er">El archivo no es un modelo válido de ZAPEL 3D.</span>'}};rd.readAsText(f)}
+ catch(e){$('out').innerHTML='<span class="er">El archivo no es un modelo válido de Zapel773DWall.</span>'}};rd.readAsText(f)}
 $('b_sismo').onclick=abreSismo;$('b_rep').onclick=reportePDF;$('b_save').onclick=saveModel;$('b_open').onclick=()=>$('fo').click();$('fo').onchange=e=>{const f=e.target.files[0];if(f)openModel(f);e.target.value=''};
 $('un').onchange=()=>{cu=$('un').value;$('gs').value=cu=='SI'?.5:1;$('lv').value=0;document.querySelectorAll('[data-u]').forEach(s=>s.textContent=UL(s.dataset.u));syncDef();form();if(res){const m=mode;run();setM(m)}else draw()};
 $('b_ex4').onclick=()=>{
@@ -2256,7 +2391,7 @@ $('b_ex4').onclick=()=>{
  const bs=[];for(let i=0;i<4;i++){bs.push(bk(i,i+4,{b:.3,h:.3}));bs.push(bk(i+4,i+8,{b:.3,h:.3}))}
  [[4,5],[5,6],[6,7],[7,4],[8,9],[9,10],[10,11],[11,8]].forEach(q=>bs.push(bk(q[0],q[1],{b:.25,h:.5})));
  const EC=+(4.7*Math.sqrt(28)).toPrecision(5),wg=z=>({z,pts:[[0,0],[6,0],[6,4],[0,4]],t:.2,mat:'H',fc:28,E:EC,gw:24});
- const W=(q,fx)=>({n:q,t:.15,mat:'H',fc:28,E:EC,gw:24,rig:1,fix:fx});
+ const W=(q,fx)=>({n:q,t:5*IN,mat:'H',fc:28,E:EC,gw:24,rig:1,fix:fx});
  load(ns,bs,[W([0,1,5,4],1),W([4,5,9,8],0),W([3,2,6,7],1),W([7,6,10,11],0),W([0,3,7,4],1),W([4,7,11,8],0),W([1,2,6,5],1),W([5,6,10,9],0)],
   [wg(3),wg(6)],[{z:6,pts:[[0,0],[6,0],[6,4],[0,4]],q:2}]);
  [8,9,10,11].forEach(i=>{N[i].f[0]=5});run()};
@@ -2291,11 +2426,11 @@ cv.onpointerdown=e=>{const r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e
   wchain.push(ni);sel={t:'w',i:k};form();draw();return}
  if(tool=='cot'){const p0=snap(px,py);if(!p0)return;const z=(SNAP&&SNAP.type=='end'&&p0[2]!=null)?p0[2]:(+$('lv').value||0)/UF('L'),p=[p0[0],p0[1],z];
   const diag=cdiag||(SNAP&&SNAP.type=='end');
-  let q=dimA?(diag?p:ortoPt(dimA,p)):p;
+  let q=dimA?(diag?p:constrainPt(dimA,p)):p;
   if(!dimA){dimA=q;draw();return}
   if(Math.hypot(q[0]-dimA[0],q[1]-dimA[1])<1e-9)return;
   ANOT.push({t:'dim',a:dimA.slice(),b:q.slice(),off:.6,txt:''});sel={t:'a',i:ANOT.length-1};dimA=null;form();draw();return}
- if(tool=='lin'){const p0=snap(px,py);if(!p0)return;const z=(SNAP&&(SNAP.type=='end'||SNAP.type=='perp')&&p0[2]!=null)?p0[2]:(+$('lv').value||0)/UF('L');if(!aline)aline=[];if(aline.length){const q=aline[aline.length-1];if(Math.hypot(p0[0]-q[0],p0[1]-q[1])<1e-9){draw();return}}aline.push([p0[0],p0[1],z]);draw();return}
+ if(tool=='lin'){let p0=snap(px,py);if(!p0)return;const z=(SNAP&&(SNAP.type=='end'||SNAP.type=='perp')&&p0[2]!=null)?p0[2]:(+$('lv').value||0)/UF('L');if(!aline)aline=[];if(aline.length){const q=aline[aline.length-1];if(!(SNAP&&(SNAP.type=='end'||SNAP.type=='perp')))p0=constrainPt(q,p0);if(Math.hypot(p0[0]-q[0],p0[1]-q[1])<1e-9){draw();return}}aline.push([p0[0],p0[1],p0[2]!=null?p0[2]:z]);draw();return}
  if(tool=='txt'){const p0=snap(px,py);if(!p0)return;const z=(SNAP&&SNAP.type=='end'&&p0[2]!=null)?p0[2]:(+$('lv').value||0)/UF('L');ANOT.push({t:'txt',p:[p0[0],p0[1],z],s:'Texto'});sel={t:'a',i:ANOT.length-1};form();draw();
   const ti=$('aTxt');if(ti){ti.focus();ti.select()}return}
  if(tool=='slb'||tool=='are'||tool=='pla'){const p=snap(px,py);if(!p)return;const lv=(+$('lv').value||0)/UF('L');
@@ -2325,17 +2460,25 @@ cv.onpointerdown=e=>{const r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e
  form();draw()};
 cv.onpointermove=e=>{const r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top;ms={p:snap(px,py)};
  if(ms.p&&(tool=='cot'||tool=='lin'||tool=='txt')&&!(SNAP&&(SNAP.type=='end'||SNAP.type=='perp')))ms.p=[ms.p[0],ms.p[1],(+$('lv').value||0)/UF('L')];
- if(dimA&&ms.p&&!cdiag&&!(SNAP&&SNAP.type=='end'))ms.p=ortoPt(dimA,ms.p);if(PT.has(e.pointerId))PT.set(e.pointerId,[px,py]);if(PT.size==2){pinchMove();return}
+ if(dimA&&ms.p&&!cdiag&&!(SNAP&&SNAP.type=='end'))ms.p=constrainPt(dimA,ms.p);
+ if(tool=='lin'&&aline&&aline.length&&ms.p&&!(SNAP&&(SNAP.type=='end'||SNAP.type=='perp')))ms.p=constrainPt(aline[aline.length-1],ms.p);if(PT.has(e.pointerId))PT.set(e.pointerId,[px,py]);if(PT.size==2){pinchMove();return}
  if(drag){drag.mv+=Math.abs(px-drag.x)+Math.abs(py-drag.y)>0?1:0;if(drag.t=='o'){C.a=drag.a+(px-drag.x)*.01;C.p=Math.max(0,Math.min(Math.PI/2,drag.p+(py-drag.y)*.01))}else{C.ox=drag.ox+px-drag.x;C.oy=drag.oy+py-drag.y}}draw()};
 cv.onpointerup=cv.onpointercancel=e=>{PT.delete(e.pointerId);pin=null;if(drag&&drag.mv<3&&tool=='bar')chain=null;drag=null;draw()};cv.onpointerleave=()=>{SNAP=null;draw()};cv.oncontextmenu=e=>e.preventDefault();cv.ondblclick=()=>{if(poly)cerrarPoly();else if(aline)cerrarGuia();else if(wchain)cerrarMuroPoli()};
 cv.onwheel=e=>{e.preventDefault();const r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top,k=e.deltaY<0?1.15:1/1.15;C.ox=px-(px-C.ox)*k;C.oy=py-(py-C.oy)*k;C.S*=k;draw()};
 addEventListener('keydown',e=>{if(e.target.tagName=='INPUT'||e.target.tagName=='SELECT')return;
+ if(e.key=='Shift'){shiftDown=true;draw();return}
+ if(e.key=='F8'){e.preventDefault();ortho=!ortho;if(ortho){polar=0;const q=$('pol');if(q)q.value='0'}const o=$('ort');if(o)o.checked=ortho;draw();return}
+ if(e.key=='F10'){e.preventDefault();polar=polar?0:45;if(polar>0){ortho=false;const o=$('ort');if(o)o.checked=false}const p=$('pol');if(p)p.value=String(polar);draw();return}
  if(e.key=='Escape'){if(poly)cerrarPoly();else if(aline)cerrarGuia();else if(wchain)cerrarMuroPoli();else{dimA=null;chain=null;draw()}}
  if(e.key=='Delete'||e.key=='Backspace')del()});
+addEventListener('keyup',e=>{if(e.key=='Shift'){shiftDown=false;draw()}});
 $('b_ex3').onclick=()=>{const q=PRE[7];load([mk(0,0,0,[1,1,1,1,0,0]),mk(6,0,0,[0,1,1,1,0,0])],[bk(0,1,{ty:'I',d:q[1],bf:q[2],tf:q[3],tw:q[4],mat:'A',E:200,wa:20,wb:20,div:6})])};
 $('wt').onchange=()=>{const v=+$('wt').value/UF('s');if(v>0)DEF.wt=v};
 $('wh').onchange=()=>{const v=+$('wh').value/UF('L');if(v>0)DEF.wh=v};
 $('sth').onchange=()=>{const v=+$('sth').value/UF('s');if(v>0)DEF.st=v};
 $('aq').onchange=()=>{const v=+$('aq').value/UF('p');if(isFinite(v))DEF.aq=v};
 addEventListener('resize',draw);$('un').value=cu;$('gs').value=1;document.querySelectorAll('[data-u]').forEach(s=>s.textContent=UL(s.dataset.u));$('b_ex4').click();setM('model');syncDef();
+if($('lang'))$('lang').onchange=()=>setLang($('lang').value);
+try{const lg=localStorage.getItem('zapel-lang');if(lg==='en'){LANG='en';if($('lang'))$('lang').value='en'}}catch(e){}
+if(LANG==='en')setLang('en');else applyLang(document.body);
 </script></body></html>
