@@ -571,7 +571,11 @@ function slabMembMesh(nd,sl,si){
    El cálculo se hace en el plano de la losa, así que vale también para losas inclinadas. */
 function plateSolve(sl){
  if(!sl||!sl.pts)return null;const F=slabFrame(sl);if(!F)return null;
- const R0=esRect(F.pts2);if(!R0)return null;
+ let R0=esRect(F.pts2),generic=false;
+ if(!R0){
+  const xs=F.pts2.map(p=>p[0]),ys=F.pts2.map(p=>p[1]),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
+  if(!(x1-x0>1e-6&&y1-y0>1e-6))return null;
+  R0={a:x1-x0,b:y1-y0,ex:[1,0],ey:[0,1],p0:[x0,y0]};generic=true}
  const t=+sl.t||.2,E=(+sl.E||25)*1e6,D=E*t**3/(12*(1-NU*NU));
  const h0=Math.max(R0.a,R0.b)/22,nu=Math.max(4,Math.round(R0.a/h0)),nv=Math.max(4,Math.round(R0.b/h0));
  const hu=R0.a/nu,hv=R0.b/nv,nx=nu-1,ny=nv-1,n=nx*ny;
@@ -584,6 +588,7 @@ function plateSolve(sl){
   let qq=(+sl.gw||0)*t;
   CP.forEach(({c,cz})=>{const zc=cz?cz.a+cz.b*P3[0]+cz.c*P3[1]:+c.z;
    if(Math.abs(zc-P3[2])<.06&&inPoly(c.pts,P3[0],P3[1]))qq+=+c.q});
+  if(generic&&!inP2(F.pts2,X,Y))qq=0;
   q[j*nx+i]=qq/D}
  const A=Array.from({length:n},()=>new Float64Array(n));
  const c0=6/hu**4+6/hv**4+8/(hu*hu*hv*hv),c1=-4/hu**4-4/(hu*hu*hv*hv),c2=-4/hv**4-4/(hu*hu*hv*hv),
@@ -1482,23 +1487,28 @@ function draw(){
    LOSAS.forEach((sl,si)=>{const p2=placas()[si];if(!p2)return;
     const src=mode=='sMx'?p2.Mx:p2.My,F=kvs===1?src:src.map(row=>row.map(v=>v*kvs)),
      {p0,ex,ey,a,b}=p2.R,map=p2.map;
-    const P4=[map(p0[0],p0[1]),map(p0[0]+ex[0]*a,p0[1]+ex[1]*a),
-     map(p0[0]+ex[0]*a+ey[0]*b,p0[1]+ex[1]*a+ey[1]*b),map(p0[0]+ey[0]*b,p0[1]+ey[1]*b)];
-    ls.push({q4:P4,nu:p2.nu,nv:p2.nv,F})});
+     const P4=[map(p0[0],p0[1]),map(p0[0]+ex[0]*a,p0[1]+ex[1]*a),
+      map(p0[0]+ex[0]*a+ey[0]*b,p0[1]+ex[1]*a+ey[1]*b),map(p0[0]+ey[0]*b,p0[1]+ey[1]*b)];
+     const Z=slabZs(sl),clip=(sl.pts||[]).map((p,k)=>proj(p[0],p[1],Z[k]));
+     ls.push({q4:P4,nu:p2.nu,nv:p2.nv,F,clip})});
    if(ls.length)grupos.push({tit:(mode=='sMx'?'Mx':'My')+' de la losa',uni:UL('FL')+'/'+UL('L'),esc:UF('FL')/UF('L'),items:ls});
   }
+  const gx=g;
   grupos.forEach((g,gi)=>{
    let mn=1e30,mx=-1e30;
    g.items.forEach(it=>it.F.forEach(c=>c.forEach(v=>{if(!isFinite(v))return;if(v<mn)mn=v;if(v>mx)mx=v})));
    if(!(mx>=mn))return;
    const gt=(sisTag()?sisTag()+' · ':'')+g.tit;
    const rg=(mode=='sw')?(()=>{const s=Math.max(Math.abs(mn),Math.abs(mx));return (mn<0&&mx>0)?[-s,s]:[mn,mx]})():[mn,mx];
-   g.items.forEach(it=>pintaCampo(it.q4,it.nu,it.nv,it.F,gt,g.uni,g.esc,rg));
+   g.items.forEach(it=>{
+    if(it.clip&&it.clip.length>=3){gx.save();gx.beginPath();it.clip.forEach((p,i)=>i?gx.lineTo(p[0],p[1]):gx.moveTo(p[0],p[1]));gx.closePath();gx.clip()}
+    pintaCampo(it.q4,it.nu,it.nv,it.F,gt,g.uni,g.esc,rg);
+    if(it.clip&&it.clip.length>=3)gx.restore()});
    leyendaV(gt,g.uni,rg[0]*g.esc,rg[1]*g.esc,gi)});
   }
   if(res&&(mode=='sMx'||mode=='sMy')&&LOSAS.length){
    const nc=placas().filter(Boolean).length;
-   if(nc<LOSAS.length){g.fillStyle=mt;g.fillText((LOSAS.length-nc)+' losa(s) sin Mx/My: se requiere losa rectangular, plana y con 4 vértices.',10,16)}};
+   if(nc<LOSAS.length){g.fillStyle=mt;g.fillText((LOSAS.length-nc)+' losa(s) sin Mx/My: revisa que el polígono sea plano y no degenerado.',10,16)}};
  drawAnot(Cc);drawGuiaDims(Cc);
  if(SNAP&&ms&&ms.p&&tool!='sel'&&(SNAP.type=='end'||SNAP.type=='perp')){
   const s=proj(SNAP.p[0],SNAP.p[1],SNAP.p[2]),perp=SNAP.type=='perp';
@@ -1969,6 +1979,7 @@ function verAyuda(t){
   '<tr><td><b>Sismo de escenario</b></td><td>En «Sismo…» elige «Espectro de evento sísmico». La lista incluye espectros 5% de USGS ShakeMap (Venezuela 2026, Turquía 2023, Noto 2024, Kaikoura 2016, Tohoku 2011, Maule 2010, Wenchuan 2008) en el punto de mayor PGA. Puedes escalar a un PGA objetivo o importar tu propio espectro (CSV/JSON: T, Sa en g). Es un escenario modelado, no un registro instrumental, y no ajusta por Vs30.</td></tr>'+
   '<tr><td><b>Contornos sísmicos</b></td><td>Después del sismo, pulsa el botón <b>Sismo</b> de Resultados (o «Ver contornos sísmicos» en el informe) y elige σ en muros, q/Mx/My en la matre, q en zapatas, Mx/My en losas o σ1/σ2 de membrana. Muros, zapatas y matres usan la envolvente D+E; en muros, σ es positivo en tracción y negativo en compresión. Las losas usan su rigidez de diafragma y los contornos σ1/σ2 muestran las tensiones principales de membrana.</td></tr>'+
   '<tr><td><b>Diafragma de losas</b></td><td>En el panel de la losa, «Aporta rigidez de diafragma» activa los elementos de membrana en el plano. Requiere al menos 3 vértices conectados a nudos de la estructura; si se desactiva, la losa solo reparte cargas como antes. Los contornos σ1/σ2 están en «Resultados».</td></tr>'+
+  '<tr><td><b>Mx/My en losas</b></td><td>Cada losa tiene su propio campo Mx/My. Si la losa no es rectangular, se calcula en su rectángulo envolvente y el contorno se recorta al polígono real; es una aproximación para revisión, no un análisis de placa con la forma exacta.</td></tr>'+
   '<tr><td><b>Progreso</b></td><td>Al calcular aparece una barra de actividad continua con la fase y el tiempo transcurrido; no cierres la ventana hasta que termine.</td></tr>'+
   '<tr><td><b>Modelos grandes</b></td><td>El cálculo estructural corre en el hilo del navegador. Si el navegador muestra «La página no responde», elige <b>Esperar</b>: el cálculo continúa. En Windows puedes abrir Edge/Chrome con el parámetro <b>--disable-hang-monitor</b> para desactivar ese aviso. Para edificios muy grandes conviene usar fuerza lateral equivalente o reducir el número de modos.</td></tr>'+
   '<tr><td><b>Pinzamiento FIN</b></td><td>Con cualquier herramienta, al acercarte a un nudo, vértice de losa/carga o extremo de cota/guía aparece un cuadro «FIN». Al hacer clic engancha ese punto exacto, aunque esté en diagonal (tiene prioridad sobre «Orto»).</td></tr>'+
@@ -2349,7 +2360,7 @@ function reportePDF(soloDescarga){
  const note=(es,en)=>'<p>'+(LANG==='en'?en:es)+'</p>';
  h+=note('El cálculo es lineal elástico, con pequeños desplazamientos y seis grados de libertad por nudo.','The analysis is linear elastic, with small displacements and six degrees of freedom per node.');
  h+=note('Los muros se modelan como columna equivalente de sección t×L unida a sus esquinas con brazos rígidos; su peso propio baja axialmente hasta la fundación. Los muros poligonales se dividen en tramos rectos que comparten vértices; la altura puede variar en cada vértice (perfil de la pared).','Walls are modeled as an equivalent column of section t×L connected to their corners by rigid arms; self-weight travels axially to the foundation. Polygonal walls are divided into straight segments sharing vertices; height may vary at each vertex (wall profile).');
- h+=note('Las losas reparten su peso y las cargas de área por áreas tributarias entre las vigas que yacen en su plano, y aportan rigidez de membrana en su plano cuando al menos tres vértices coinciden con nudos de la estructura; el panel de la losa permite desactivar ese diafragma. Pueden tener vértices a distinto nivel (losas inclinadas o rampas). El campo Mx/My es un análisis local de placa en el plano de la losa, con la losa apoyada en sus vigas, y requiere planta rectangular y coplanar; es independiente de la membrana.','Slabs distribute their self-weight and area loads by tributary areas to beams lying in their plane. They also contribute in-plane membrane stiffness when at least three vertices coincide with structural nodes; the slab panel allows disabling the diaphragm. Slabs may have vertices at different levels (sloped slabs or ramps). The local Mx/My field is a plate analysis in the slab plane, with the slab supported on its beams, and requires a rectangular coplanar plan; it is independent of the membrane.');
+ h+=note('Las losas reparten su peso y las cargas de área por áreas tributarias entre las vigas que yacen en su plano, y aportan rigidez de membrana en su plano cuando al menos tres vértices coinciden con nudos de la estructura; el panel de la losa permite desactivar ese diafragma. Pueden tener vértices a distinto nivel (losas inclinadas o rampas). El campo Mx/My es un análisis local de placa en el plano de la losa, con la losa apoyada en sus vigas. Para losas no rectangulares se usa el rectángulo envolvente y el contorno se recorta al polígono real, como aproximación; es independiente de la membrana.','Slabs distribute their self-weight and area loads by tributary areas to beams lying in their plane. They also contribute in-plane membrane stiffness when at least three vertices coincide with structural nodes; the slab panel allows disabling the diaphragm. Slabs may have vertices at different levels (sloped slabs or ramps). The local Mx/My field is a plate analysis in the slab plane, with the slab supported on its beams. For non-rectangular slabs the bounding rectangle is used and the contour is clipped to the actual polygon, as an approximation; it is independent of the membrane.');
  h+=note('Las cotas, guías y textos son anotaciones de dibujo: se guardan con el modelo y se incluyen en la memoria, pero no intervienen en el cálculo.','Dimensions, guides and texts are drafting annotations: they are saved with the model and included in the report, but do not participate in the analysis.');
  h+=note('La membrana de losa es un elemento triangular de deformación constante, lineal elástico, sin aberturas ni acoplamiento con la flexión fuera del plano; sus resultados son tensiones principales σ1/σ2 para revisión del diafragma.','The slab membrane is a constant-strain triangular element, linear elastic, without openings or coupling to out-of-plane bending; its results are principal stresses σ1/σ2 for diaphragm review.');
  h+=note('Las matres se resuelven en dos etapas: reacciones del pórtico con apoyo rígido y luego grilla equivalente sobre resortes de balasto.','Mats are solved in two stages: frame reactions with a rigid support, then an equivalent grid on Winkler springs.');
