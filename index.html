@@ -327,7 +327,7 @@ let N=[],B=[],MUROS=[],LOSAS=[],CARGAS=[],ZAPATAS=[],PLATEAS=[],ANOT=[],sismoRes
 /* estado de dibujo: muro poligonal, cotas y guías */
 let WGRP=0,wchain=null,widx=[],dimA=null,aline=null,ortho=true,polar=0,shiftDown=false,cdiag=false,SNAP=null;
 /* valores por defecto de los objetos nuevos (siempre en unidades internas: m, kN, kN/m²) */
-const DEF={wt:5*IN,wh:8*.3048,st:.20,aq:2},GAM={H:24,A:78.5,O:24};
+const DEF={wt:5*IN,wh:8*.3048,st:4*IN,aq:2},GAM={H:24,A:78.5,O:24};
 const WEXP={B:{a:7,zg:1200},C:{a:9.5,zg:900},D:{a:11.5,zg:700}};
 let VIENTO={norma:'asce22',evento:'diseno',riesgo:2,exp:'C',V:165,Kzt:1,Kd:.85,Ke:1,G:.85,Cpw:.8,Cpl:-.5,GCpi:.18,techo:true};
 const mk=(x,y,z,r=[0,0,0,0,0,0])=>({x,y,z,r,f:[0,0,0,0,0,0]}),bk=(i,j,o={})=>({...D,i,j,...o});
@@ -592,7 +592,7 @@ function slabMembMesh(nd,sl,si){
  const bidx=[];let match=0;
  for(let k=0;k<sl.pts.length;k++){const p=sl.pts[k];const idx=add(p[0],p[1],Z[k]);bidx.push(idx);if(idx<N.length)match++}
  if(match<3)return {els:[],warn:'Losa '+(si+1)+': el diafragma requiere al menos 3 vértices conectados a nudos de la estructura.'};
- const t=Math.max(.01,+sl.t||.2),E=Math.max(1e5,(+sl.E||25)*1e6),nu=.2,D=E/(1-nu*nu);
+ const t=Math.max(.01,+sl.t||DEF.st),E=Math.max(1e5,(+sl.E||25)*1e6),nu=.2,D=E/(1-nu*nu);
  const Dm=[[D,D*nu,0],[D*nu,D,0],[0,0,D*(1-nu)/2]];
  const els=[];
  tris.forEach(tr=>{
@@ -629,7 +629,7 @@ function plateSolve(sl){
   const xs=F.pts2.map(p=>p[0]),ys=F.pts2.map(p=>p[1]),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
   if(!(x1-x0>1e-6&&y1-y0>1e-6))return null;
   R0={a:x1-x0,b:y1-y0,ex:[1,0],ey:[0,1],p0:[x0,y0]};generic=true}
- const t=+sl.t||.2,E=(+sl.E||25)*1e6,D=E*t**3/(12*(1-NU*NU));
+ const t=+sl.t||DEF.st,E=(+sl.E||25)*1e6,D=E*t**3/(12*(1-NU*NU));
  const h0=Math.max(R0.a,R0.b)/22,nu=Math.max(4,Math.round(R0.a/h0)),nv=Math.max(4,Math.round(R0.b/h0));
  const hu=R0.a/nu,hv=R0.b/nv,nx=nu-1,ny=nv-1,n=nx*ny;
  const q=new Float64Array(n),CP=CARGAS.map(c=>{if(!(c.pts&&c.pts.length>=3))return null;
@@ -1151,7 +1151,7 @@ function informeViento(r){
 function tablaViento(r){return r&&!r.err?'<h3>Viento</h3>'+vientoTablaHTML(r):''}
 
 /* ---------- Matres (losas de fundación) ---------- */
-const DEFPL={H:.6,ks:20000,qa:200,fc:28,fy:420,s:.8};
+const DEFPL={H:8*IN,ks:20000,qa:200,fc:28,fy:420,s:.8};
 let PCC={res:undefined,v:{}};
 function plateaCalc(ip){
  const pl=PLATEAS[ip];if(!pl)return null;
@@ -1162,7 +1162,7 @@ function plateaCalc(ip){
 function plateaCalc0(ip){
  const pl=PLATEAS[ip];if(!pl)return null;
  const R=esRect(pl.pts);if(!R)return {err:'La matre debe ser rectangular.'};
- const {a,b,p0,ex,ey}=R,H=+pl.H||.6,ks=+pl.ks||20000,s=Math.max(+pl.s||.8,.3);
+ const {a,b,p0,ex,ey}=R,H=+pl.H||DEFPL.H,ks=+pl.ks||20000,s=Math.max(+pl.s||.8,.3);
  const cols=[];
  N.forEach((n,i)=>{if(!n.r.some(v=>v))return;
   const dx=n.x-p0[0],dy=n.y-p0[1],u=dx*ex[0]+dy*ex[1],v=dx*ey[0]+dy*ey[1];
@@ -1529,7 +1529,7 @@ function draw(){
   g.strokeStyle=on?ac:'#475569';g.lineWidth=on?2:1;
   pPath(tp);g.stroke();pPath(bt);g.stroke();for(let k=0;k<4;k++){g.beginPath();g.moveTo(tp[k][0],tp[k][1]);g.lineTo(bt[k][0],bt[k][1]);g.stroke()}
   g.fillStyle=on?ac:'#475569';g.fillText('Z'+(i+1),(tp[0][0]+tp[2][0])/2,(tp[0][1]+tp[2][1])/2)});
- PLATEAS.forEach((z,i)=>{const on=sel&&sel.t=='p'&&sel.i==i,Hh=+z.H||.6;
+ PLATEAS.forEach((z,i)=>{const on=sel&&sel.t=='p'&&sel.i==i,Hh=+z.H||DEFPL.H;
   const ps=z.pts.map(p=>proj(p[0],p[1],z.z)),pb=z.pts.map(p=>proj(p[0],p[1],z.z-Hh));
   pPath(pb);g.globalAlpha=.16;g.fillStyle='#475569';g.fill();g.globalAlpha=1;
   g.strokeStyle=on?ac:'#475569';g.lineWidth=on?2:1;pPath(ps);g.stroke();pPath(pb);g.stroke();
@@ -2608,7 +2608,7 @@ $('b_ex4').onclick=()=>{
  ns.slice(0,4).forEach(q=>q.r=[1,1,1,1,1,1]);
  const bs=[];for(let i=0;i<4;i++){bs.push(bk(i,i+4,{b:.3,h:.3}));bs.push(bk(i+4,i+8,{b:.3,h:.3}))}
  [[4,5],[5,6],[6,7],[7,4],[8,9],[9,10],[10,11],[11,8]].forEach(q=>bs.push(bk(q[0],q[1],{b:.25,h:.5})));
- const EC=+(4.7*Math.sqrt(28)).toPrecision(5),wg=z=>({z,pts:[[0,0],[6,0],[6,4],[0,4]],t:.2,mat:'H',fc:28,E:EC,gw:24});
+ const EC=+(4.7*Math.sqrt(28)).toPrecision(5),wg=z=>({z,pts:[[0,0],[6,0],[6,4],[0,4]],t:DEF.st,mat:'H',fc:28,E:EC,gw:24});
  const W=(q,fx)=>({n:q,t:5*IN,mat:'H',fc:28,E:EC,gw:24,rig:1,fix:fx});
  load(ns,bs,[W([0,1,5,4],1),W([4,5,9,8],0),W([3,2,6,7],1),W([7,6,10,11],0),W([0,3,7,4],1),W([4,7,11,8],0),W([1,2,6,5],1),W([5,6,10,9],0)],
   [wg(3),wg(6)],[{z:6,pts:[[0,0],[6,0],[6,4],[0,4]],q:2}]);
