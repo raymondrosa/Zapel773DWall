@@ -130,7 +130,8 @@ button,select,input{touch-action:manipulation}
 <span class="sp"></span>
 <span class="grup"><span class="lb">Ejemplos</span><button type="button" id="b_ex4">Edificio</button><button type="button" id="b_ex">Pórtico</button><button type="button" id="b_ex2">Viga suelo</button><button type="button" id="b_ex3">Viga acero</button></span>
 <span class="sp"></span>
-<span class="grup"><span class="lb">Resultados</span><select id="mdsel"></select><button type="button" id="smC" class="smbtn" disabled title="Ver la envolvente sísmica en los contornos (disponible después del análisis sísmico)">Sismo</button></span>
+<span class="grup"><span class="lb">Resultados</span><select id="mdsel"></select><button type="button" id="smC" class="smbtn" disabled title="Ver la envolvente sísmica en los contornos (disponible después del análisis sísmico)">Sismo</button>
+<button type="button" id="vwC" class="smbtn" disabled title="Ver la envolvente de viento (disponible después del análisis de viento)">Viento</button></span>
 <button type="button" class="go" id="b_run">▶ Calcular</button>
 <button type="button" id="b_rep">📄 Reporte</button>
 <button type="button" id="b_rep3" title="Descargar el reporte como archivo HTML">⬇</button>
@@ -502,8 +503,11 @@ function analyze(){
  E.forEach(e=>{if(e.M.skip)return;const{ax,T,dof,L,Ko,fo,Kc,fc,rel}=e,ul=mul(T,dof.map(d=>[u[d]])).map(x=>x[0]),a=nd[e.i];
   if(rel.length){const idx=[0,1,2,3,4,5,6,7,8,9,10,11].filter(k=>!rel.includes(k)),sl=gauss(rel.map(p=>rel.map(q=>Ko[p][q])),rel.map(p=>fo[p]-idx.reduce((t,k)=>t+Ko[p][k]*ul[k],0)));rel.forEach((p,i)=>ul[p]=sl?sl[i]:0)}
   const Fl=Kc.map((row,i)=>row.reduce((t,v,j)=>t+v*ul[j],0)-fc[i]),I=[0,0,0,0];let pw,pS;
-  for(let m=0;m<=12;m++){const x=m/12,s=L*x,h=L/12,Nn=hm(x,L),v=Nn[0]*ul[1]+Nn[1]*ul[5]+Nn[2]*ul[7]+Nn[3]*ul[11],w=Nn[0]*ul[2]-Nn[1]*ul[4]+Nn[2]*ul[8]-Nn[3]*ul[10],uu=ul[0]*(1-x)+ul[6]*x,
-   d=[0,1,2].map(k=>ax.ex[k]*uu+ax.ey[k]*v+ax.ez[k]*w),Sy=-e.ky*v,Sz=-e.kz*w,wy=e.qya+(e.qyb-e.qya)*x+Sy,wz=e.qza+(e.qzb-e.qza)*x+Sz;dmax=Math.max(dmax,Math.hypot(d[0],d[1],d[2]));
+  for(let m=0;m<=12;m++){const x=m/12,s=L*x,h=L/12,Nn=hm(x,L),v=Nn[0]*ul[1]+Nn[1]*ul[5]+Nn[2]*ul[7]+Nn[3]*ul[11],w=Nn[0]*ul[2]-Nn[1]*ul[4]+Nn[2]*ul[8]-Nn[3]*ul[10],uu=ul[0]*(1-x)+ul[6]*x;
+   let d=[0,1,2].map(k=>ax.ex[k]*uu+ax.ey[k]*v+ax.ez[k]*w);
+   if(m===0)d=[u[6*e.i],u[6*e.i+1],u[6*e.i+2]];
+   else if(m===12)d=[u[6*e.j],u[6*e.j+1],u[6*e.j+2]];
+   const Sy=-e.ky*v,Sz=-e.kz*w,wy=e.qya+(e.qyb-e.qya)*x+Sy,wz=e.qza+(e.qzb-e.qza)*x+Sz;dmax=Math.max(dmax,Math.hypot(d[0],d[1],d[2]));
    if(m){const a1=I[0]+(pw[0]+wy)/2*h,b1=I[2]+(pw[1]+wz)/2*h;I[1]+=(I[0]+a1)/2*h;I[3]+=(I[2]+b1)/2*h;I[0]=a1;I[2]=b1;const sy=(pS[0]+Sy)/2*h,sz=(pS[1]+Sz)/2*h;for(let k=0;k<3;k++)soil[k]+=sy*ax.ey[k]+sz*ax.ez[k]}
    pw=[wy,wz];pS=[Sy,Sz];
    const rec={P:[a.x+ax.ex[0]*s,a.y+ax.ex[1]*s,a.z+ax.ex[2]*s],d,ax,N:-(Fl[0]+e.qxa*s+(e.qxb-e.qxa)*s*s/(2*L)),Vy:Fl[1]+I[0],Vz:Fl[2]+I[2],T:-Fl[3],My:Fl[4]+Fl[2]*s+I[3],Mz:-Fl[5]+Fl[1]*s+I[1],Sy,Sz};
@@ -1479,7 +1483,7 @@ function cerrarMuroPoli(){
  wchain=null;widx=[];SNAP=null;form();setM('model')}
 
 function draw(){
- if(!res&&(resG||resS)){resG=null;resS=null;sisOn=false;updateSisUI()}
+ if(!res&&(resG||resS||resV)){resG=null;resS=null;resV=null;sisOn=false;vieOn=false;updateSisUI();updateVieUI()}
  const w=cv.clientWidth,h=cv.clientHeight;cv.width=w*dpr;cv.height=h*dpr;g.setTransform(dpr,0,0,dpr,0,0);
  const cs=getComputedStyle(document.documentElement),Cc=n=>cs.getPropertyValue(n).trim(),fg=Cc('--fg'),ac=Cc('--ac'),mt=Cc('--mut');g.font='11px system-ui';g.lineWidth=1;
  const [k1,k2,k3]=PLS[$('pl').value],c=(+$('lv').value||0)/UF('L'),st=(+$('gs').value||.5)/UF('L'),xs=N.flatMap(n=>[n.x,n.y,n.z]);let lo=[0,0,0],hi=[10,10,10];
@@ -1560,12 +1564,13 @@ function draw(){
    g.lineWidth=1}
   if(!R){g.strokeStyle=g.fillStyle='#dc2626';[0,1,2].forEach(k=>{const v=n.f[k];if(v){const d=[0,0,0];d[k]=Math.sign(v)*38/C.S;const q=proj(n.x-d[0],n.y-d[1],n.z-d[2]);arrow(q[0],q[1],p[0],p[1])}});
    if(n.f.slice(3).some(v=>v))g.fillText('M'+n.f.slice(3).map(v=>+(v*UF('FL')).toFixed(2)),p[0]+8,p[1]-8)}});
- if(R&&mode=='def'){const k0=50/(res.dmax*C.S)*(+$('df').value||1),k=k0*af;g.strokeStyle='#2563eb';g.lineWidth=2;
-  res.smp.forEach(b=>{if(!b.length)return;g.beginPath();b.forEach((q,i)=>{const p=proj(q.P[0]+q.d[0]*k,q.P[1]+q.d[1]*k,q.P[2]+q.d[2]*k);i?g.lineTo(...p):g.moveTo(...p)});g.stroke();
+  if(R&&mode=='def'){const k0=50/(res.dmax*C.S)*(+$('df').value||1),k=k0*af;g.strokeStyle='#2563eb';g.lineWidth=2;g.lineJoin='round';g.lineCap='round';
+   res.smp.forEach(b=>{if(!b.length)return;g.beginPath();b.forEach((q,i)=>{const p=proj(q.P[0]+q.d[0]*k,q.P[1]+q.d[1]*k,q.P[2]+q.d[2]*k);i?g.lineTo(...p):g.moveTo(...p)});g.stroke();
    let im=0;b.forEach((q,i)=>{if(Math.hypot(...q.d)>Math.hypot(...b[im].d))im=i});const q=b[im],dm=Math.hypot(...q.d);if(dm>1e-12){const p=proj(q.P[0]+q.d[0]*k,q.P[1]+q.d[1]*k,q.P[2]+q.d[2]*k);g.fillStyle='#2563eb';g.beginPath();g.arc(p[0],p[1],3,0,7);g.fill();g.fillStyle=fg;g.fillText((dm*UF('d')).toPrecision(3)+' '+UL('d'),p[0]+6,p[1]+14)}});
    if(res.u){g.strokeStyle='#7c3aed';g.lineWidth=2;g.setLineDash([]);
     MUROS.forEach(w=>{if(!wallGeo(w))return;g.beginPath();w.n.forEach((kk,j)=>{const q=N[kk];if(!q)return;const p=proj(q.x+res.u[6*kk]*k,q.y+res.u[6*kk+1]*k,q.z+res.u[6*kk+2]*k);j?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1])});g.closePath();g.stroke()})}
-  g.fillStyle=mt;g.fillText('Deformada ampliada ×'+k0.toExponential(1)+' · δmax = '+(res.dmax*UF('d')).toPrecision(3)+' '+UL('d'),10,16)}
+   if(res.u){g.fillStyle='#2563eb';N.forEach((n,i)=>{const p=proj(n.x+res.u[6*i]*k,n.y+res.u[6*i+1]*k,n.z+res.u[6*i+2]*k);g.beginPath();g.arc(p[0],p[1],2.2,0,7);g.fill()})}
+   g.fillStyle=mt;g.fillText('Deformada ampliada ×'+k0.toExponential(1)+' · δmax = '+(res.dmax*UF('d')).toPrecision(3)+' '+UL('d'),10,16)}
  if(R&&mode!='def'&&mode!='sw'&&mode!='sMx'&&mode!='sMy'&&mode!='mq'&&mode!='mMx'&&mode!='mMy'&&mode!='zq'&&mode!='sS1'&&mode!='sS2'){const e=res.ext[mode],sg=['My','Mz','Sy','Sz'].includes(mode)?-1:1,col={N:'#9333ea',Vy:'#16a34a',Vz:'#16a34a',T:'#d97706',My:'#dc2626',Mz:'#dc2626',Sy:'#0891b2',Sz:'#0891b2'}[mode],ax=['Vz','My','N','Sz'].includes(mode)?'ez':'ey',k=sg*60/C.S/e;
  res.smp.forEach(b=>{if(!b.length)return;const Pt=q=>{const o=q[mode]*k,v=q.ax[ax];return proj(q.P[0]+v[0]*o,q.P[1]+v[1]*o,q.P[2]+v[2]*o)},p0=proj(...b[0].P),p1=proj(...b.at(-1).P),Q=b.map(Pt);
   g.beginPath();g.moveTo(...p0);Q.forEach(p=>g.lineTo(...p));g.lineTo(...p1);g.closePath();g.globalAlpha=.2;g.fillStyle=col;g.fill();g.globalAlpha=1;g.strokeStyle=col;g.lineWidth=1.5;g.beginPath();Q.forEach((p,i)=>i?g.lineTo(...p):g.moveTo(...p));g.stroke();
@@ -1689,7 +1694,7 @@ function form(){const p=$('prop');
   ANOT.forEach((a,i)=>chips.push(['a',i,(a.t=='dim'?'C':a.t=='line'?'G':'T')+(i+1)]));
   p.innerHTML='<p class="m">'+(LANG==='en'?'Draw with <b>Beam</b>, <b>Wall</b>, <b>Poly wall</b>, <b>Slab</b> or <b>Area load</b>; annotate with <b>Dimension</b>, <b>Guide</b> and <b>Text</b>; use <b>Supports</b> to assign fixed, pin or roller supports to nodes. In the slab, change the <b>Level</b> between clicks for a slope. Right-click or Esc ends the chain, polyline or polygon. Right-drag (or drag in Select) rotates the view; Shift+drag pans; the wheel zooms.</p>':'Dibuja con <b>Barra</b>, <b>Muro</b>, <b>Muro poli</b>, <b>Losa</b> o <b>Carga de área</b>; anota con <b>Cota</b>, <b>Guía</b> y <b>Texto</b>; con <b>Apoyos</b> asigna fijo, articulado o rodillo a los nudos. En la losa, cambia el <b>Nivel</b> entre clics para darle desnivel. Clic derecho o Esc cierra la cadena, la polilínea o el polígono. Clic derecho arrastrado (o arrastrar en Seleccionar) gira la vista, Mayús+arrastrar desplaza y la rueda hace zoom.</p>')
    +'<div class="m">Barras '+B.length+' · Muros '+MUROS.length+' · Losas '+LOSAS.length+' · Cargas de área '+CARGAS.length+' · Anotaciones '+ANOT.length+(ZAPATAS.length?' · Zapatas '+ZAPATAS.length:'')+'</div>'
-   +(()=>{const rc=resumenContorno();return rc.length?'<b>Contornos'+(sisOn?' · sismo':'')+'</b><table><tr><th></th><th></th><th>mín</th><th>máx</th></tr>'+rc.map(q=>'<tr><td>'+q[0]+'</td><td>'+q[1]+'</td><td>'+fmtEsc(q[2])+'</td><td>'+fmtEsc(q[3])+'</td></tr>').join('')+'</table><div class="m" style="font-size:11px">'+rc[0][4]+'</div>':''})()
+   +(()=>{const rc=resumenContorno();return rc.length?'<b>Contornos'+(sisOn?' · sismo':'')+(vieOn&&mode=='sw'?' · viento':'')+'</b><table><tr><th></th><th></th><th>mín</th><th>máx</th></tr>'+rc.map(q=>'<tr><td>'+q[0]+'</td><td>'+q[1]+'</td><td>'+fmtEsc(q[2])+'</td><td>'+fmtEsc(q[3])+'</td></tr>').join('')+'</table><div class="m" style="font-size:11px">'+rc[0][4]+'</div>':''})()
    +(chips.length&&chips.length<=80?'<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:6px">'+chips.map(q=>'<button data-s="'+q[0]+':'+q[1]+'" style="padding:1px 6px">'+q[2]+'</button>').join('')+'</div>':'');
   p.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const q=b.dataset.s.split(':');sel={t:q[0],i:+q[1]};form();draw()});
   return}
@@ -1965,16 +1970,26 @@ function del(){if(!sel)return;
  sel=null;res=null;chain=null;poly=null;wchain=null;widx=[];dimA=null;aline=null;$('out').innerHTML='';form();setM('model')}
 
 function setM(m){mode=m;const q=$('mdsel');if(q&&q.value!==m)q.value=m;
- if(!res){resG=null;resS=null;sisOn=false;updateSisUI()}
+ if(!res){resG=null;resS=null;resV=null;sisOn=false;vieOn=false;updateSisUI();updateVieUI()}
  draw();if(!sel)form()}
 function updateSisUI(){
  const b=document.getElementById('smC');if(!b)return;
  b.disabled=!resS;b.classList.toggle('on',!!resS&&sisOn);
  b.setAttribute('aria-pressed',sisOn?'true':'false');
  b.textContent=sisOn?'Sismo ✓':'Sismo'}
+function updateVieUI(){
+ const b=document.getElementById('vwC');if(!b)return;
+ b.disabled=!resV;b.classList.toggle('on',!!resV&&vieOn);
+ b.setAttribute('aria-pressed',vieOn?'true':'false');
+ b.textContent=vieOn?'Viento ✓':'Viento'}
 function setSis(on){
  if(on&&!resS)return;if(!on&&!resG)return;
- sisOn=!!on;res=sisOn?resS:resG;updateSisUI();
+ sisOn=!!on;if(sisOn)vieOn=false;res=sisOn?resS:resG;updateSisUI();updateVieUI();
+ if(!res){setM('model');return}
+ draw();if(!sel)form()}
+function setVie(on){
+ if(on&&!resV)return;if(!on&&!resG)return;
+ vieOn=!!on;if(vieOn)sisOn=false;res=vieOn?resV:resG;updateVieUI();updateSisUI();
  if(!res){setM('model');return}
  draw();if(!sel)form()}
 function sisKv(){
@@ -1984,6 +1999,7 @@ function sisKv(){
  else if(sismoRes)v=.2*(+sismoRes.SDS||0);
  return Math.max(0,Math.min(.5,v))}
 function sisTag(){
+ if(vieOn){if(mode=='sw')return vientoRes&&vientoRes.evento=='maria'?'Viento María · D+W':'Viento · D+W';return ''}
  if(!sisOn)return '';
  if(mode=='sMx'||mode=='sMy')return 'Sismo · D ± '+(100*sisKv()).toFixed(0)+'%·D';
  if(mode=='sS1'||mode=='sS2')return 'Sismo · D+E';
@@ -2037,7 +2053,7 @@ async function runUI(){
 }
 
 function run(){res=analyze();vieOn=false;vientoRes=null;resV=null;const o=$('out');if(res.err){o.innerHTML='<span class="er">'+res.err+'</span>';res=null;setM('model');return}
- resG=res;resS=null;sisOn=false;updateSisUI();
+ resG=res;resS=null;resV=null;sisOn=false;vieOn=false;updateSisUI();updateVieUI();
  const f=(v,d=3)=>Math.abs(v)<1e-9?'0':(+v).toPrecision(d),rows=[],F_=UF('F'),M_=UF('FL');
  N.forEach((n,i)=>{if(n.r.some(v=>v))rows.push('<tr><td>N'+(i+1)+'</td>'+[0,1,2,3,4,5].map(k=>'<td>'+f(res.R[6*i+k]*UF(k<3?'F':'FL'))+'</td>').join('')+'</tr>')});
  let h='<b>Valores máximos</b>δ = '+f(res.dmax*UF('d'))+' '+UL('d')+' · N = '+f(res.ext.N*F_)+' · Vy = '+f(res.ext.Vy*F_)+' · Vz = '+f(res.ext.Vz*F_)+' '+UL('F')+'<br>T = '+f(res.ext.T*M_)+' · My = '+f(res.ext.My*M_)+' · Mz = '+f(res.ext.Mz*M_)+' '+UL('FL');
@@ -2062,6 +2078,7 @@ if($('cdiag'))$('cdiag').onchange=()=>{cdiag=$('cdiag').checked;draw()};
 $('mdsel').innerHTML=[['model','Modelo'],['def','Deformada'],['sw','σ en muros'],['mq','q en la matre'],['mMx','Mx en la matre'],['mMy','My en la matre'],['zq','q en zapatas'],['sMx','Mx en losas'],['sMy','My en losas'],['sS1','σ1 losa (diafragma)'],['sS2','σ2 losa (diafragma)'],['N','Axial N'],['Vy','Cortante Vy'],['Vz','Cortante Vz'],['T','Torsión T'],['My','Momento My'],['Mz','Momento Mz'],['Sz','Suelo z'],['Sy','Suelo y']].map(([k,l])=>'<option value="'+k+'">'+l+'</option>').join('');
 $('mdsel').onchange=async()=>{const k=$('mdsel').value;if(k!='model'&&!res)await runUI();if(res||k=='model')setM(k);else $('mdsel').value=mode};
 $('smC').onclick=()=>setSis(!sisOn);
+$('vwC').onclick=()=>setVie(!vieOn);
 $('v_iso').onclick=()=>view(-.6,.45);$('v_xy').onclick=()=>view(0,Math.PI/2,'XY');$('v_xz').onclick=()=>view(0,0,'XZ');$('v_yz').onclick=()=>view(-Math.PI/2,0,'YZ');
 ['pl','lv','gs','df'].forEach(i=>{const e2=$(i);if(e2)e2.onchange=draw});$('vs').onchange=draw;$('cm').onchange=draw;
 /* --- pantalla, ayuda y utilidades --- */
@@ -2077,7 +2094,7 @@ function abreGuia(){
   '<tr><td><b>4. Loads</b></td><td>Nodal loads, beam loads, area loads; wall and slab self-weight are automatic.</td></tr>'+
   '<tr><td><b>5. Calculate</b></td><td>Press Calculate. Check warnings, reactions, deformed shape and drift.</td></tr>'+
   '<tr><td><b>6. Seismic</b></td><td>Seismic…: ELF, modal CQC or event spectrum. After analysis use the <b>Seismic</b> button for contours.</td></tr>'+
-  '<tr><td><b>6b. Wind</b></td><td>Wind…: ASCE 7-22 or PRBC 2018 directional procedure; V is editable, María scenario, ±X/±Y cases, base shear, overturning and drift.</td></tr>'+
+  '<tr><td><b>6b. Wind</b></td><td>Wind…: ASCE 7-22 or PRBC 2018 directional procedure; V is editable, María scenario, ±X/±Y cases, base shear, overturning and drift. The <b>Wind</b> result button toggles the wind envelope with check ✓.</td></tr>'+
   '<tr><td><b>7. Drafting</b></td><td>Ortho (F8), Polar 45°/30°/15° (F10), Shift for temporary Ortho, FIN/⊥ snaps, guides with live dimensions.</td></tr>'+
   '<tr><td><b>8. Save / report</b></td><td>Save JSON; Report opens the calculation memory (print/PDF).</td></tr>'+
   '<tr><td><b>Shortcuts</b></td><td>Esc ends; Del deletes; F8 Ortho; F10 Polar; Shift temporary Ortho.</td></tr></table>'
@@ -2089,7 +2106,7 @@ function abreGuia(){
   '<tr><td><b>4. Cargas</b></td><td>Cargas nodales, en barras y de área; el peso propio de muros y losas es automático.</td></tr>'+
   '<tr><td><b>5. Calcular</b></td><td>Pulsa Calcular. Revisa avisos, reacciones, deformada y derivas.</td></tr>'+
   '<tr><td><b>6. Sismo</b></td><td>Sismo…: fuerza lateral, modal CQC o espectro de evento. Después usa el botón <b>Sismo</b> para los contornos.</td></tr>'+
-  '<tr><td><b>6b. Viento</b></td><td>Viento…: ASCE 7-22 o PRBC 2018, procedimiento direccional; V editable, escenario María, casos ±X/±Y, cortante basal, vuelco y deriva.</td></tr>'+
+  '<tr><td><b>6b. Viento</b></td><td>Viento…: ASCE 7-22 o PRBC 2018, procedimiento direccional; V editable, escenario María, casos ±X/±Y, cortante basal, vuelco y deriva. El botón <b>Viento</b> de Resultados alterna con la gravedad y muestra check ✓.</td></tr>'+
   '<tr><td><b>7. Dibujo</b></td><td>Orto (F8), Polar 45°/30°/15° (F10), Shift para Orto temporal, snaps FIN/⊥, guías con medidas en vivo.</td></tr>'+
   '<tr><td><b>8. Guardar / reporte</b></td><td>Guardar JSON; Reporte abre la memoria (imprimir/PDF).</td></tr>'+
   '<tr><td><b>Atajos</b></td><td>Esc termina; Supr elimina; F8 Orto; F10 Polar; Shift Orto temporal.</td></tr></table>';
@@ -2110,7 +2127,7 @@ function verAyuda(t){
   '<tr><td><b>Idioma</b></td><td>El selector <b>Idioma</b> de la barra cambia entre español (predeterminado) e inglés. La preferencia se guarda en el navegador; la guía rápida y los formularios se muestran en el idioma elegido.</td></tr>'+
   '<tr><td><b>Guía rápida</b></td><td>El botón <b>Guía</b> abre una guía de 8 pasos con los atajos básicos, en español o inglés.</td></tr>'+
   '<tr><td><b>Guía / Texto</b></td><td>La guía marca ejes o líneas de referencia y, mientras la dibujas, muestra la medida de cada tramo y el total acumulado. Al acercarte a una barra, muro, borde de losa, cota o guía aparece el pinzamiento perpendicular <b>⊥</b> (el pie de la perpendicular desde el último punto). El texto rotula la planta (por ejemplo «P1», «Muro cortina»).</td></tr>'+
-  '<tr><td><b>Viento</b></td><td>En «Viento…» se aplica el procedimiento direccional de ASCE 7-22 o PRBC 2018 (ASCE 7-16) para edificio cerrado: Kz, qz, presiones de barlovento/sotavento, succión de techo, cuatro casos ±X/±Y, cortante basal, vuelco y derivas H/400. La velocidad V es editable; verifica el mapa oficial del sitio y la categoría de riesgo. «Huracán María 2017» usa 155 mph de viento sostenido reportado como escenario de referencia, no como velocidad básica de 3 s.</td></tr>'+
+  '<tr><td><b>Viento</b></td><td>En «Viento…» se aplica el procedimiento direccional de ASCE 7-22 o PRBC 2018 (ASCE 7-16) para edificio cerrado: Kz, qz, presiones de barlovento/sotavento, succión de techo, cuatro casos ±X/±Y, cortante basal, vuelco y derivas H/400. La velocidad V es editable; verifica el mapa oficial del sitio y la categoría de riesgo. «Huracán María 2017» usa 155 mph de viento sostenido reportado como escenario de referencia, no como velocidad básica de 3 s. Después del análisis, el botón <b>Viento</b> de Resultados alterna entre la envolvente de viento y la gravedad, con check ✓.</td></tr>'+
   '<tr><td><b>Sismo de escenario</b></td><td>En «Sismo…» elige «Espectro de evento sísmico». La lista incluye espectros 5% de USGS ShakeMap (Venezuela 2026, Turquía 2023, Noto 2024, Kaikoura 2016, Tohoku 2011, Maule 2010, Wenchuan 2008) en el punto de mayor PGA. Puedes escalar a un PGA objetivo o importar tu propio espectro (CSV/JSON: T, Sa en g). Es un escenario modelado, no un registro instrumental, y no ajusta por Vs30.</td></tr>'+
   '<tr><td><b>Contornos sísmicos</b></td><td>Después del sismo, pulsa el botón <b>Sismo</b> de Resultados (o «Ver contornos sísmicos» en el informe) y elige σ en muros, q/Mx/My en la matre, q en zapatas, Mx/My en losas o σ1/σ2 de membrana. Muros, zapatas y matres usan la envolvente D+E; en muros, σ es positivo en tracción y negativo en compresión. Las losas usan su rigidez de diafragma y los contornos σ1/σ2 muestran las tensiones principales de membrana.</td></tr>'+
   '<tr><td><b>Diafragma de losas</b></td><td>En el panel de la losa, «Aporta rigidez de diafragma» activa los elementos de membrana en el plano. Requiere al menos 3 vértices conectados a nudos de la estructura; si se desactiva, la losa solo reparte cargas como antes. Los contornos σ1/σ2 están en «Resultados».</td></tr>'+
@@ -2201,7 +2218,7 @@ async function runModal(){
  progSet(88,'Sismo · análisis modal','Preparando resultados…');
  await uiTick();
  if(r.err){o.innerHTML='<span class="er">'+r.err+'</span>';$('hint').textContent='';progHide();return}
- MODAL=r;resS=r.resEnv||r.res;res=resS;sisOn=true;vieOn=false;vientoRes=null;resV=null;updateSisUI();setM('def');o.innerHTML=informeModal(r);
+ MODAL=r;resS=r.resEnv||r.res;res=resS;sisOn=true;vieOn=false;vientoRes=null;resV=null;updateSisUI();updateVieUI();setM('def');o.innerHTML=informeModal(r);
  progSet(100,'Listo');await uiTick();progHide();
  $('hint').textContent='Caso sísmico modal aplicado. Contornos sísmicos: botón Sismo o «Ver contornos sísmicos». Pulsa ▶ Calcular para volver a gravedad.'}
 
@@ -2313,7 +2330,7 @@ async function runSismo(){
  if(r.err){o.innerHTML='<span class="er">'+r.err+'</span>';progHide();return}
  progSet(88,'Sismo · fuerza lateral','Preparando el informe…');
  await uiTick();
- sismoRes=r;MODAL=null;resS=r.resEnv||r.res;res=resS;sisOn=true;vieOn=false;vientoRes=null;resV=null;updateSisUI();setM('def');
+ sismoRes=r;MODAL=null;resS=r.resEnv||r.res;res=resS;sisOn=true;vieOn=false;vientoRes=null;resV=null;updateSisUI();updateVieUI();setM('def');
  o.innerHTML=informeSismo(r);
  progSet(100,'Listo');await uiTick();progHide();
  $('hint').textContent='Caso sísmico aplicado ('+(SISMO.cod=='prbc18'?'PRBC 2018':'ASCE 7-22')+'). Contornos sísmicos: botón Sismo. Pulsa ▶ Calcular para volver a gravedad.'}
@@ -2358,7 +2375,7 @@ async function runViento(){
  if(r.err){$('out').innerHTML='<span class="er">'+r.err+'</span>';progHide();return}
  progSet(90,'Análisis de viento','Preparando el informe…');await nextFrame();
  vientoRes=r;resV=r.resEnv;res=resV;vieOn=true;sisOn=false;sismoRes=null;MODAL=null;resS=null;
- updateSisUI();setM('def');$('out').innerHTML=informeViento(r);
+ updateSisUI();updateVieUI();setM('def');$('out').innerHTML=informeViento(r);
  progSet(100,'Listo');await uiTick();progHide();
  $('hint').textContent='Viento aplicado ('+(VIENTO.norma=='prbc18'?'PRBC 2018':'ASCE 7-22')+'). Pulsa ▶ Calcular para volver a gravedad.'
 }
@@ -2489,7 +2506,7 @@ function reportePDF(soloDescarga){
   sMx:'Momentos Mx en las losas',sMy:'Momentos My en las losas',sS1:'Tensión principal σ1 en losas (membrana)',sS2:'Compresión principal σ2 en losas (membrana)',zq:'Presión de contacto en las zapatas',
   N:'Diagrama de fuerza axial N',My:'Diagrama de momento My',Vz:'Diagrama de cortante Vz',Mz:'Diagrama de momento Mz'};
   const orden=['model','def','sw','mq','mMx','mMy','zq','sMx','sMy','sS1','sS2','N','My','Vz'];
- const capS=sisOn?' · sismo':'';
+ const capS=sisOn?' · sismo':(vieOn?' · viento':'');
  const figs=[];
  orden.forEach(md=>{
   if((md=='mq'||md=='mMx'||md=='mMy')&&!PLATEAS.length)return;
