@@ -101,6 +101,21 @@ button,select,input{touch-action:manipulation}
  #smw .smact{padding-bottom:calc(2px + env(safe-area-inset-bottom,0px))}
  #smw .smact button{flex:1 1 100%}
 }
+
+#wnw{position:fixed;inset:0;background:rgba(15,23,42,.35);z-index:201;display:none;align-items:center;justify-content:center;padding:10px;overflow-y:auto;overscroll-behavior:contain}
+#wnw .smbox{display:flex;flex-direction:column;width:100%;max-width:430px;min-width:0;max-height:90vh;background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:14px;box-shadow:0 12px 40px rgba(0,0,0,.3);box-sizing:border-box}
+#wnw .smscroll{min-height:0;flex:1 1 auto;overflow-y:auto;overflow-x:hidden;padding-right:2px}
+#wnw .smact{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid var(--bd);flex:0 0 auto}
+#wnw .smact button{min-height:38px;flex:1 1 auto;min-width:0}
+#wnw label{display:block;margin:5px 0 2px;font-size:12px}
+#wnw input,#wnw select{width:100%;box-sizing:border-box;padding:3px 5px}
+#wnw .wn2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+#wnw .wn3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+#wnw .ck{display:flex;align-items:center;gap:6px;font-weight:600}
+#wnw .ck input{width:auto}
+#wnw .m{font-size:11px}
+@media(max-width:760px){#wnw{padding:6px;align-items:center}#wnw .smbox{max-height:calc(100dvh - 12px);padding:10px;border-radius:8px}#wnw .smact{flex-direction:column}#wnw .smact button{flex:1 1 100%}}
+
 </style></head><body>
 <div id="tb">
 <span id="brand">Zapel773DWall</span>
@@ -120,6 +135,7 @@ button,select,input{touch-action:manipulation}
 <button type="button" id="b_rep">📄 Reporte</button>
 <button type="button" id="b_rep3" title="Descargar el reporte como archivo HTML">⬇</button>
 <button type="button" id="b_sismo">Sismo…</button>
+<button type="button" id="b_viento">Viento…</button>
 <button type="button" id="b_guide" title="Guía rápida de uso">Guía</button>
 <button type="button" id="b_help" title="Ayuda y atajos">?</button>
 </div>
@@ -143,6 +159,32 @@ button,select,input{touch-action:manipulation}
 <div id="mn"><div id="cw"><canvas id="cv"></canvas><div id="stz"></div></div>
 <div id="pn"><div id="prop"></div><div id="out"></div><div class="m" style="margin-top:14px;padding-top:8px;border-top:1px solid var(--bd);font-size:11px;line-height:1.5">Zapel773DWall · Etapa 7<br>Barras · muros · losas · zapatas y matres<br>Cargas de área · contornos · sismo ASCE 7-22 / PRBC 2018 (ELF y modal)<br>Basado en ZAPEL77P<br>Autor: Dr. Bernardo Deschapelles<br>Actualizado por el Prof. Raymond Rosa Ávila</div></div></div>
 <div id="prog"><div class="pbox"><b id="progT">Calculando…</b><div class="m" id="progS" style="font-size:11px;min-height:15px"></div><div class="pbar"><i id="progB"></i></div><div class="m" style="font-size:10px;margin-top:6px">En modelos grandes el navegador puede preguntar si deseas esperar; elige «Esperar». La barra muestra actividad continua mientras el cálculo sigue.</div><div class="m" style="display:flex;justify-content:space-between;font-size:11px;margin-top:4px"><span id="progE">0 s</span><span id="progP">0 %</span></div></div></div>
+
+<div id="wnw"><div class="smbox"><div class="smscroll">
+ <b>Análisis de viento</b>
+ <div class="m">ASCE 7-22 / PRBC 2018 (ASCE 7-16) · edificio cerrado · procedimiento direccional</div>
+ <label>Norma<select id="wnNorma"><option value="asce22">ASCE 7-22</option><option value="prbc18">PRBC 2018 (ASCE 7-16)</option></select></label>
+ <label>Escenario<select id="wnEvento"><option value="diseno">Diseño (mapa)</option><option value="maria">Huracán María 2017 · 155 mph sostenido</option></select></label>
+ <div class="wn2">
+  <label>Categoría de riesgo<select id="wnRiesgo"><option value="1">I</option><option value="2">II</option><option value="3">III</option><option value="4">IV</option></select></label>
+  <label>Exposición<select id="wnExp"><option value="B">B</option><option value="C">C</option><option value="D">D</option></select></label>
+ </div>
+ <label>Velocidad básica V (mph)<input id="wnV" type="number" step="1" min="1" value="165"></label>
+ <div class="wn3">
+  <label>Kzt<input id="wnKzt" type="number" step="0.01" value="1"></label>
+  <label>Kd<input id="wnKd" type="number" step="0.01" value="0.85"></label>
+  <label>Ke<input id="wnKe" type="number" step="0.01" value="1"></label>
+ </div>
+ <div class="wn3">
+  <label>G<input id="wnG" type="number" step="0.01" value="0.85"></label>
+  <label>Cp barlovento<input id="wnCpw" type="number" step="0.05" value="0.8"></label>
+  <label>Cp sotavento<input id="wnCpl" type="number" step="0.05" value="-0.5"></label>
+ </div>
+ <label>GCpi (presión interna)<input id="wnGCpi" type="number" step="0.01" value="0.18"></label>
+ <label class="ck"><input id="wnTecho" type="checkbox" checked> Incluir succión de techo</label>
+ <div id="wnInfo" class="m"></div>
+</div><div class="smact"><button type="button" id="wnOk" class="go">Calcular viento</button><button type="button" id="wnX">Cerrar</button></div></div></div>
+
 <script>
 const $=id=>document.getElementById(id),cv=$('cv'),g=cv.getContext('2d');
 /* aviso visible si algo falla al iniciar (antes de morir en silencio) */
@@ -175,7 +217,12 @@ const EN_DICT={
 "Contornos":"Contours","Contornos · sismo":"Seismic contours","Valores máximos":"Maximum values","Reacciones":"Reactions","Muros · fuerzas en la base":"Walls · base forces",
 "Cargas de superficie":"Surface loads","Matres":"Mats","Zapatas · contacto":"Footings · contact","Modos calculados":"Computed modes","Derivas y estabilidad":"Drifts and stability","Equilibrio":"Equilibrium",
 "Período y cortante":"Period and base shear","Distribución por nivel":"Distribution by level","Torsión accidental":"Accidental torsion","Dirección X":"Direction X","Dirección Y":"Direction Y","Entrepiso":"Story",
-"Ayuda":"Help","Ayuda y atajos":"Help and shortcuts","Atajos y consejos":"Shortcuts and tips","Acerca de Zapel773DWall":"About Zapel773DWall","Guía":"Guide","Idioma":"Language"
+"Ayuda":"Help","Ayuda y atajos":"Help and shortcuts","Atajos y consejos":"Shortcuts and tips","Acerca de Zapel773DWall":"About Zapel773DWall","Guía":"Guide","Idioma":"Language",
+"Viento…":"Wind…","Viento":"Wind","Análisis de viento":"Wind analysis","Escenario":"Scenario","Exposición":"Exposure","Categoría de riesgo":"Risk category",
+"Velocidad básica V (mph)":"Basic wind speed V (mph)","Incluir succión de techo":"Include roof suction","Calcular viento":"Run wind",
+"Diseño (mapa)":"Design (map)","Huracán María 2017 · 155 mph sostenido":"Hurricane Maria 2017 · 155 mph sustained",
+"GCpi (presión interna)":"GCpi (internal pressure)","Cp barlovento":"Windward Cp","Cp sotavento":"Leeward Cp",
+"Cortante basal":"Base shear","Momento de vuelco":"Overturning moment","Deriva admisible usada: H/400 por entrepiso.":"Service drift limit used: H/400 per story."
 };
 const EN_PH=[
 ["Análisis sísmico","Seismic analysis"],["Fracción de cargas de área en W","Area-load fraction in W"],["Fuerza lateral equivalente","Equivalent lateral force"],["Modal espectral (CQC)","Modal response spectrum (CQC)"],["Espectro de evento sísmico","Event response spectrum"],["Sistema resistente","Structural system"],["Clase de sitio","Site class"],["Categoría de riesgo","Risk category"],["PGA objetivo (g)","Target PGA (g)"],["Nº de modos","No. of modes"],["Calcular sismo","Calculate seismic"],["Cerrar","Close"],["Norma","Code"],["Método","Method"],["Evento","Event"],
@@ -275,11 +322,13 @@ function prism(r,a,z,col){const s=sp(r),ax=axes(r);if(ax.L<1e-9)return;const at=
 const PLS={XY:[0,1,2],XZ:[0,2,1],YZ:[1,2,0]},RL=['Ux','Uy','Uz','Rx','Ry','Rz'],FL=['Fx','Fy','Fz','Mx','My','Mz'];
 const D={ty:'rect',b:.3,h:.5,bf:.15,hf:.12,bw:.25,Dm:.4,d:.3,tf:.01,tw:.007,tt:.01,pts:[[0,0],[.3,0],[.3,.5],[0,.5]],mat:'H',fc:28,E:25,ang:0,wa:0,wb:0,xa:0,xb:0,ya:0,yb:0,pza:0,pzb:0,pya:0,pyb:0,kz:0,ky:0,div:4,a1:0,a2:0};
 let cu='IM';const UN={SI:{L:['m',1],F:['kN',1],FL:['kN·m',1],q:['kN/m',1],E:['GPa',1],k:['kN/m³',1],d:['mm',1000],s:['mm',1000],fc:['MPa',1],A:['cm²',1e4],I:['cm⁴',1e8],p:['kN/m²',1],gw:['kN/m³',1],ar:['m²',1]},IM:{L:['ft',3.28084],F:['kip',.224809],FL:['kip·ft',.737562],q:['kip/ft',.068522],E:['ksi',145.038],k:['kip/ft³',.006366],d:['in',39.3701],s:['in',39.3701],fc:['ksi',.145038],A:['in²',1550.003],I:['in⁴',2402510],p:['ksf',.0208854],gw:['kip/ft³',.00636588],ar:['ft²',10.7639]}},UF=k=>k?UN[cu][k][1]:1,UL=k=>UN[cu][k][0],fmtv=v=>+v.toPrecision(6),KM={N:'F',Vy:'F',Vz:'F',T:'FL',My:'FL',Mz:'FL',Sy:'q',Sz:'q'};
-let N=[],B=[],MUROS=[],LOSAS=[],CARGAS=[],ZAPATAS=[],PLATEAS=[],ANOT=[],sismoRes=null,MODAL=null,tool='sel',sel=null,res=null,resG=null,resS=null,sisOn=false,mode='model',chain=null,poly=null,drag=null,ms=null,C={a:-.6,p:.45,S:40,ox:300,oy:300},dpr=devicePixelRatio||1;
+let N=[],B=[],MUROS=[],LOSAS=[],CARGAS=[],ZAPATAS=[],PLATEAS=[],ANOT=[],sismoRes=null,MODAL=null,vientoRes=null,resV=null,vieOn=false,tool='sel',sel=null,res=null,resG=null,resS=null,sisOn=false,mode='model',chain=null,poly=null,drag=null,ms=null,C={a:-.6,p:.45,S:40,ox:300,oy:300},dpr=devicePixelRatio||1;
 /* estado de dibujo: muro poligonal, cotas y guías */
 let WGRP=0,wchain=null,widx=[],dimA=null,aline=null,ortho=true,polar=0,shiftDown=false,cdiag=false,SNAP=null;
 /* valores por defecto de los objetos nuevos (siempre en unidades internas: m, kN, kN/m²) */
 const DEF={wt:5*IN,wh:8*.3048,st:.20,aq:2},GAM={H:24,A:78.5,O:24};
+const WEXP={B:{a:7,zg:1200},C:{a:9.5,zg:900},D:{a:11.5,zg:700}};
+let VIENTO={norma:'asce22',evento:'diseno',riesgo:2,exp:'C',V:165,Kzt:1,Kd:.85,Ke:1,G:.85,Cpw:.8,Cpl:-.5,GCpi:.18,techo:true};
 const mk=(x,y,z,r=[0,0,0,0,0,0])=>({x,y,z,r,f:[0,0,0,0,0,0]}),bk=(i,j,o={})=>({...D,i,j,...o});
 const mul=(A,Bm)=>A.map(r=>Bm[0].map((_,j)=>r.reduce((s,v,k)=>s+v*Bm[k][j],0))),tp=A=>A[0].map((_,j)=>A.map(r=>r[j]));
 const crs=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],nrm=a=>{const l=Math.hypot(...a);return a.map(v=>v/l)},dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
@@ -1014,6 +1063,89 @@ function modalCalc(){
  out.res=out.dirs.X.comb&&out.dirs.Y.comb?maxRes(out.dirs.X.comb,out.dirs.Y.comb):(out.dirs.X.comb||out.dirs.Y.comb);
  out.env=out.res;
  return out}
+
+/* ---------- Viento: ASCE 7-22 / PRBC 2018 (ASCE 7-16), procedimiento direccional ---------- */
+function kzViento(zft,exp){
+ const E=WEXP[exp]||WEXP.C,zz=Math.max(15,Math.min(+zft||15,E.zg));
+ return 2.01*Math.pow(zz/E.zg,2/E.a)}
+function nivelesViento(){
+ const zs=[...new Set(N.map(n=>+(+n.z).toFixed(4)))].sort((a,b)=>a-b);
+ const base=zs.length?zs[0]:0,out=[];
+ for(let i=1;i<zs.length;i++){
+  const z=zs[i],prev=zs[i-1],nodos=[];
+  N.forEach((n,j)=>{if(Math.abs(n.z-z)<1e-3)nodos.push(j)});
+  if(!nodos.length)continue;
+  const xs=nodos.map(k=>N[k].x),ys=nodos.map(k=>N[k].y),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
+  out.push({z,prev,dz:z-prev,nodos,x0,x1,y0,y1,Bx:Math.max(x1-x0,1e-6),By:Math.max(y1-y0,1e-6)})}
+ return {base,levels:out}}
+function aplicaViento(o){
+ const save=N.map(n=>n.f.slice());
+ o.levels.forEach(L=>{
+  const F=(o.dir=='X'?L.FX:L.FY)*(o.sg||1),axis=o.dir=='X'?0:1;
+  const lo=axis?L.y0:L.x0,hi=axis?L.y1:L.x1,tol=Math.max(.02*((hi-lo)||1),1e-3);
+  let face=L.nodos.filter(i=>o.sg>0?(axis?N[i].y:N[i].x)<=lo+tol:(axis?N[i].y:N[i].x)>=hi-tol);
+  if(!face.length)face=L.nodos.slice();
+  const add=F/Math.max(face.length,1);
+  face.forEach(i=>N[i].f[axis]+=add)});
+ if(VIENTO.techo&&o.roofF){const top=o.levels[o.levels.length-1];const add=-o.roofF/Math.max(top.nodos.length,1);top.nodos.forEach(i=>N[i].f[2]+=add)}
+ const r=analyze();N.forEach((n,i)=>n.f=save[i].slice());return r}
+function vientoCalc(){
+ const vv=+VIENTO.V;if(!(vv>0))return {err:'Define una velocidad básica de viento V mayor que cero.'};
+ const g=nivelesViento();if(!g.levels.length)return {err:'No hay niveles con nodos para calcular el viento.'};
+ const h=g.levels[g.levels.length-1].z-g.base;if(!(h>0))return {err:'La altura del edificio es nula.'};
+ const hft=h*3.28084;
+ const qh=0.00256*kzViento(hft,VIENTO.exp)*VIENTO.Kzt*VIENTO.Kd*VIENTO.Ke*vv*vv;
+ const levels=g.levels.map(L=>{
+  const zft=Math.max(15,((L.z+L.prev)/2-g.base)*3.28084),kz=kzViento(zft,VIENTO.exp);
+  const qz=0.00256*kz*VIENTO.Kzt*VIENTO.Kd*VIENTO.Ke*vv*vv;
+  const pW=qz*VIENTO.G*VIENTO.Cpw-qh*VIENTO.G*VIENTO.GCpi;
+  const pL=qh*VIENTO.G*VIENTO.Cpl-qh*VIENTO.G*VIENTO.GCpi;
+  const pN=pW-pL;
+  const FX=pN*0.0478803*L.By*L.dz,FY=pN*0.0478803*L.Bx*L.dz;
+  return {...L,kz,qz,pW,pL,pN,FX,FY}});
+ const top=levels[levels.length-1];
+ const pRoof=qh*VIENTO.G*(-0.7)-qh*VIENTO.GCpi;
+ const roofF=pRoof*0.0478803*top.Bx*top.By;
+ const casos=[];let mejor=null,mejorD=0;
+ [['X',1],['X',-1],['Y',1],['Y',-1]].forEach(([dir,sg])=>{
+  const r=aplicaViento({dir,sg,levels,roofF});
+  const dTop=Math.abs(despNivel(r,top.nodos,dir));
+  casos.push({dir,sg,r,dTop});
+  if(dTop>mejorD){mejorD=dTop;mejor=r}});
+ const env=casos.reduce((a,c)=>a?maxRes(a,c.r):c.r,null);
+ const tab=levels.map((L,i)=>{
+  let dr=0,dir='X';
+  casos.forEach(c=>{
+   const a=Math.abs(despNivel(c.r,L.nodos,c.dir)),b=i?Math.abs(despNivel(c.r,levels[i-1].nodos,c.dir)):0;
+   const d=Math.abs(a-b);if(d>dr){dr=d;dir=c.dir}});
+  const da=L.dz/400;
+  return {z:L.z,dz:L.dz,dr,da,dir,ok:dr<=da}});
+ const V=levels.reduce((s,L)=>s+L.FX,0),M=levels.reduce((s,L)=>s+L.FX*(L.z-g.base),0);
+ return {err:null,norma:VIENTO.norma,evento:VIENTO.evento,riesgo:VIENTO.riesgo,exp:VIENTO.exp,V:vv,
+  Vb:vv,h,hn:h,qh,Kzt:VIENTO.Kzt,Kd:VIENTO.Kd,Ke:VIENTO.Ke,G:VIENTO.G,Cpw:VIENTO.Cpw,Cpl:VIENTO.Cpl,GCpi:VIENTO.GCpi,
+  pRoof,roofF, niveles:levels, casos, tab, resEnv:env, res:mejor, Vbase:V, Mbase:M, ecc:0,
+  base:g.base, techo:!!VIENTO.techo, vmax:Math.max(...levels.map(L=>L.pN)), vmin:Math.min(...levels.map(L=>L.pN))}}
+function vientoTablaHTML(r){
+ const fu=UF('F'),lu=UF('L'),f=(v,d=2)=>(+v).toPrecision(d),pu=v=>cu=='SI'?(v*0.0478803).toFixed(2)+' kPa':(v/1000).toFixed(3)+' ksf';
+ let h='<div class="m" style="font-size:11px">V = <b>'+f(r.V,3)+' mph</b> · Categoría de riesgo '+r.riesgo+' · Exposición '+r.exp+' · h = '+f(r.hn*lu,2)+' '+UL('L')+' · Kz(h) = '+f(r.qh>0?r.niveles[r.niveles.length-1].kz:0,3)+' · qh = '+r.qh.toFixed(1)+' psf<br>'+
+  'Kzt = '+f(r.Kzt,2)+' · Kd = '+f(r.Kd,2)+' · Ke = '+f(r.Ke,2)+' · G = '+f(r.G,2)+' · Cp barlovento = '+f(r.Cpw,2)+' · Cp sotavento = '+f(r.Cpl,2)+' · GCpi = ±'+f(r.GCpi,2)+'<br>Presión barlovento = '+pu(r.niveles[r.niveles.length-1].pW)+' · sotavento = '+pu(r.niveles[r.niveles.length-1].pL)+' · neta = '+pu(r.niveles[r.niveles.length-1].pN)+'</div>';
+ h+='<table><tr><th>Nivel z ('+UL('L')+')</th><th>Kz</th><th>qz (psf)</th><th>p neta</th><th>F ('+UL('F')+')</th></tr>';
+ r.niveles.forEach(L=>{h+='<tr><td>'+f(L.z*lu,2)+'</td><td>'+f(L.kz,3)+'</td><td>'+L.qz.toFixed(1)+'</td><td>'+pu(L.pN)+'</td><td>'+f(L.FX*fu,2)+'</td></tr>'});
+ h+='</table>';
+ h+='<div class="m" style="font-size:11px">Cortante basal V<sub>W</sub> = <b>'+f(r.Vbase*fu,2)+' '+UL('F')+'</b> · Momento de vuelco = '+(r.Mbase*fu*lu).toFixed(1)+' '+UL('FL')+'<br>';
+ if(r.roofF)h+='Succión de techo: '+pu(r.pRoof)+' → '+f(Math.abs(r.roofF)*fu,2)+' '+UL('F')+' hacia arriba'+(r.techo?' (aplicada)':' (no aplicada)')+'<br>';
+ h+='Deriva admisible usada: H/400 por entrepiso.</div>';
+ if(r.tab.length){h+='<table><tr><th>Entrepiso z ('+UL('L')+')</th><th>Δ ('+UL('d')+')</th><th>Δ adm.</th><th>Estado</th></tr>';
+  r.tab.forEach(L=>{h+='<tr><td>'+f(L.z*lu,2)+'</td><td>'+f(L.dr*UF('d'),3)+'</td><td>'+f(L.da*UF('d'),3)+'</td><td'+(L.ok?'':' class="er"')+'>'+(L.ok?'cumple':'revisar')+'</td></tr>'});
+  h+='</table>'}
+ if(r.evento=='maria')h+='<div class="er" style="margin-top:6px;font-size:11px">Escenario Huracán María 2017: V = 155 mph de viento máximo sostenido reportado por el NHC. No es una velocidad básica ASCE de 3 s ni una reconstrucción histórica; para diseño usa el mapa oficial ASCE/PRBC y edita V.</div>';
+ else h+='<div class="m" style="font-size:11px">V es editable: verifica el mapa oficial de viento para la categoría de riesgo y el sitio. PRBC 2018 se basa en ASCE 7-16; revisa enmiendas locales.</div>';
+ return h}
+function informeViento(r){
+ if(!r||r.err)return '<span class="er">'+(r&&r.err||'Sin resultados de viento.')+'</span>';
+ return '<b>Viento '+(r.norma=='prbc18'?'PRBC 2018 (ASCE 7-16)':'ASCE 7-22')+' · procedimiento direccional</b>'+vientoTablaHTML(r)}
+function tablaViento(r){return r&&!r.err?'<h3>Viento</h3>'+vientoTablaHTML(r):''}
+
 /* ---------- Matres (losas de fundación) ---------- */
 const DEFPL={H:.6,ks:20000,qa:200,fc:28,fy:420,s:.8};
 let PCC={res:undefined,v:{}};
@@ -1904,7 +2036,7 @@ async function runUI(){
  return !!res;
 }
 
-function run(){res=analyze();const o=$('out');if(res.err){o.innerHTML='<span class="er">'+res.err+'</span>';res=null;setM('model');return}
+function run(){res=analyze();vieOn=false;vientoRes=null;resV=null;const o=$('out');if(res.err){o.innerHTML='<span class="er">'+res.err+'</span>';res=null;setM('model');return}
  resG=res;resS=null;sisOn=false;updateSisUI();
  const f=(v,d=3)=>Math.abs(v)<1e-9?'0':(+v).toPrecision(d),rows=[],F_=UF('F'),M_=UF('FL');
  N.forEach((n,i)=>{if(n.r.some(v=>v))rows.push('<tr><td>N'+(i+1)+'</td>'+[0,1,2,3,4,5].map(k=>'<td>'+f(res.R[6*i+k]*UF(k<3?'F':'FL'))+'</td>').join('')+'</tr>')});
@@ -1945,6 +2077,7 @@ function abreGuia(){
   '<tr><td><b>4. Loads</b></td><td>Nodal loads, beam loads, area loads; wall and slab self-weight are automatic.</td></tr>'+
   '<tr><td><b>5. Calculate</b></td><td>Press Calculate. Check warnings, reactions, deformed shape and drift.</td></tr>'+
   '<tr><td><b>6. Seismic</b></td><td>Seismic…: ELF, modal CQC or event spectrum. After analysis use the <b>Seismic</b> button for contours.</td></tr>'+
+  '<tr><td><b>6b. Wind</b></td><td>Wind…: ASCE 7-22 or PRBC 2018 directional procedure; V is editable, María scenario, ±X/±Y cases, base shear, overturning and drift.</td></tr>'+
   '<tr><td><b>7. Drafting</b></td><td>Ortho (F8), Polar 45°/30°/15° (F10), Shift for temporary Ortho, FIN/⊥ snaps, guides with live dimensions.</td></tr>'+
   '<tr><td><b>8. Save / report</b></td><td>Save JSON; Report opens the calculation memory (print/PDF).</td></tr>'+
   '<tr><td><b>Shortcuts</b></td><td>Esc ends; Del deletes; F8 Ortho; F10 Polar; Shift temporary Ortho.</td></tr></table>'
@@ -1956,6 +2089,7 @@ function abreGuia(){
   '<tr><td><b>4. Cargas</b></td><td>Cargas nodales, en barras y de área; el peso propio de muros y losas es automático.</td></tr>'+
   '<tr><td><b>5. Calcular</b></td><td>Pulsa Calcular. Revisa avisos, reacciones, deformada y derivas.</td></tr>'+
   '<tr><td><b>6. Sismo</b></td><td>Sismo…: fuerza lateral, modal CQC o espectro de evento. Después usa el botón <b>Sismo</b> para los contornos.</td></tr>'+
+  '<tr><td><b>6b. Viento</b></td><td>Viento…: ASCE 7-22 o PRBC 2018, procedimiento direccional; V editable, escenario María, casos ±X/±Y, cortante basal, vuelco y deriva.</td></tr>'+
   '<tr><td><b>7. Dibujo</b></td><td>Orto (F8), Polar 45°/30°/15° (F10), Shift para Orto temporal, snaps FIN/⊥, guías con medidas en vivo.</td></tr>'+
   '<tr><td><b>8. Guardar / reporte</b></td><td>Guardar JSON; Reporte abre la memoria (imprimir/PDF).</td></tr>'+
   '<tr><td><b>Atajos</b></td><td>Esc termina; Supr elimina; F8 Orto; F10 Polar; Shift Orto temporal.</td></tr></table>';
@@ -1976,6 +2110,7 @@ function verAyuda(t){
   '<tr><td><b>Idioma</b></td><td>El selector <b>Idioma</b> de la barra cambia entre español (predeterminado) e inglés. La preferencia se guarda en el navegador; la guía rápida y los formularios se muestran en el idioma elegido.</td></tr>'+
   '<tr><td><b>Guía rápida</b></td><td>El botón <b>Guía</b> abre una guía de 8 pasos con los atajos básicos, en español o inglés.</td></tr>'+
   '<tr><td><b>Guía / Texto</b></td><td>La guía marca ejes o líneas de referencia y, mientras la dibujas, muestra la medida de cada tramo y el total acumulado. Al acercarte a una barra, muro, borde de losa, cota o guía aparece el pinzamiento perpendicular <b>⊥</b> (el pie de la perpendicular desde el último punto). El texto rotula la planta (por ejemplo «P1», «Muro cortina»).</td></tr>'+
+  '<tr><td><b>Viento</b></td><td>En «Viento…» se aplica el procedimiento direccional de ASCE 7-22 o PRBC 2018 (ASCE 7-16) para edificio cerrado: Kz, qz, presiones de barlovento/sotavento, succión de techo, cuatro casos ±X/±Y, cortante basal, vuelco y derivas H/400. La velocidad V es editable; verifica el mapa oficial del sitio y la categoría de riesgo. «Huracán María 2017» usa 155 mph de viento sostenido reportado como escenario de referencia, no como velocidad básica de 3 s.</td></tr>'+
   '<tr><td><b>Sismo de escenario</b></td><td>En «Sismo…» elige «Espectro de evento sísmico». La lista incluye espectros 5% de USGS ShakeMap (Venezuela 2026, Turquía 2023, Noto 2024, Kaikoura 2016, Tohoku 2011, Maule 2010, Wenchuan 2008) en el punto de mayor PGA. Puedes escalar a un PGA objetivo o importar tu propio espectro (CSV/JSON: T, Sa en g). Es un escenario modelado, no un registro instrumental, y no ajusta por Vs30.</td></tr>'+
   '<tr><td><b>Contornos sísmicos</b></td><td>Después del sismo, pulsa el botón <b>Sismo</b> de Resultados (o «Ver contornos sísmicos» en el informe) y elige σ en muros, q/Mx/My en la matre, q en zapatas, Mx/My en losas o σ1/σ2 de membrana. Muros, zapatas y matres usan la envolvente D+E; en muros, σ es positivo en tracción y negativo en compresión. Las losas usan su rigidez de diafragma y los contornos σ1/σ2 muestran las tensiones principales de membrana.</td></tr>'+
   '<tr><td><b>Diafragma de losas</b></td><td>En el panel de la losa, «Aporta rigidez de diafragma» activa los elementos de membrana en el plano. Requiere al menos 3 vértices conectados a nudos de la estructura; si se desactiva, la losa solo reparte cargas como antes. Los contornos σ1/σ2 están en «Resultados».</td></tr>'+
@@ -2066,7 +2201,7 @@ async function runModal(){
  progSet(88,'Sismo · análisis modal','Preparando resultados…');
  await uiTick();
  if(r.err){o.innerHTML='<span class="er">'+r.err+'</span>';$('hint').textContent='';progHide();return}
- MODAL=r;resS=r.resEnv||r.res;res=resS;sisOn=true;updateSisUI();setM('def');o.innerHTML=informeModal(r);
+ MODAL=r;resS=r.resEnv||r.res;res=resS;sisOn=true;vieOn=false;vientoRes=null;resV=null;updateSisUI();setM('def');o.innerHTML=informeModal(r);
  progSet(100,'Listo');await uiTick();progHide();
  $('hint').textContent='Caso sísmico modal aplicado. Contornos sísmicos: botón Sismo o «Ver contornos sísmicos». Pulsa ▶ Calcular para volver a gravedad.'}
 
@@ -2178,10 +2313,59 @@ async function runSismo(){
  if(r.err){o.innerHTML='<span class="er">'+r.err+'</span>';progHide();return}
  progSet(88,'Sismo · fuerza lateral','Preparando el informe…');
  await uiTick();
- sismoRes=r;MODAL=null;resS=r.resEnv||r.res;res=resS;sisOn=true;updateSisUI();setM('def');
+ sismoRes=r;MODAL=null;resS=r.resEnv||r.res;res=resS;sisOn=true;vieOn=false;vientoRes=null;resV=null;updateSisUI();setM('def');
  o.innerHTML=informeSismo(r);
  progSet(100,'Listo');await uiTick();progHide();
  $('hint').textContent='Caso sísmico aplicado ('+(SISMO.cod=='prbc18'?'PRBC 2018':'ASCE 7-22')+'). Contornos sísmicos: botón Sismo. Pulsa ▶ Calcular para volver a gravedad.'}
+
+
+/* ---------- Interfaz y ejecución del viento ---------- */
+function actualizaInfoViento(){
+ const ev=$('wnEvento')?$('wnEvento').value:'diseno',info=$('wnInfo');if(!info)return;
+ if(ev=='maria'){$('wnV').value=155;if($('wnExp'))$('wnExp').value='C';info.innerHTML='<span class="er">María: V = 155 mph de viento máximo sostenido reportado por el NHC. Es un escenario de referencia, no una velocidad básica ASCE de 3 s ni una reconstrucción histórica. Para diseño usa el mapa ASCE/PRBC.</span>'}
+ else info.innerHTML='V básica editable. Verifica el mapa ASCE 7-22 o PRBC 2018 para el sitio y la categoría de riesgo; PRBC 2018 se basa en ASCE 7-16.'
+}
+function abreViento(){
+ const d=$('wnw');if(!d)return;
+ if($('wnNorma'))$('wnNorma').value=VIENTO.norma;
+ if($('wnEvento'))$('wnEvento').value=VIENTO.evento;
+ if($('wnRiesgo'))$('wnRiesgo').value=String(VIENTO.riesgo);
+ if($('wnExp'))$('wnExp').value=VIENTO.exp;
+ if($('wnV'))$('wnV').value=VIENTO.V;
+ if($('wnKzt'))$('wnKzt').value=VIENTO.Kzt;
+ if($('wnKd'))$('wnKd').value=VIENTO.Kd;
+ if($('wnKe'))$('wnKe').value=VIENTO.Ke;
+ if($('wnG'))$('wnG').value=VIENTO.G;
+ if($('wnCpw'))$('wnCpw').value=VIENTO.Cpw;
+ if($('wnCpl'))$('wnCpl').value=VIENTO.Cpl;
+ if($('wnGCpi'))$('wnGCpi').value=VIENTO.GCpi;
+ if($('wnTecho'))$('wnTecho').checked=VIENTO.techo!==false;
+ actualizaInfoViento();d.style.display='flex'
+}
+function vientoNum(id,d){const v=+($(id)?$(id).value:NaN);return isFinite(v)?v:d}
+async function runViento(){
+ const d=$('wnw');if(d)d.style.display='none';
+ VIENTO={norma:$('wnNorma')?$('wnNorma').value:'asce22',evento:$('wnEvento')?$('wnEvento').value:'diseno',
+  riesgo:vientoNum('wnRiesgo',2),exp:$('wnExp')?$('wnExp').value:'C',V:vientoNum('wnV',165),
+  Kzt:vientoNum('wnKzt',1),Kd:vientoNum('wnKd',.85),Ke:vientoNum('wnKe',1),G:vientoNum('wnG',.85),
+  Cpw:vientoNum('wnCpw',.8),Cpl:vientoNum('wnCpl',-.5),GCpi:vientoNum('wnGCpi',.18),
+  techo:!!($('wnTecho')&&$('wnTecho').checked)};
+ if(!(VIENTO.V>0)){$('out').innerHTML='<span class="er">La velocidad básica de viento V debe ser mayor que cero.</span>';return}
+ progShow('Análisis de viento','Calculando presiones y casos ±X / ±Y…');
+ await nextFrame();await uiTick();
+ let r;
+ try{r=vientoCalc()}catch(e){console.error(e);$('out').innerHTML='<span class="er">Error de viento: '+e.message+'</span>';progHide();return}
+ if(r.err){$('out').innerHTML='<span class="er">'+r.err+'</span>';progHide();return}
+ progSet(90,'Análisis de viento','Preparando el informe…');await nextFrame();
+ vientoRes=r;resV=r.resEnv;res=resV;vieOn=true;sisOn=false;sismoRes=null;MODAL=null;resS=null;
+ updateSisUI();setM('def');$('out').innerHTML=informeViento(r);
+ progSet(100,'Listo');await uiTick();progHide();
+ $('hint').textContent='Viento aplicado ('+(VIENTO.norma=='prbc18'?'PRBC 2018':'ASCE 7-22')+'). Pulsa ▶ Calcular para volver a gravedad.'
+}
+if($('b_viento'))$('b_viento').onclick=abreViento;
+if($('wnX'))$('wnX').onclick=()=>{$('wnw').style.display='none'};
+if($('wnOk'))$('wnOk').onclick=runViento;
+if($('wnEvento'))$('wnEvento').onchange=actualizaInfoViento;
 
 /* ---------------- Memoria de cálculo (PDF por impresión) ---------------- */
 function apoyoTxt(r){const Lb=['Ux','Uy','Uz','Rx','Ry','Rz'];
@@ -2355,6 +2539,8 @@ function reportePDF(soloDescarga){
  h+='<h2>2. '+(LANG==='en'?'Analysis results':'Resultados del análisis')+'</h2>'+$('out').innerHTML;
  const sism=tablaSismo();
  if(sism)h+='<h2>3. '+(LANG==='en'?'Seismic analysis':'Análisis sísmico')+'</h2>'+sism;
+ const vw=vientoRes?tablaViento(vientoRes):'';
+ if(vw)h+='<h2>'+(sism?'4':'3')+'. '+(LANG==='en'?'Wind analysis':'Análisis de viento')+'</h2>'+vw;
  if(figs.length)h+='<h2>'+(sism?'4':'3')+'. '+(LANG==='en'?'Figures':'Figuras')+'</h2>'+figs.join('');
  h+='<h2>'+(sism?'5':'4')+'. '+(LANG==='en'?'Assumptions and notes':'Hipótesis y notas')+'</h2><div style="font-size:8.5pt">';
  const note=(es,en)=>'<p>'+(LANG==='en'?en:es)+'</p>';
