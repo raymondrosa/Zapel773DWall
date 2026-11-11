@@ -6,7 +6,8 @@
 :root{--bg:#fff;--fg:#1f2328;--mut:#6b7280;--bd:#d0d7de;--pn:#f6f8fa;--ac:#2563eb;--g:#d8dee4;--ok:#16a34a;--er:#dc2626;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0d1117;--fg:#e6edf3;--mut:#9aa4af;--bd:#30363d;--pn:#161b22;--ac:#58a6ff;--g:#2a313a;--ok:#3fb950;--er:#f85149}}
 :root[data-theme=dark]{--bg:#0d1117;--fg:#e6edf3;--mut:#9aa4af;--bd:#30363d;--pn:#161b22;--ac:#58a6ff;--g:#2a313a;--ok:#3fb950;--er:#f85149}
-html,body{height:100%;margin:0}body{background:var(--bg);color:var(--fg);font:13px system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;flex-direction:column}
+html,body{height:100%;margin:0}
+#cv{cursor:crosshair}body{background:var(--bg);color:var(--fg);font:13px system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;flex-direction:column}
 #tb{display:flex;flex-wrap:wrap;gap:5px;padding:6px 8px;border-bottom:1px solid var(--bd);background:var(--pn);align-items:center;position:relative;z-index:60}
 button,input,select,textarea{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:4px 8px}
 button{cursor:pointer}button.on{background:var(--ac);color:#fff;border-color:var(--ac)}button.go{background:var(--ok);color:#fff;border-color:var(--ok);font-weight:600}
@@ -120,7 +121,7 @@ button,select,input{touch-action:manipulation}
 <div id="tb">
 <span id="brand">Zapel773DWall</span>
 <span class="grup"><b id="langLbl">Idioma</b><select id="lang" title="Idioma de la interfaz"><option value="es">Español</option><option value="en">English</option></select></span>
-<span class="grup"><span class="lb">Dibujar</span><button type="button" id="t_sel" class="on">Seleccionar</button><button type="button" id="t_bar">Barra</button><button type="button" id="t_wal">Muro</button><button type="button" id="t_walp">Muro poli</button><button type="button" id="t_slb">Losa</button><button type="button" id="t_are">Carga de área</button><button type="button" id="t_zap">Zapata</button><button type="button" id="t_pla">Matre</button><button type="button" id="b_del">Eliminar</button></span>
+<span class="grup"><span class="lb">Dibujar</span><button type="button" id="t_sel" class="on">Seleccionar</button><button type="button" id="t_mov">Mover</button><button type="button" id="t_bar">Barra</button><button type="button" id="t_wal">Muro</button><button type="button" id="t_walp">Muro poli</button><button type="button" id="t_slb">Losa</button><button type="button" id="t_are">Carga de área</button><button type="button" id="t_zap">Zapata</button><button type="button" id="t_pla">Matre</button><button type="button" id="b_del">Eliminar</button></span>
 <span class="sp"></span>
 <span class="grup"><span class="lb">Apoyos</span><button type="button" id="t_supf" title="Apoyo fijo (empotrado): restringe Ux, Uy, Uz, Rx, Ry y Rz">Fijo</button><button type="button" id="t_supp" title="Apoyo articulado: restringe las traslaciones y deja libres los giros">Artic.</button><button type="button" id="t_supr" title="Apoyo de rodillo: restringe el descenso vertical Uz">Rodillo</button><button type="button" id="t_supn" title="Quita el apoyo del nudo (lo deja libre)">Libre</button></span>
 <span class="sp"></span>
@@ -219,7 +220,7 @@ const EN_DICT={
 "Cargas de superficie":"Surface loads","Matres":"Mats","Zapatas · contacto":"Footings · contact","Modos calculados":"Computed modes","Derivas y estabilidad":"Drifts and stability","Equilibrio":"Equilibrium",
 "Período y cortante":"Period and base shear","Distribución por nivel":"Distribution by level","Torsión accidental":"Accidental torsion","Dirección X":"Direction X","Dirección Y":"Direction Y","Entrepiso":"Story",
 "Ayuda":"Help","Ayuda y atajos":"Help and shortcuts","Atajos y consejos":"Shortcuts and tips","Acerca de Zapel773DWall":"About Zapel773DWall","Guía":"Guide","Idioma":"Language",
-"Viento…":"Wind…","Viento":"Wind","Análisis de viento":"Wind analysis","Escenario":"Scenario","Exposición":"Exposure","Categoría de riesgo":"Risk category",
+"Mover":"Move","Copiar / duplicar":"Copy / duplicate","Agrupar":"Group","Desagrupar":"Ungroup","Eliminar selección":"Delete selection","Viento…":"Wind…","Viento":"Wind","Análisis de viento":"Wind analysis","Escenario":"Scenario","Exposición":"Exposure","Categoría de riesgo":"Risk category",
 "Velocidad básica V (mph)":"Basic wind speed V (mph)","Incluir succión de techo":"Include roof suction","Calcular viento":"Run wind",
 "Diseño (mapa)":"Design (map)","Huracán María 2017 · 155 mph sostenido":"Hurricane Maria 2017 · 155 mph sustained",
 "GCpi (presión interna)":"GCpi (internal pressure)","Cp barlovento":"Windward Cp","Cp sotavento":"Leeward Cp",
@@ -323,7 +324,8 @@ function prism(r,a,z,col){const s=sp(r),ax=axes(r);if(ax.L<1e-9)return;const at=
 const PLS={XY:[0,1,2],XZ:[0,2,1],YZ:[1,2,0]},RL=['Ux','Uy','Uz','Rx','Ry','Rz'],FL=['Fx','Fy','Fz','Mx','My','Mz'];
 const D={ty:'rect',b:.3,h:.5,bf:.15,hf:.12,bw:.25,Dm:.4,d:.3,tf:.01,tw:.007,tt:.01,pts:[[0,0],[.3,0],[.3,.5],[0,.5]],mat:'H',fc:28,E:25,ang:0,wa:0,wb:0,xa:0,xb:0,ya:0,yb:0,pza:0,pzb:0,pya:0,pyb:0,kz:0,ky:0,div:4,a1:0,a2:0};
 let cu='IM';const UN={SI:{L:['m',1],F:['kN',1],FL:['kN·m',1],q:['kN/m',1],E:['GPa',1],k:['kN/m³',1],d:['mm',1000],s:['mm',1000],fc:['MPa',1],A:['cm²',1e4],I:['cm⁴',1e8],p:['kN/m²',1],gw:['kN/m³',1],ar:['m²',1]},IM:{L:['ft',3.28084],F:['kip',.224809],FL:['kip·ft',.737562],q:['kip/ft',.068522],E:['ksi',145.038],k:['kip/ft³',.006366],d:['in',39.3701],s:['in',39.3701],fc:['ksi',.145038],A:['in²',1550.003],I:['in⁴',2402510],p:['ksf',.0208854],gw:['kip/ft³',.00636588],ar:['ft²',10.7639]}},UF=k=>k?UN[cu][k][1]:1,UL=k=>UN[cu][k][0],fmtv=v=>+v.toPrecision(6),KM={N:'F',Vy:'F',Vz:'F',T:'FL',My:'FL',Mz:'FL',Sy:'q',Sz:'q'};
-let N=[],B=[],MUROS=[],LOSAS=[],CARGAS=[],ZAPATAS=[],PLATEAS=[],ANOT=[],sismoRes=null,MODAL=null,vientoRes=null,resV=null,vieOn=false,tool='sel',sel=null,res=null,resG=null,resS=null,sisOn=false,mode='model',chain=null,poly=null,drag=null,ms=null,C={a:-.6,p:.45,S:40,ox:300,oy:300},dpr=devicePixelRatio||1;
+let FUS_DUP=0;
+let N=[],B=[],MUROS=[],LOSAS=[],CARGAS=[],ZAPATAS=[],PLATEAS=[],ANOT=[],SEL=[],GRUPOS=[],rubber=null,moveBase=null,sismoRes=null,MODAL=null,vientoRes=null,resV=null,vieOn=false,tool='sel',sel=null,res=null,resG=null,resS=null,sisOn=false,mode='model',chain=null,poly=null,drag=null,ms=null,C={a:-.6,p:.45,S:40,ox:300,oy:300},dpr=devicePixelRatio||1;
 /* estado de dibujo: muro poligonal, cotas y guías */
 let WGRP=0,wchain=null,widx=[],dimA=null,aline=null,ortho=true,polar=0,shiftDown=false,cdiag=false,SNAP=null;
 /* valores por defecto de los objetos nuevos (siempre en unidades internas: m, kN, kN/m²) */
@@ -1646,7 +1648,7 @@ function draw(){
   if(res&&(mode=='sMx'||mode=='sMy')&&LOSAS.length){
    const nc=placas().filter(Boolean).length;
    if(nc<LOSAS.length){g.fillStyle=mt;g.fillText((LOSAS.length-nc)+' losa(s) sin Mx/My: revisa que el polígono sea plano y no degenerado.',10,16)}};
- drawAnot(Cc);drawGuiaDims(Cc);
+ drawAnot(Cc);drawGuiaDims(Cc);drawSelectionOverlay();
  if(SNAP&&ms&&ms.p&&tool!='sel'&&(SNAP.type=='end'||SNAP.type=='perp')){
   const s=proj(SNAP.p[0],SNAP.p[1],SNAP.p[2]),perp=SNAP.type=='perp';
   g.strokeStyle=g.fillStyle=perp?'#0891b2':'#d946ef';g.lineWidth=2;
@@ -1687,12 +1689,203 @@ function resumenContorno(){
 
   else if(mode=='sS1'||mode=='sS2'){LOSAS.forEach((s,i)=>{const a=(res.memb||[]).filter(q=>q.si===i).map(q=>mode=='sS1'?q.s1:q.s2).filter(isFinite);if(!a.length)return;let mn=1e30,mx=-1e30;a.forEach(v=>{if(v<mn)mn=v;if(v>mx)mx=v});o.push(['L'+(i+1),mode=='sS1'?'σ1':'σ2',mn*UF('p'),mx*UF('p'),UL('p')])})}
  return o}
+
+/* ---------- Selección múltiple, grupos, copia y movimiento ---------- */
+const sameItem=(a,b)=>!!a&&!!b&&a.t==b.t&&a.i==b.i;
+function groupOf(t,i){return GRUPOS.findIndex(g=>g.items.some(q=>q.t==t&&q.i===i))}
+function expandSel(items){
+ const out=[],seen=new Set();
+ (items||[]).forEach(it=>{if(!it)return;const gi=groupOf(it.t,it.i),list=gi>=0?GRUPOS[gi].items:[it];
+  list.forEach(q=>{const k=q.t+':'+q.i;if(!seen.has(k)){seen.add(k);out.push({t:q.t,i:+q.i})}})});
+ return out}
+function setSelection(items,add,toggle){
+ const list=[],seen=new Set();
+ (items||[]).forEach(it=>{if(!it)return;const k=it.t+':'+it.i;if(!seen.has(k)){seen.add(k);list.push({t:it.t,i:+it.i})}});
+ if(add){
+  if(toggle&&list.length&&list.every(it=>SEL.some(q=>sameItem(q,it))))SEL=SEL.filter(q=>!list.some(it=>sameItem(q,it)));
+  else list.forEach(it=>{if(!SEL.some(q=>sameItem(q,it)))SEL.push(it)});
+ }else SEL=list;
+ SEL=SEL.filter(it=>it&&it.i>=0);
+ sel=SEL.length===1?SEL[0]:null;
+}
+function pickAt(px,py){
+ const an=hitAnot(px,py);if(an>=0)return{t:'a',i:an};
+ const hz=hitZap(px,py);if(hz>=0)return{t:'z',i:hz};
+ const hn=hitN(px,py);if(hn>=0)return{t:'n',i:hn};
+ const hb=hitB(px,py);if(hb>=0)return{t:'b',i:hb};
+ const hw=hitWall(px,py);if(hw>=0)return{t:'w',i:hw};
+ const ha=hitArea(px,py);if(ha>=0)return{t:'c',i:ha};
+ const hs=hitSlab(px,py);if(hs>=0)return{t:'s',i:hs};
+ const hp=hitPlatea(px,py);if(hp>=0)return{t:'p',i:hp};
+ return null}
+function selectClick(it,e){
+ let items=[it];
+ if(it&&!e.altKey){const gi=groupOf(it.t,it.i);if(gi>=0)items=GRUPOS[gi].items.slice()}
+ setSelection(items,!!(e.ctrlKey||e.metaKey),true);form();draw()}
+function itemPts(it){
+ if(!it)return[];
+ if(it.t=='n'){const n=N[it.i];return n?[proj(n.x,n.y,n.z)]:[]}
+ if(it.t=='b'){const r=B[it.i];if(!r)return[];const a=N[r.i],b=N[r.j];if(!a||!b)return[];
+  const p0=proj(a.x,a.y,a.z),p1=proj(b.x,b.y,b.z);return[p0,proj((a.x+b.x)/2,(a.y+b.y)/2,(a.z+b.z)/2),p1]}
+ if(it.t=='w'){const w=MUROS[it.i],g=w?wallGeo(w):null;if(!g)return[];return g.p.map(q=>proj(q.x,q.y,q.z))}
+ if(it.t=='s'||it.t=='c'){const o=(it.t=='s'?LOSAS:CARGAS)[it.i];if(!o||!o.pts)return[];const Z=slabZs(o);return o.pts.map((p,k)=>proj(p[0],p[1],Z[k]))}
+ if(it.t=='z'){const z=ZAPATAS[it.i],n=z?N[z.n]:null;return n?[proj(n.x,n.y,n.z)]:[]}
+ if(it.t=='p'){const o=PLATEAS[it.i];if(!o||!o.pts)return[];return o.pts.map(p=>proj(p[0],p[1],+o.z||0))}
+ if(it.t=='a'){const a=ANOT[it.i];if(!a)return[];
+  if(a.t=='dim')return[proj(...a.a),proj(...a.b)];if(a.t=='line')return(a.pts||[]).map(p=>proj(...p));return a.p?[proj(...a.p)]:[]}
+ return[]}
+function segRect(x1,y1,x2,y2,r){
+ const x0=Math.min(r.x0,r.x1),x3=Math.max(r.x0,r.x1),y0=Math.min(r.y0,r.y1),y3=Math.max(r.y0,r.y1);
+ const inR=(x,y)=>x>=x0&&x<=x3&&y>=y0&&y<=y3;
+ if(inR(x1,y1)||inR(x2,y2))return true;
+ const inter=(a,b,c,d)=>{const o=(p,q,r)=>(q[0]-p[0])*(r[1]-p[1])-(q[1]-p[1])*(r[0]-p[0]);
+  const A=[x1,y1],B2=[x2,y2],C=[a,b],D=[c,d],o1=o(A,B2,C),o2=o(A,B2,D),o3=o(C,D,A),o4=o(C,D,B2);
+  return o1*o2<0&&o3*o4<0};
+ return inter(x0,y0,x3,y0)||inter(x3,y0,x3,y3)||inter(x3,y3,x0,y3)||inter(x0,y3,x0,y0)}
+function rectSelect(r){
+ const win=r.x1>=r.x0,items=[],seen=new Set();
+ const addIt=it=>{const gi=groupOf(it.t,it.i),list=gi>=0?GRUPOS[gi].items:[it];
+  list.forEach(q=>{const k=q.t+':'+q.i;if(!seen.has(k)){seen.add(k);items.push(q)}})};
+ ['b','w','s','c','z','p','a'].forEach(t=>{
+  const arr=t=='b'?B:t=='w'?MUROS:t=='s'?LOSAS:t=='c'?CARGAS:t=='z'?ZAPATAS:t=='p'?PLATEAS:ANOT;
+  arr.forEach((_,i)=>{const it={t,i},pts=itemPts(it);if(!pts.length)return;
+   let ok=win?pts.every(p=>p[0]>=Math.min(r.x0,r.x1)&&p[0]<=Math.max(r.x0,r.x1)&&p[1]>=Math.min(r.y0,r.y1)&&p[1]<=Math.max(r.y0,r.y1)):
+    pts.some(p=>p[0]>=Math.min(r.x0,r.x1)&&p[0]<=Math.max(r.x0,r.x1)&&p[1]>=Math.min(r.y0,r.y1)&&p[1]<=Math.max(r.y0,r.y1));
+   if(!ok&&!win){for(let k=1;k<pts.length;k++)if(segRect(pts[k-1][0],pts[k-1][1],pts[k][0],pts[k][1],r)){ok=true;break}}
+   if(ok)addIt(it)})});
+ if(r.add)setSelection(items,true,false);else setSelection(items,false,false);
+ form();draw()}
+function formMulti(p){
+ const counts={};SEL.forEach(q=>{counts[q.t]=(counts[q.t]||0)+1});
+ const gi=SEL.length?groupOf(SEL[0].t,SEL[0].i):-1;
+ p.innerHTML='<b>'+SEL.length+' elementos seleccionados</b>'+
+  (gi>=0?'<div class="m">Grupo: <b>'+GRUPOS[gi].name+'</b> · Alt+clic para seleccionar uno solo.</div>':'')+
+  '<div class="m">'+(counts.b?counts.b+' barras · ':'')+(counts.n?counts.n+' nodos · ':'')+(counts.w?counts.w+' muros · ':'')+(counts.s?counts.s+' losas · ':'')+(counts.c?counts.c+' cargas · ':'')+(counts.z?counts.z+' zapatas · ':'')+(counts.p?counts.p+' matres · ':'')+(counts.a?counts.a+' anotaciones':'')+'</div>'+
+  '<button style="width:100%;margin-top:6px" id="bMultiCopy">Copiar / duplicar</button><button style="width:100%;margin-top:4px" id="bMultiMove">Mover con snap</button><button style="width:100%;margin-top:4px" id="bMultiGroup">Agrupar</button><button style="width:100%;margin-top:4px" id="bMultiUngroup">Desagrupar</button><button style="width:100%;margin-top:4px" id="bMultiDel">Eliminar selección</button><div class="m" style="margin-top:6px">Ctrl+clic añade o quita. Arrastra en vacío para seleccionar por ventana (izq→der) o cruce (der→izq).</div>';
+ const b1=p.querySelector('#bMultiCopy'),b2=p.querySelector('#bMultiMove'),b3=p.querySelector('#bMultiGroup'),b4=p.querySelector('#bMultiUngroup'),b5=p.querySelector('#bMultiDel');
+ if(b1)b1.onclick=duplicarSeleccion;if(b2)b2.onclick=()=>setT('mov');if(b3)b3.onclick=agruparSeleccion;if(b4)b4.onclick=desagruparSeleccion;if(b5)b5.onclick=delSeleccion}
+function agruparSeleccion(){
+ const items=SEL.slice();if(items.length<2)return;
+ const inS=q=>SEL.some(x=>sameItem(x,q));
+ GRUPOS=GRUPOS.map(g=>({...g,items:g.items.filter(q=>!inS(q))})).filter(g=>g.items.length>=2);
+ const id=GRUPOS.reduce((m,g)=>Math.max(m,g.id||0),0)+1;
+ GRUPOS.push({id,name:'Grupo '+id,items:items.map(q=>({t:q.t,i:q.i}))});
+ sel=null;form();draw()}
+function desagruparSeleccion(){
+ const inS=q=>SEL.some(x=>sameItem(x,q));
+ GRUPOS=GRUPOS.filter(g=>!g.items.some(inS));form();draw()}
+function delSeleccion(){
+ const items=(SEL.length?expandSel(SEL):(sel?[{t:sel.t,i:sel.i}]:[]));
+ if(!items.length)return;
+ const rem={n:new Set(),b:new Set(),w:new Set(),s:new Set(),c:new Set(),z:new Set(),p:new Set(),a:new Set()};
+ items.forEach(q=>{if(rem[q.t])rem[q.t].add(q.i)});
+ for(let i=0;i<MUROS.length;i++)if(rem.w.has(i)&&MUROS[i].grp){const g=MUROS[i].grp;MUROS.forEach((v,j)=>{if(v.grp==g)rem.w.add(j)})}
+ if(rem.n.size){B.forEach((r,i)=>{if(rem.n.has(r.i)||rem.n.has(r.j))rem.b.add(i)});
+  MUROS.forEach((w,i)=>{if(w.n.some(k=>rem.n.has(k)))rem.w.add(i)});
+  ZAPATAS.forEach((z,i)=>{if(rem.n.has(z.n))rem.z.add(i)})}
+ const maps={};
+ const filt=(arr,set,key)=>{const out=[],m=new Map();arr.forEach((v,i)=>{if(!set.has(i)){m.set(i,out.length);out.push(v)}});maps[key]=m;return out};
+ B=filt(B,rem.b,'b');MUROS=filt(MUROS,rem.w,'w');LOSAS=filt(LOSAS,rem.s,'s');CARGAS=filt(CARGAS,rem.c,'c');ZAPATAS=filt(ZAPATAS,rem.z,'z');PLATEAS=filt(PLATEAS,rem.p,'p');ANOT=filt(ANOT,rem.a,'a');
+ const used=new Set();B.forEach(r=>{used.add(r.i);used.add(r.j)});MUROS.forEach(w=>w.n.forEach(i=>used.add(i)));
+ const nMap=new Map(),n2=[];N.forEach((n,i)=>{if(used.has(i)&&!rem.n.has(i)){nMap.set(i,n2.length);n2.push(n)}});N=n2;
+ B.forEach(r=>{r.i=nMap.get(r.i);r.j=nMap.get(r.j)});MUROS.forEach(w=>{w.n=w.n.map(i=>nMap.get(i))});ZAPATAS.forEach(z=>{z.n=nMap.get(z.n)});
+ const allMaps={b:maps.b,w:maps.w,s:maps.s,c:maps.c,z:maps.z,p:maps.p,a:maps.a,n:nMap};
+ GRUPOS=GRUPOS.map(g=>{const items=[];g.items.forEach(q=>{const m=allMaps[q.t];if(!m)return;if(m.has(q.i))items.push({t:q.t,i:m.get(q.i)})});return{...g,items}}).filter(g=>g.items.length>=2);
+ SEL=[];sel=null;res=null;chain=null;poly=null;wchain=null;widx=[];dimA=null;aline=null;$('out').innerHTML='';form();setM('model')}
+function translateSelection(dx,dy,dz){
+ const items=expandSel(SEL.length?SEL:(sel?[sel]:[]));if(!items.length)return;
+ const nodes=new Set();items.forEach(it=>{if(it.t=='n')nodes.add(it.i);else if(it.t=='b'){const r=B[it.i];if(r){nodes.add(r.i);nodes.add(r.j)}}else if(it.t=='w'){const w=MUROS[it.i];if(w)w.n.forEach(i=>nodes.add(i))}else if(it.t=='z'){const z=ZAPATAS[it.i];if(z)nodes.add(z.n)}});
+ nodes.forEach(i=>{const n=N[i];if(n){n.x+=dx;n.y+=dy;n.z+=dz}});
+ items.forEach(it=>{
+  if(it.t=='s'||it.t=='c'){const o=(it.t=='s'?LOSAS:CARGAS)[it.i];if(!o)return;o.pts=o.pts.map(p=>[p[0]+dx,p[1]+dy]);if(o.zs)o.zs=o.zs.map(z=>z+dz);if(o.z!=null)o.z+=dz}
+  else if(it.t=='p'){const o=PLATEAS[it.i];if(!o)return;o.pts=o.pts.map(p=>[p[0]+dx,p[1]+dy]);if(o.z!=null)o.z+=dz}
+  else if(it.t=='a'){const a=ANOT[it.i];if(!a)return;const sh=p=>[p[0]+dx,p[1]+dy,p[2]+dz];
+   if(a.t=='dim'){a.a=sh(a.a);a.b=sh(a.b)}else if(a.t=='line')a.pts=a.pts.map(sh);else if(a.p)a.p=sh(a.p)}});
+ const fused=fusionarNodos();
+ res=null;$('out').innerHTML='';form();draw();
+ if(fused===1)$('hint').textContent='Conexión: 1 nudo fusionado. La copia comparte un solo nudo; el resto trabaja como voladizo. Para que toda la copia siga a la original, conecta más nudos coincidentes.';
+ else if(fused>1)$('hint').textContent='Conexión: '+fused+' nudos fusionados.';
+ if(FUS_DUP>0)$('hint').textContent=($('hint').textContent?$('hint').textContent+' · ':'')+FUS_DUP+' elemento(s) superpuesto(s) eliminado(s) (se conserva el original) para no duplicar rigidez ni peso.'}
+function duplicarSeleccion(){
+ const items=expandSel(SEL.length?SEL:(sel?[sel]:[]));if(!items.length)return;
+ const off=(+$('gs').value||1)/UF('L'),nm=new Map(),newItems=[];
+ const gN=i=>{if(!nm.has(i)){const n=N[i];N.push({...n,x:n.x+off,y:n.y+off,r:n.r.slice(),f:n.f.slice()});nm.set(i,N.length-1)}return nm.get(i)};
+ const add=(t,i)=>{if(!newItems.some(q=>q.t==t&&q.i===i))newItems.push({t,i})};
+ items.forEach(it=>{
+  if(it.t=='n'){add('n',gN(it.i))}
+  else if(it.t=='b'){const r=B[it.i];if(!r)return;const i=gN(r.i),j=gN(r.j);B.push({...r,i,j});add('b',B.length-1)}
+  else if(it.t=='w'){const w=MUROS[it.i];if(!w)return;MUROS.push({...w,n:w.n.map(gN),grp:0,gk:undefined});add('w',MUROS.length-1)}
+  else if(it.t=='z'){const z=ZAPATAS[it.i];if(!z)return;ZAPATAS.push({...z,n:gN(z.n)});add('z',ZAPATAS.length-1)}
+  else if(it.t=='s'){const s=LOSAS[it.i];if(!s)return;LOSAS.push({...s,pts:s.pts.map(p=>[p[0]+off,p[1]+off]),zs:(s.zs||slabZs(s)).map(z=>z)});add('s',LOSAS.length-1)}
+  else if(it.t=='c'){const c=CARGAS[it.i];if(!c)return;CARGAS.push({...c,pts:c.pts.map(p=>[p[0]+off,p[1]+off]),zs:c.zs?c.zs.slice():undefined});add('c',CARGAS.length-1)}
+  else if(it.t=='p'){const p=PLATEAS[it.i];if(!p)return;PLATEAS.push({...p,pts:p.pts.map(q=>[q[0]+off,q[1]+off])});add('p',PLATEAS.length-1)}
+  else if(it.t=='a'){const a=ANOT[it.i];if(!a)return;const sh=q=>[q[0]+off,q[1]+off,q[2]];let b;
+   if(a.t=='dim')b={...a,a:sh(a.a),b:sh(a.b)};else if(a.t=='line')b={...a,pts:a.pts.map(sh)};else b={...a,p:sh(a.p)};ANOT.push(b);add('a',ANOT.length-1)}});
+ const g0=groupOf(items[0].t,items[0].i),sameG=g0>=0&&items.every(q=>groupOf(q.t,q.i)==g0);
+ if(sameG&&newItems.length){const id=GRUPOS.reduce((m,g)=>Math.max(m,g.id||0),0)+1;GRUPOS.push({id,name:GRUPOS[g0].name+' copia',items:newItems.map(q=>({t:q.t,i:q.i}))})}
+ SEL=newItems;sel=SEL.length===1?SEL[0]:null;fusionarNodos();res=null;$('out').innerHTML='';form();draw()}
+
+
+function drawSelectionOverlay(){
+ if(SEL.length>1){
+  const all=[];
+  SEL.forEach(it=>itemPts(it).forEach(p=>{all.push(p);g.fillStyle='#7c3aed';g.beginPath();g.arc(p[0],p[1],2.6,0,7);g.fill()}));
+  if(all.length>=2){const xs=all.map(p=>p[0]),ys=all.map(p=>p[1]);g.strokeStyle='#7c3aed';g.lineWidth=1.4;g.setLineDash([4,3]);g.strokeRect(Math.min(...xs)-5,Math.min(...ys)-5,Math.max(...xs)-Math.min(...xs)+10,Math.max(...ys)-Math.min(...ys)+10);g.setLineDash([])}
+ }
+ if(rubber){
+  const x0=Math.min(rubber.x0,rubber.x1),y0=Math.min(rubber.y0,rubber.y1),w=Math.abs(rubber.x1-rubber.x0),h2=Math.abs(rubber.y1-rubber.y0),win=rubber.x1>=rubber.x0;
+  g.fillStyle=win?'rgba(37,99,235,.10)':'rgba(22,163,74,.10)';g.fillRect(x0,y0,w,h2);
+  g.strokeStyle=win?'#2563eb':'#16a34a';g.lineWidth=1.4;g.setLineDash([5,3]);g.strokeRect(x0,y0,w,h2);g.setLineDash([]);
+  g.fillStyle=win?'#2563eb':'#16a34a';g.font='11px system-ui';g.fillText(win?'VENTANA':'CRUCE',x0+4,Math.max(12,y0-5))}
+ if(moveBase){
+  const a=proj(moveBase[0],moveBase[1],moveBase[2]);g.fillStyle='#7c3aed';g.beginPath();g.arc(a[0],a[1],4,0,7);g.fill();
+  if(ms&&ms.p){const b=proj(ms.p[0],ms.p[1],ms.p[2]);g.strokeStyle='#7c3aed';g.lineWidth=1.6;g.setLineDash([6,4]);g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.stroke();g.setLineDash([]);
+   const dx=ms.p[0]-moveBase[0],dy=ms.p[1]-moveBase[1],u=UF('L');g.fillStyle='#7c3aed';g.font='11px system-ui';g.fillText('Δ '+ (Math.hypot(dx,dy)*u).toFixed(2)+' '+UL('L'),b[0]+6,b[1]-8)}}
+}
+
+
+function fusionarNodos(tol=1e-5){
+ FUS_DUP=0;tol=tol||1e-5;let fusionados=0;const keep=[],map=new Map();
+ N.forEach((n,i)=>{
+  let tgt=-1;
+  for(const k of keep){const m=N[k];if(Math.hypot(n.x-m.x,n.y-m.y,n.z-m.z)<tol){tgt=k;break}}
+  if(tgt<0){keep.push(i);map.set(i,i)}
+  else{const t=N[tgt];for(let k=0;k<6;k++)t.f[k]+=n.f[k];map.set(i,tgt);fusionados++}
+ });
+ if(keep.length===N.length){FUS_DUP=quitarDuplicados();return 0;}
+ const idx=new Map(),N2=[];keep.forEach(old=>{idx.set(old,N2.length);N2.push(N[old])});
+ const fm=new Map();map.forEach((tgt,old)=>{if(idx.has(tgt))fm.set(old,idx.get(tgt))});
+ N=N2;B.forEach(r=>{r.i=fm.get(r.i);r.j=fm.get(r.j)});MUROS.forEach(w=>{w.n=w.n.map(i=>fm.get(i))});ZAPATAS.forEach(z=>{z.n=fm.get(z.n)});
+ SEL=SEL.map(it=>it.t=='n'?{...it,i:fm.get(it.i)}:it).filter(it=>it.i!=null);
+ if(sel&&sel.t=='n')sel={...sel,i:fm.get(sel.i)};
+ GRUPOS=GRUPOS.map(g=>({...g,items:g.items.map(q=>q.t=='n'?{t:'n',i:fm.get(q.i)}:q).filter(q=>q.i!=null)})).filter(g=>g.items.length>=2);
+ /* Tras fusionar nudos, la copia puede dejar barras, muros o zapatas superpuestos (mismos nudos). Se conserva el original y se eliminan los repetidos: si no, se cuentan dos veces la rigidez y el peso. */
+ FUS_DUP=quitarDuplicados();
+ return fusionados}
+function quitarDuplicados(){
+ let quitados=0;
+ const limpia=(arr,t,clave)=>{
+  const vistos=new Map(),map=new Map(),keep=[];
+  arr.forEach((o,i)=>{const k=clave(o);if(k!=null&&vistos.has(k)){map.set(i,vistos.get(k));quitados++}else{if(k!=null)vistos.set(k,keep.length);map.set(i,keep.length);keep.push(o)}});
+  if(keep.length===arr.length)return arr;
+  const rem=q=>q.t==t?{...q,i:map.get(q.i)}:q;
+  SEL=SEL.map(rem).filter((q,k,a)=>a.findIndex(z=>z.t==q.t&&z.i===q.i)===k);
+  if(sel&&sel.t==t)sel=rem(sel);
+  GRUPOS=GRUPOS.map(g=>({...g,items:g.items.map(rem).filter((q,k,a)=>a.findIndex(z=>z.t==q.t&&z.i===q.i)===k)})).filter(g=>g.items.length>=2);
+  return keep};
+ B=limpia(B,'b',r=>r.i===r.j?null:Math.min(r.i,r.j)+'-'+Math.max(r.i,r.j));
+ MUROS=limpia(MUROS,'w',w=>(w.n&&w.n.length)?[...w.n].sort((a,b)=>a-b).join('-'):null);
+ ZAPATAS=limpia(ZAPATAS,'z',z=>z.n==null?null:String(z.n));
+ return quitados}
+
 function form(){const p=$('prop');
- if(!sel){const chips=[];
+ if(SEL.length>1){formMulti(p);return}
+ if(sel){if(SEL.length!==1||!sameItem(SEL[0],sel))SEL=[{t:sel.t,i:sel.i}]}else if(SEL.length===1)sel=SEL[0];
+ if(!sel&&!SEL.length){const chips=[];
   B.forEach((r,i)=>chips.push(['b',i,'B'+(i+1)]));MUROS.forEach((w,i)=>chips.push(['w',i,wallTag(i)]));
   LOSAS.forEach((s,i)=>chips.push(['s',i,'L'+(i+1)]));CARGAS.forEach((c,i)=>chips.push(['c',i,'Q'+(i+1)]));
   ANOT.forEach((a,i)=>chips.push(['a',i,(a.t=='dim'?'C':a.t=='line'?'G':'T')+(i+1)]));
-  p.innerHTML='<p class="m">'+(LANG==='en'?'Draw with <b>Beam</b>, <b>Wall</b>, <b>Poly wall</b>, <b>Slab</b> or <b>Area load</b>; annotate with <b>Dimension</b>, <b>Guide</b> and <b>Text</b>; use <b>Supports</b> to assign fixed, pin or roller supports to nodes. In the slab, change the <b>Level</b> between clicks for a slope. Right-click or Esc ends the chain, polyline or polygon. Right-drag (or drag in Select) rotates the view; Shift+drag pans; the wheel zooms.</p>':'Dibuja con <b>Barra</b>, <b>Muro</b>, <b>Muro poli</b>, <b>Losa</b> o <b>Carga de área</b>; anota con <b>Cota</b>, <b>Guía</b> y <b>Texto</b>; con <b>Apoyos</b> asigna fijo, articulado o rodillo a los nudos. En la losa, cambia el <b>Nivel</b> entre clics para darle desnivel. Clic derecho o Esc cierra la cadena, la polilínea o el polígono. Clic derecho arrastrado (o arrastrar en Seleccionar) gira la vista, Mayús+arrastrar desplaza y la rueda hace zoom.</p>')
+  p.innerHTML='<p class="m">'+(LANG==='en'?'Draw with <b>Beam</b>, <b>Wall</b>, <b>Poly wall</b>, <b>Slab</b> or <b>Area load</b>; annotate with <b>Dimension</b>, <b>Guide</b> and <b>Text</b>; use <b>Supports</b> to assign fixed, pin or roller supports to nodes. In the slab, change the <b>Level</b> between clicks for a slope. Right-click or Esc ends the chain, polyline or polygon. Right-drag rotates the view; in Select, drag on empty space for a window/crossing selection; Shift+drag pans; the wheel zooms.</p>':'Dibuja con <b>Barra</b>, <b>Muro</b>, <b>Muro poli</b>, <b>Losa</b> o <b>Carga de área</b>; anota con <b>Cota</b>, <b>Guía</b> y <b>Texto</b>; con <b>Apoyos</b> asigna fijo, articulado o rodillo a los nudos. En la losa, cambia el <b>Nivel</b> entre clics para darle desnivel. Clic derecho o Esc cierra la cadena, la polilínea o el polígono. Clic derecho arrastrado gira la vista; en Seleccionar, arrastra en vacío para seleccionar por ventana o cruce, Mayús+arrastrar desplaza y la rueda hace zoom.</p>')
    +'<div class="m">Barras '+B.length+' · Muros '+MUROS.length+' · Losas '+LOSAS.length+' · Cargas de área '+CARGAS.length+' · Anotaciones '+ANOT.length+(ZAPATAS.length?' · Zapatas '+ZAPATAS.length:'')+'</div>'
    +(()=>{const rc=resumenContorno();return rc.length?'<b>Contornos'+(sisOn?' · sismo':'')+(vieOn&&mode=='sw'?' · viento':'')+'</b><table><tr><th></th><th></th><th>mín</th><th>máx</th></tr>'+rc.map(q=>'<tr><td>'+q[0]+'</td><td>'+q[1]+'</td><td>'+fmtEsc(q[2])+'</td><td>'+fmtEsc(q[3])+'</td></tr>').join('')+'</table><div class="m" style="font-size:11px">'+rc[0][4]+'</div>':''})()
    +(chips.length&&chips.length<=80?'<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:6px">'+chips.map(q=>'<button data-s="'+q[0]+':'+q[1]+'" style="padding:1px 6px">'+q[2]+'</button>').join('')+'</div>':'');
@@ -1952,7 +2145,8 @@ function formZ(p){
   +'<button style="margin-top:6px;width:100%" id="bDel">Eliminar zapata</button>';
  bindNum(p,z)}
 
-function del(){if(!sel)return;
+function del(){delSeleccion()}
+function delOneOld(){if(!sel)return;
  if(sel.t=='a'){ANOT.splice(sel.i,1);sel=null;form();draw();return}
  if(sel.t=='n'){const gs=new Set(MUROS.filter(w=>w.n.includes(sel.i)&&w.grp).map(w=>w.grp));
   B=B.filter(r=>r.i!=sel.i&&r.j!=sel.i);MUROS=MUROS.filter(w=>!w.n.includes(sel.i)&&!gs.has(w.grp))}
@@ -2011,12 +2205,12 @@ function verContornosSismo(){
  setM(m);
  const h=document.getElementById('hint');
  if(h)h.textContent='Contornos sísmicos: elige σ en muros, q/Mx/My en la matre, q en zapatas o Mx/My en losas. Botón Sismo para volver a gravedad.'}
-function setT(t){tool=t;chain=null;poly=null;wchain=null;widx=[];dimA=null;aline=null;SNAP=null;
- ['sel','bar','wal','walp','slb','are','zap','pla','cot','lin','txt','supf','supp','supr','supn'].forEach(k=>{const b=$('t_'+k);if(b)b.classList.toggle('on',t==k)});
- const h={sel:'',bar:'Barra: clic en cada nodo; clic derecho o Esc termina la cadena.',wal:'Muro: clic en el inicio y en el fin del muro (en planta); se levanta desde el nivel actual.',walp:'Muro poligonal: clic en cada vértice de la planta; clic derecho, Esc o doble clic termina. Vuelve al primer vértice para cerrar el polígono.',slb:'Losa: clic en los vértices; cambia el Nivel entre clics para darle desnivel. Clic derecho, Esc o doble clic cierra el polígono.',zap:'Zapata: clic en un nodo con apoyo para crear o seleccionar su zapata aislada.',pla:'Matre: dibuja el rectángulo en planta; calcula con las reacciones de los pilares que caen dentro.',are:'Carga de área: clic sobre una losa para aplicarla, o dibuja el polígono de la carga.',cot:'Cota: clic en el inicio y en el fin. «Orto» la mantiene horizontal o vertical; «Cota diag.» la alinea entre los dos puntos; el pinzamiento FIN engancha nudos y extremos.',lin:'Guía: clic en cada punto; mientras dibujas se muestran el tramo y el total. Cerca de una línea aparece el snap perpendicular ⊥. Clic derecho, Esc o doble clic termina.',txt:'Texto: clic donde quieras la nota y escribe el texto en el panel.',supf:'Apoyo fijo: clic en cada nudo que quieras empotrar (Ux, Uy, Uz, Rx, Ry, Rz).',supp:'Apoyo articulado: clic en los nudos; restringe las traslaciones y deja libres los giros.',supr:'Apoyo de rodillo: clic en los nudos; restringe Uz (apoyo vertical).',supn:'Quitar apoyo: clic en los nudos para dejarlos libres.'}[t]||'';
+function setT(t){tool=t;chain=null;poly=null;wchain=null;widx=[];dimA=null;aline=null;SNAP=null;rubber=null;if(t!='mov')moveBase=null;
+ ['sel','mov','bar','wal','walp','slb','are','zap','pla','cot','lin','txt','supf','supp','supr','supn'].forEach(k=>{const b=$('t_'+k);if(b)b.classList.toggle('on',t==k)});
+ const h={sel:'Seleccionar: clic en un elemento; Ctrl+clic añade o quita; arrastra en vacío para ventana/cruce. Clic derecho arrastrado gira la vista.',mov:'Mover: selecciona elementos, haz clic en un punto de esquina (snap FIN) y luego en el destino.',bar:'Barra: clic en cada nodo; clic derecho o Esc termina la cadena.',wal:'Muro: clic en el inicio y en el fin del muro (en planta); se levanta desde el nivel actual.',walp:'Muro poligonal: clic en cada vértice de la planta; clic derecho, Esc o doble clic termina. Vuelve al primer vértice para cerrar el polígono.',slb:'Losa: clic en los vértices; cambia el Nivel entre clics para darle desnivel. Clic derecho, Esc o doble clic cierra el polígono.',zap:'Zapata: clic en un nodo con apoyo para crear o seleccionar su zapata aislada.',pla:'Matre: dibuja el rectángulo en planta; calcula con las reacciones de los pilares que caen dentro.',are:'Carga de área: clic sobre una losa para aplicarla, o dibuja el polígono de la carga.',cot:'Cota: clic en el inicio y en el fin. «Orto» la mantiene horizontal o vertical; «Cota diag.» la alinea entre los dos puntos; el pinzamiento FIN engancha nudos y extremos.',lin:'Guía: clic en cada punto; mientras dibujas se muestran el tramo y el total. Cerca de una línea aparece el snap perpendicular ⊥. Clic derecho, Esc o doble clic termina.',txt:'Texto: clic donde quieras la nota y escribe el texto en el panel.',supf:'Apoyo fijo: clic en cada nudo que quieras empotrar (Ux, Uy, Uz, Rx, Ry, Rz).',supp:'Apoyo articulado: clic en los nudos; restringe las traslaciones y deja libres los giros.',supr:'Apoyo de rodillo: clic en los nudos; restringe Uz (apoyo vertical).',supn:'Quitar apoyo: clic en los nudos para dejarlos libres.'}[t]||'';
  $('hint').textContent=h;draw()}
 function view(a,p,pl){C.a=a;C.p=p;if(pl)$('pl').value=pl;fit();draw()}
-function load(n,b,ms,ls,cs,zs,pt,an){N=n;B=b;MUROS=ms||[];LOSAS=ls||[];CARGAS=cs||[];ZAPATAS=zs||[];PLATEAS=pt||[];ANOT=an||[];sel=null;res=null;chain=null;poly=null;wchain=null;widx=[];dimA=null;aline=null;$('out').innerHTML='';form();mode='model';fit();setM('model')}
+function load(n,b,ms,ls,cs,zs,pt,an,gr){N=n;B=b;MUROS=ms||[];LOSAS=ls||[];CARGAS=cs||[];ZAPATAS=zs||[];PLATEAS=pt||[];ANOT=an||[];GRUPOS=gr||[];SEL=[];rubber=null;moveBase=null;sel=null;fusionarNodos();res=null;chain=null;poly=null;wchain=null;widx=[];dimA=null;aline=null;$('out').innerHTML='';form();mode='model';fit();setM('model')}
 
 /* --- Barra de progreso global --- */
 let PROG_T0=0,PROG_TIMER=null;
@@ -2071,7 +2265,7 @@ function run(){res=analyze();vieOn=false;vientoRes=null;resV=null;const o=$('out
  h+='<b>Equilibrio</b>Cargas ΣF = ('+res.ap.map(v=>f(v*F_)).join(', ')+') · residuo = ('+res.resid.map(v=>f(v*F_,2)).join(', ')+') '+UL('F');
  if(res.avisos&&res.avisos.length)h+='<div class="er" style="margin-top:6px">'+res.avisos.join('<br>')+'</div>';
  o.innerHTML=h;setM('def')}
-$('t_sel').onclick=()=>setT('sel');$('t_bar').onclick=()=>setT('bar');$('t_wal').onclick=()=>setT('wal');$('t_walp').onclick=()=>setT('walp');$('t_slb').onclick=()=>setT('slb');$('t_are').onclick=()=>setT('are');$('t_zap').onclick=()=>setT('zap');$('t_pla').onclick=()=>setT('pla');$('t_supf').onclick=()=>setT('supf');$('t_supp').onclick=()=>setT('supp');$('t_supr').onclick=()=>setT('supr');$('t_supn').onclick=()=>setT('supn');$('t_cot').onclick=()=>setT('cot');$('t_lin').onclick=()=>setT('lin');$('t_txt').onclick=()=>setT('txt');$('b_del').onclick=del;$('b_run').onclick=runUI;$('b_fit').onclick=()=>{fit();draw()};$('zi').onclick=()=>{zoomAt(cv.clientWidth/2,cv.clientHeight/2,1.25);draw()};$('zo').onclick=()=>{zoomAt(cv.clientWidth/2,cv.clientHeight/2,.8);draw()};$('b_an').onclick=async()=>{if(anim){stopAnim();return}if(!res)await runUI();if(!res)return;setM('def');$('b_an').textContent='■ Detener';anim=requestAnimationFrame(tick)};$('b_clr').onclick=()=>load([],[]);
+$('t_sel').onclick=()=>setT('sel');$('t_mov').onclick=()=>setT('mov');$('t_bar').onclick=()=>setT('bar');$('t_wal').onclick=()=>setT('wal');$('t_walp').onclick=()=>setT('walp');$('t_slb').onclick=()=>setT('slb');$('t_are').onclick=()=>setT('are');$('t_zap').onclick=()=>setT('zap');$('t_pla').onclick=()=>setT('pla');$('t_supf').onclick=()=>setT('supf');$('t_supp').onclick=()=>setT('supp');$('t_supr').onclick=()=>setT('supr');$('t_supn').onclick=()=>setT('supn');$('t_cot').onclick=()=>setT('cot');$('t_lin').onclick=()=>setT('lin');$('t_txt').onclick=()=>setT('txt');$('b_del').onclick=del;$('b_run').onclick=runUI;$('b_fit').onclick=()=>{fit();draw()};$('zi').onclick=()=>{zoomAt(cv.clientWidth/2,cv.clientHeight/2,1.25);draw()};$('zo').onclick=()=>{zoomAt(cv.clientWidth/2,cv.clientHeight/2,.8);draw()};$('b_an').onclick=async()=>{if(anim){stopAnim();return}if(!res)await runUI();if(!res)return;setM('def');$('b_an').textContent='■ Detener';anim=requestAnimationFrame(tick)};$('b_clr').onclick=()=>load([],[]);
 if($('ort'))$('ort').onchange=()=>{ortho=$('ort').checked;if(ortho){polar=0;const p=$('pol');if(p)p.value='0'}draw()};
 if($('pol'))$('pol').onchange=()=>{polar=+$('pol').value||0;if(polar>0){ortho=false;const o=$('ort');if(o)o.checked=false}draw()};
 if($('cdiag'))$('cdiag').onchange=()=>{cdiag=$('cdiag').checked;draw()};
@@ -2090,6 +2284,7 @@ function abreGuia(){
   '<table>'+
   '<tr><td><b>1. Setup</b></td><td>Choose units, grid step and level. Default wall: 5 in thick, 8 ft high. Grid covers at least 130 ft.</td></tr>'+
   '<tr><td><b>2. Draw</b></td><td>Beam: click nodes; right-click/Esc ends. Wall/Wall poly: plan clicks. Slab/Area: polygon; change Level between clicks for slopes.</td></tr>'+
+  '<tr><td><b>2b. Select / copy</b></td><td>Click selects; Ctrl+click adds/removes; drag empty space for window/crossing. Copy / duplicate, Ctrl+D; Ctrl+G groups, Ctrl+Shift+G ungroups; Move uses corner snap.</td></tr>'+
   '<tr><td><b>3. Supports</b></td><td>Fixed, Pin, Roller or Free; click nodes. Tune individual DOF in the node panel.</td></tr>'+
   '<tr><td><b>4. Loads</b></td><td>Nodal loads, beam loads, area loads; wall and slab self-weight are automatic.</td></tr>'+
   '<tr><td><b>5. Calculate</b></td><td>Press Calculate. Check warnings, reactions, deformed shape and drift.</td></tr>'+
@@ -2102,6 +2297,7 @@ function abreGuia(){
   '<table>'+
   '<tr><td><b>1. Preparar</b></td><td>Elige unidades, malla y nivel. Muro inicial: 5 pulg de espesor y 8 pies de alto. La rejilla cubre al menos 130 pies.</td></tr>'+
   '<tr><td><b>2. Dibujar</b></td><td>Barra: clic en nudos; clic derecho/Esc termina. Muro/Muro poli: clics en planta. Losa/Carga: polígono; cambia el Nivel entre clics para rampas.</td></tr>'+
+  '<tr><td><b>2b. Seleccionar / copiar</b></td><td>Clic selecciona; Ctrl+clic añade/quita; arrastra en vacío para ventana/cruce. Copiar / duplicar, Ctrl+D; Ctrl+G agrupa, Ctrl+Mayús+G desagrupa; Mover usa snap de esquina.</td></tr>'+
   '<tr><td><b>3. Apoyos</b></td><td>Fijo, Artic., Rodillo o Libre; clic en nudos. Ajusta grados de libertad en el panel del nudo.</td></tr>'+
   '<tr><td><b>4. Cargas</b></td><td>Cargas nodales, en barras y de área; el peso propio de muros y losas es automático.</td></tr>'+
   '<tr><td><b>5. Calcular</b></td><td>Pulsa Calcular. Revisa avisos, reacciones, deformada y derivas.</td></tr>'+
@@ -2127,6 +2323,9 @@ function verAyuda(t){
   '<tr><td><b>Idioma</b></td><td>El selector <b>Idioma</b> de la barra cambia entre español (predeterminado) e inglés. La preferencia se guarda en el navegador; la guía rápida y los formularios se muestran en el idioma elegido.</td></tr>'+
   '<tr><td><b>Guía rápida</b></td><td>El botón <b>Guía</b> abre una guía de 8 pasos con los atajos básicos, en español o inglés.</td></tr>'+
   '<tr><td><b>Guía / Texto</b></td><td>La guía marca ejes o líneas de referencia y, mientras la dibujas, muestra la medida de cada tramo y el total acumulado. Al acercarte a una barra, muro, borde de losa, cota o guía aparece el pinzamiento perpendicular <b>⊥</b> (el pie de la perpendicular desde el último punto). El texto rotula la planta (por ejemplo «P1», «Muro cortina»).</td></tr>'+
+  '<tr><td><b>Selección múltiple</b></td><td>Ctrl+clic añade o quita elementos; arrastra en vacío de izquierda a derecha para ventana y de derecha a izquierda para cruce. Alt+clic dentro de un grupo selecciona un solo elemento.</td></tr>'+
+  '<tr><td><b>Copiar y agrupar</b></td><td><b>Copiar / duplicar</b> crea una copia desplazada; <b>Ctrl+D</b> duplica. <b>Ctrl+G</b> agrupa y <b>Ctrl+Mayús+G</b> desagrupa. Los grupos se guardan con el modelo. Al mover o pegar una copia sobre nudos existentes, los nudos coincidentes se fusionan y se conserva el apoyo del nudo original; el apoyo de la copia se descarta en ese nudo de unión para que el desplazamiento sea continuo.</td></tr>'+
+  '<tr><td><b>Mover con snap</b></td><td>Selecciona, pulsa <b>Mover</b>, haz clic en el punto base (se engancha a esquinas/nudos con FIN) y luego en el destino. Esc cancela.</td></tr>'+
   '<tr><td><b>Viento</b></td><td>En «Viento…» se aplica el procedimiento direccional de ASCE 7-22 o PRBC 2018 (ASCE 7-16) para edificio cerrado: Kz, qz, presiones de barlovento/sotavento, succión de techo, cuatro casos ±X/±Y, cortante basal, vuelco y derivas H/400. La velocidad V es editable; verifica el mapa oficial del sitio y la categoría de riesgo. «Huracán María 2017» usa 155 mph de viento sostenido reportado como escenario de referencia, no como velocidad básica de 3 s. Después del análisis, el botón <b>Viento</b> de Resultados alterna entre la envolvente de viento y la gravedad, con check ✓.</td></tr>'+
   '<tr><td><b>Sismo de escenario</b></td><td>En «Sismo…» elige «Espectro de evento sísmico». La lista incluye espectros 5% de USGS ShakeMap (Venezuela 2026, Turquía 2023, Noto 2024, Kaikoura 2016, Tohoku 2011, Maule 2010, Wenchuan 2008) en el punto de mayor PGA. Puedes escalar a un PGA objetivo o importar tu propio espectro (CSV/JSON: T, Sa en g). Es un escenario modelado, no un registro instrumental, y no ajusta por Vs30.</td></tr>'+
   '<tr><td><b>Contornos sísmicos</b></td><td>Después del sismo, pulsa el botón <b>Sismo</b> de Resultados (o «Ver contornos sísmicos» en el informe) y elige σ en muros, q/Mx/My en la matre, q en zapatas, Mx/My en losas o σ1/σ2 de membrana. Muros, zapatas y matres usan la envolvente D+E; en muros, σ es positivo en tracción y negativo en compresión. Las losas usan su rigidez de diafragma y los contornos σ1/σ2 muestran las tensiones principales de membrana.</td></tr>'+
@@ -2137,7 +2336,7 @@ function verAyuda(t){
   '<tr><td><b>Pinzamiento FIN</b></td><td>Con cualquier herramienta, al acercarte a un nudo, vértice de losa/carga o extremo de cota/guía aparece un cuadro «FIN». Al hacer clic engancha ese punto exacto, aunque esté en diagonal (tiene prioridad sobre «Orto»).</td></tr>'+
   '<tr><td><b>Desnivel</b></td><td>En la losa seleccionada usa «Desnivel / rampa» o edita x, y, z de cada vértice. Las vigas de borde inclinadas reciben el peso.</td></tr>'+
   '<tr><td><b>Zapata</b></td><td>Clic sobre un nudo con apoyo.</td></tr>'+
-  '<tr><td><b>Girar</b></td><td>Arrastrar con el botón izquierdo en Seleccionar (o botón derecho).</td></tr>'+
+  '<tr><td><b>Girar</b></td><td>Arrastrar con el botón derecho. En Seleccionar, arrastrar con el izquierdo en vacío crea una ventana/cruce de selección.</td></tr>'+
   '<tr><td><b>Desplazar</b></td><td>Mayús + arrastrar.</td></tr>'+
   '<tr><td><b>Zoom</b></td><td>Rueda del ratón, o pellizcar en pantalla táctil.</td></tr>'+
   '<tr><td><b>Eliminar</b></td><td>Supr con el objeto seleccionado.</td></tr>'+
@@ -2581,7 +2780,7 @@ function reportePDF(soloDescarga){
   let listo=true;try{const ims=w.document.images;for(let i=0;i<ims.length;i++)if(!ims[i].complete)listo=false}catch(e){listo=true}
   if(listo||k>40){clearInterval(tid);w.focus();w.print()}},150)}
 
-function saveModel(){const d={app:'zapel-3d',v:5,units:cu,N,B,MUROS,LOSAS,CARGAS,ZAPATAS,PLATEAS,ANOT},blob=new Blob([JSON.stringify(d,null,1)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Zapel773DWall-modelo.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function saveModel(){const d={app:'zapel-3d',v:5,units:cu,N,B,MUROS,LOSAS,CARGAS,ZAPATAS,PLATEAS,ANOT,GRUPOS},blob=new Blob([JSON.stringify(d,null,1)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Zapel773DWall-modelo.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 function parseModel(d){
  if(!d||d.app!='zapel-3d'||!Array.isArray(d.N)||!Array.isArray(d.B))throw 0;
  const a6=v=>Array.from({length:6},(_,k)=>+(v&&v[k])||0),n=d.N.map(q=>({x:+q.x||0,y:+q.y||0,z:+q.z||0,r:a6(q.r),f:a6(q.f)})),b=d.B.map(q=>({...D,...q})).filter(q=>n[q.i]&&n[q.j]);
@@ -2594,12 +2793,14 @@ function parseModel(d){
   .map(a=>a.t=='dim'?{...a,a:[+a.a[0],+a.a[1],+(a.a[2]||0)],b:[+a.b[0],+a.b[1],+(a.b[2]||0)],off:+a.off||0,txt:a.txt||''}:a.t=='line'?{...a,pts:a.pts.map(p=>[+p[0],+p[1],+(p[2]||0)])}:{...a,p:[+a.p[0],+a.p[1],+(a.p[2]||0)],s:a.s||'Texto'});
  const zp=(d.ZAPATAS||[]).filter(q=>q&&n[q.n]!==undefined).map(q=>({c1:.3,c2:.3,fu:1.4,...q}));
  const pt=(d.PLATEAS||[]).filter(q=>q&&Array.isArray(q.pts)&&q.pts.length>2).map(q=>({...DEFPL,...q}));
- return {n,b,mw,ls,cs,zp,pt,an,units:d.units=='IM'?'IM':'SI'}}
+ const lens={n:n.length,b:b.length,w:mw.length,s:ls.length,c:cs.length,z:zp.length,p:pt.length,a:an.length};
+ const gr=(d.GRUPOS||[]).map((g,gi)=>({id:+g.id||gi+1,name:String(g.name||('Grupo '+(gi+1))),items:(g.items||[]).filter(q=>q&&lens[q.t]!==undefined&&+q.i>=0&&+q.i<lens[q.t]).map(q=>({t:q.t,i:+q.i}))})).filter(g=>g.items.length>=2);
+ return {n,b,mw,ls,cs,zp,pt,an,gr,units:d.units=='IM'?'IM':'SI'}}
 function openModel(f){const rd=new FileReader();rd.onload=()=>{try{
  const m=parseModel(JSON.parse(rd.result));
  cu=m.units;$('un').value=cu;$('gs').value=cu=='SI'?.5:1;$('lv').value=0;
  document.querySelectorAll('[data-u]').forEach(s=>s.textContent=UL(s.dataset.u));syncDef();
- load(m.n,m.b,m.mw,m.ls,m.cs,m.zp,m.pt,m.an);if(m.b.length||m.mw.length)run()}
+ load(m.n,m.b,m.mw,m.ls,m.cs,m.zp,m.pt,m.an,m.gr);if(m.b.length||m.mw.length)run()}
  catch(e){$('out').innerHTML='<span class="er">El archivo no es un modelo válido de Zapel773DWall.</span>'}};rd.readAsText(f)}
 $('b_sismo').onclick=abreSismo;$('b_rep').onclick=reportePDF;$('b_save').onclick=saveModel;$('b_open').onclick=()=>$('fo').click();$('fo').onchange=e=>{const f=e.target.files[0];if(f)openModel(f);e.target.value=''};
 $('un').onchange=()=>{cu=$('un').value;$('gs').value=cu=='SI'?.5:1;$('lv').value=0;document.querySelectorAll('[data-u]').forEach(s=>s.textContent=UL(s.dataset.u));syncDef();form();if(res){const m=mode;run();setM(m)}else draw()};
@@ -2667,27 +2868,30 @@ cv.onpointerdown=e=>{const r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e
   sel={t:'n',i:hn};form();setM('model');
   $('stz').textContent='N'+(hn+1)+' · '+supNom(N[hn].r);
   return}
- const an=hitAnot(px,py);
- if(an>=0)sel={t:'a',i:an};else{const hz=hitZap(px,py);
-  if(hz>=0)sel={t:'z',i:hz};else{const hn=hitN(px,py);
-  if(hn>=0)sel={t:'n',i:hn};else{const hb=hitB(px,py);
-   if(hb>=0)sel={t:'b',i:hb};else{const hw=hitWall(px,py);
-    if(hw>=0)sel={t:'w',i:hw};else{const ha=hitArea(px,py);
-     if(ha>=0)sel={t:'c',i:ha};else{const hs=hitSlab(px,py);
-      if(hs>=0)sel={t:'s',i:hs};else{const hp=hitPlatea(px,py);if(hp>=0)sel={t:'p',i:hp};else{sel=null;drag={t:e.shiftKey?'p':'o',x:px,y:py,a:C.a,p:C.p,ox:C.ox,oy:C.oy,mv:0}}}}}}}}}
- form();draw()};
+ if(tool=='mov'){
+  if(!SEL.length){$('hint').textContent='Mover: selecciona primero uno o varios elementos.';return}
+  const p=snap(px,py);if(!p)return;
+  if(!moveBase){moveBase=[p[0],p[1],p[2]];$('hint').textContent='Mover: haz clic en el destino (snap FIN de esquina).';draw();return}
+  const dx=p[0]-moveBase[0],dy=p[1]-moveBase[1],dz=(p[2]||0)-(moveBase[2]||0);translateSelection(dx,dy,dz);moveBase=null;setT('sel');form();draw();return}
+ const it=pickAt(px,py);
+ if(it){selectClick(it,e);return}
+ if(e.shiftKey){drag={t:'p',x:px,y:py,a:C.a,p:C.p,ox:C.ox,oy:C.oy,mv:0};draw();return}
+ rubber={x0:px,y0:py,x1:px,y1:py,add:!!(e.ctrlKey||e.metaKey),mv:0};draw()};
 cv.onpointermove=e=>{const r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top;ms={p:snap(px,py)};
  if(ms.p&&(tool=='cot'||tool=='lin'||tool=='txt')&&!(SNAP&&(SNAP.type=='end'||SNAP.type=='perp')))ms.p=[ms.p[0],ms.p[1],(+$('lv').value||0)/UF('L')];
  if(dimA&&ms.p&&!cdiag&&!(SNAP&&SNAP.type=='end'))ms.p=constrainPt(dimA,ms.p);
  if(tool=='lin'&&aline&&aline.length&&ms.p&&!(SNAP&&(SNAP.type=='end'||SNAP.type=='perp')))ms.p=constrainPt(aline[aline.length-1],ms.p);if(PT.has(e.pointerId))PT.set(e.pointerId,[px,py]);if(PT.size==2){pinchMove();return}
+  if(rubber){rubber.x1=px;rubber.y1=py;rubber.mv=(rubber.mv||0)+1;draw();return}
  if(drag){drag.mv+=Math.abs(px-drag.x)+Math.abs(py-drag.y)>0?1:0;if(drag.t=='o'){C.a=drag.a+(px-drag.x)*.01;C.p=Math.max(0,Math.min(Math.PI/2,drag.p+(py-drag.y)*.01))}else{C.ox=drag.ox+px-drag.x;C.oy=drag.oy+py-drag.y}}draw()};
-cv.onpointerup=cv.onpointercancel=e=>{PT.delete(e.pointerId);pin=null;if(drag&&drag.mv<3&&tool=='bar')chain=null;drag=null;draw()};cv.onpointerleave=()=>{SNAP=null;draw()};cv.oncontextmenu=e=>e.preventDefault();cv.ondblclick=()=>{if(poly)cerrarPoly();else if(aline)cerrarGuia();else if(wchain)cerrarMuroPoli()};
+cv.onpointerup=cv.onpointercancel=e=>{PT.delete(e.pointerId);pin=null;if(rubber){const r=rubber;rubber=null;if(Math.hypot(r.x1-r.x0,r.y1-r.y0)<3){if(!r.add){SEL=[];sel=null;form()}}else rectSelect(r);draw();return}if(drag&&drag.mv<3&&tool=='bar')chain=null;drag=null;draw()};cv.onpointerleave=()=>{SNAP=null;draw()};cv.oncontextmenu=e=>e.preventDefault();cv.ondblclick=()=>{if(poly)cerrarPoly();else if(aline)cerrarGuia();else if(wchain)cerrarMuroPoli()};
 cv.onwheel=e=>{e.preventDefault();const r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top,k=e.deltaY<0?1.15:1/1.15;C.ox=px-(px-C.ox)*k;C.oy=py-(py-C.oy)*k;C.S*=k;draw()};
 addEventListener('keydown',e=>{if(e.target.tagName=='INPUT'||e.target.tagName=='SELECT')return;
  if(e.key=='Shift'){shiftDown=true;draw();return}
  if(e.key=='F8'){e.preventDefault();ortho=!ortho;if(ortho){polar=0;const q=$('pol');if(q)q.value='0'}const o=$('ort');if(o)o.checked=ortho;draw();return}
  if(e.key=='F10'){e.preventDefault();polar=polar?0:45;if(polar>0){ortho=false;const o=$('ort');if(o)o.checked=false}const p=$('pol');if(p)p.value=String(polar);draw();return}
- if(e.key=='Escape'){if(poly)cerrarPoly();else if(aline)cerrarGuia();else if(wchain)cerrarMuroPoli();else{dimA=null;chain=null;draw()}}
+ if(e.key=='Escape'){if(rubber){rubber=null;draw();return}if(moveBase){moveBase=null;setT('sel');draw();return}if(poly)cerrarPoly();else if(aline)cerrarGuia();else if(wchain)cerrarMuroPoli();else{dimA=null;chain=null;draw()}}
+ if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()=='d'){e.preventDefault();duplicarSeleccion();return}
+ if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()=='g'){e.preventDefault();if(e.shiftKey)desagruparSeleccion();else agruparSeleccion();return}
  if(e.key=='Delete'||e.key=='Backspace')del()});
 addEventListener('keyup',e=>{if(e.key=='Shift'){shiftDown=false;draw()}});
 $('b_ex3').onclick=()=>{const q=PRE[7];load([mk(0,0,0,[1,1,1,1,0,0]),mk(6,0,0,[0,1,1,1,0,0])],[bk(0,1,{ty:'I',d:q[1],bf:q[2],tf:q[3],tw:q[4],mat:'A',E:200,wa:20,wb:20,div:6})])};
