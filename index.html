@@ -450,7 +450,7 @@ function cargasSup(){
  for(let i=0;i<add.length;i++)add[i]+=area[i];
  return {add,area,losas,areas,avisos}}
 
-function analyze(){
+function analyze(keepK){
  if(!B.length&&!MUROS.length)return{err:'Dibuja al menos una barra o un muro.'};
  const nd=N.map(n=>({x:n.x,y:n.y,z:n.z})),used=new Set(),E=[],MEM=[],avisos=[];let wF=0;const wH=[0,0];
  /* --- cargas derivadas de losas, cargas de área y muros sin rigidez --- */
@@ -482,7 +482,12 @@ function analyze(){
   const m=Math.max(1,r.div|0),a=nd[r.i],z=nd[r.j];let p=r.i;
   for(let k=1;k<=m;k++){const q=k==m?r.j:nd.push({x:a.x+(z.x-a.x)*k/m,y:a.y+(z.y-a.y)*k/m,z:a.z+(z.z-a.z)*k/m})-1;
    E.push({M,k,m,i:p,j:q,ax,L:ax.L/m});p=q}});
- const n=nd.length*6,G=Array.from({length:n},()=>Array(n).fill(0)),F=Array(n).fill(0);
+ const n=nd.length*6;
+ /* El solver global es denso: G ocupa ~n² y la eliminación gaussiana duplica ese espacio.
+    Se avisa/bloquea antes de que el navegador se quede sin memoria. */
+ if(n>6000)return{err:'Modelo demasiado grande para el solver denso del navegador: '+nd.length+' nudos ('+n+' GDL). Reduce subdivisiones (div), simplifica losas/muros o divide el modelo en partes.'};
+ if(n>3500)avisos.push('Modelo grande ('+nd.length+' nudos, '+n+' GDL): el análisis puede tardar y consumir bastante memoria.');
+ const G=Array.from({length:n},()=>Array(n).fill(0)),F=Array(n).fill(0);
  E.forEach(e=>{const r=e.M.r,{ax,L}=e,sc=r._sec||sp(r),Em=r.E*1e6,ad=e.M.bi>=0?addB[e.M.bi]:0,
   K=kl(Em,Em/2.4,sc.A,sc.I,sc.Iz,sc.J,L),kz=(r.kz||0)*sc.w,ky=(r.ky||0)*sc.d,Rm=[ax.ex,ax.ey,ax.ez],T=Array.from({length:12},()=>Array(12).fill(0));
   if(kz||ky)GP.forEach(([x,w])=>{const h=hm(x,L),nz=[h[0],-h[1],h[2],-h[3]],iy=[1,5,7,11],iz=[2,4,8,10];for(let a=0;a<4;a++)for(let b=0;b<4;b++){K[iy[a]][iy[b]]+=ky*L*w*h[a]*h[b];K[iz[a]][iz[b]]+=kz*L*w*nz[a]*nz[b]}});
@@ -525,7 +530,7 @@ function analyze(){
   memb.push({si:M.si,q3:M.q3,sx,sy,txy,s1:avg+Rr,s2:avg-Rr})});
  return{ext,u,R,smp,dmax,resid:[0,1,2].map(k=>ap[k]+sr[k]+soil[k]),ap,avisos,
   muros:MUROS.map((w,i)=>{const q=wsm[i];if(!q||!q.length)return null;return {N:q[0].N,V:q[0].Vz,M:q[0].My,Vp:q[0].Vy,Mp:q[0].Mz}}),
-  cargas:{losas:qLosas,areas:qAreas,muros:qMuros},wsm,memb,Km:G,rs}}
+  cargas:{losas:qLosas,areas:qAreas,muros:qMuros},wsm,memb,Km:keepK?G:null,rs}}
 
 /*==NUCLEO:FIN==*/
 
@@ -1022,7 +1027,7 @@ function escalaRes(c,k){
   memb:(c.memb||[]).map(o=>{const q={...o};q.sx*=k;q.sy*=k;q.txy*=k;q.s1*=k;q.s2*=k;return q})}}
 function modalCalc(){
  const e=espectro();
- const base=analyze();
+ const base=analyze(true);
  if(base.err)return {err:base.err};
  const K=base.Km,rs=base.rs,n=K.length;
  const W=pesoNodos(+e.p.fA||0);
