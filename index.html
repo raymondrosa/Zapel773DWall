@@ -1941,7 +1941,7 @@ function syncLvlVis(){
  const s=$('lvlVis');if(!s)return;
  const zs=[...new Set(N.map(n=>+(+n.z).toFixed(4)))].sort((a,b)=>a-b);
  const cur=ZV==null?'':String(ZV);
- s.innerHTML='<option value="">Todos</option>'+zs.map(z=>'<option value="'+z+'">'+z.toFixed(2)+' '+UL('L')+'</option>').join('');
+ s.innerHTML='<option value="">'+(LANG==='en'?'All':'Todos')+'</option>'+zs.map((z,i)=>'<option value="'+z+'" title="'+z.toFixed(2)+' '+UL('L')+'">'+(LANG==='en'?'Level ':'Nivel ')+(i+1)+'</option>').join('');
  s.value=zs.some(z=>String(z)===cur)?cur:'';
 }
 function form(){const p=$('prop');
@@ -3002,7 +3002,14 @@ async function rustSismoRun(){
  const p=(typeof SISMO!=='undefined'&&SISMO)||{},nmo=Math.max(1,Math.min(+p.nmo||3,5));
  o.innerHTML='<span class="m">Calculando sismo modal con Rust…</span>';
  try{
-  const r=await window.ZAPEL_DESKTOP.solveRust(modelo,{sismo:true,modes:nmo});
+  let so={sismo:true,modes:nmo};
+  try{
+   const p={...DEFSIS,...(SISMO||{})},Si=SITIO[p.clase]||SITIO.D,{Fa,Fv}=coefSitio(p,Si);
+   const SDS=2*Fa*p.ss/3,SD1=2*Fv*p.s1/3;
+   const sis=SISTEMAS[+p.sis]||SISTEMAS[3],R=sis[1]||8,Ie=[1,1,1.25,1.5][+p.riesgo]||1;
+   so={sismo:true,modes:nmo,sds:SDS,sd1:SD1,tl:+p.TL||8,r:R,ie:Ie,fA:+p.fA||.25};
+  }catch(_){}
+  const r=await window.ZAPEL_DESKTOP.solveRust(modelo,so);
   if(!r||!r.ok){o.innerHTML='<span class="er">Rust sísmico: '+((r&&r.error)||'sin respuesta')+'</span>';return}
   let h='<b>Sismo modal espectral · Rust</b><div class="m">'+(r.solver||'')+'</div>';
   if(r.spectrum)h+='<table><tr><th>SDS</th><td>'+fmtEsc(r.spectrum.sds)+'</td></tr><tr><th>SD1</th><td>'+fmtEsc(r.spectrum.sd1)+'</td></tr><tr><th>T0</th><td>'+fmtEsc(r.spectrum.t0)+' s</td></tr><tr><th>Ts</th><td>'+fmtEsc(r.spectrum.ts)+' s</td></tr></table>';
