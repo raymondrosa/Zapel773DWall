@@ -124,23 +124,26 @@ button,select,input{touch-action:manipulation}
 /* Menu lateral izquierdo */
 body{flex-direction:row;overflow:hidden}
 #side{width:205px;max-width:205px;flex:0 0 205px;height:100vh;overflow-y:auto;overflow-x:hidden;background:var(--pn);border-right:1px solid var(--bd);z-index:60;display:flex;flex-direction:column;gap:2px;padding:6px}
-#side button{font-size:13px;padding:4px 5px;white-space:normal;line-height:1.2;text-align:left;display:inline-flex;align-items:center;gap:4px;min-width:0;width:100%}
+#side button{font-size:14px;padding:4px 5px;white-space:normal;line-height:1.2;text-align:left;display:inline-flex;align-items:center;gap:4px;min-width:0;width:100%}
 #side .grup{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;width:100%;align-items:stretch;margin:0 0 5px}
 #side .grup button{width:100%;min-width:0;justify-content:flex-start;overflow-wrap:anywhere}
-#side .grup .lb{grid-column:1/-1;width:100%;line-height:1.3;margin-top:3px;font-size:12px}
+#side .grup .lb{grid-column:1/-1;width:100%;line-height:1.3;margin-top:3px;font-size:13px}
 #side .grup #hint,#side .grup input,#side .grup select{grid-column:1/-1;width:100%}
 #side #tb,#side #tb2{display:flex;flex-direction:column;flex-wrap:nowrap;gap:3px;width:100%;padding:0;border:0;background:transparent;overflow:visible;align-items:stretch}
 #side .grup{display:flex;flex-wrap:wrap;gap:3px;width:100%;align-items:center;margin:0 0 5px}
 #side .grup .lb,#side .grup>b{display:block;width:100%;font-size:11px;color:var(--mut);font-weight:600}
 #side .sp{display:none!important}
-#side #brand{display:block!important;font-size:15px;margin-bottom:4px}
+#side #brand{display:block!important;font-size:16px;margin-bottom:4px}
 #side #b_tbcol{width:100%;order:-1}
 #side #hint{font-size:10px;line-height:1.3;max-height:52px;overflow:auto}
-#side.colapsada{width:0;flex-basis:0;padding:0;border-right:0;overflow:visible}
-#side.colapsada #tb .grup,#side.colapsada #tb2,#side.colapsada #brand,#side.colapsada #hint{display:none!important}
+#side.colapsada{width:46px;flex-basis:46px;padding:4px 3px;border-right:1px solid var(--bd);overflow:visible}
+#side.colapsada #tb,#side.colapsada #tb2,#side.colapsada #brand,#side.colapsada #hint{display:none!important}
+#rail{display:none;flex-direction:column;gap:5px;width:100%;align-items:center}
+#side.colapsada #rail{display:flex}
+#rail button{width:38px!important;height:38px;padding:0!important;font-size:18px;line-height:1;display:flex!important;align-items:center;justify-content:center;color:var(--fg)}
 #side.colapsada #tb{display:block;padding:0;border:0}
 #b_tbcol{position:fixed;left:205px;top:50%;transform:translateY(-50%);z-index:90;width:24px!important;min-width:24px!important;max-width:24px!important;height:40px;padding:0!important;font-size:16px;line-height:1;border-radius:0 7px 7px 0;background:var(--pn);box-shadow:0 1px 5px #0003}
-#side.colapsada #b_tbcol{left:0!important;border-radius:0 7px 7px 0;width:24px!important;height:44px}
+#side.colapsada #b_tbcol{left:46px!important;top:6px!important;transform:none;border-radius:0 7px 7px 0;width:22px!important;height:34px;font-size:14px}
 #mn{flex:1;min-width:0}
 #pn{width:300px}
 @media(max-width:760px){#side{width:180px;max-width:180px;flex-basis:180px}#pn{width:230px}#b_tbcol{left:180px}}
@@ -210,6 +213,16 @@ body{flex-direction:row;overflow:hidden}
 <button type="button" id="b_viento">Viento…</button>
 <button type="button" id="b_guide" title="Guía rápida de uso">Guía</button>
 <button type="button" id="b_help" title="Ayuda y atajos">?</button>
+</div>
+<div id="rail">
+<button type="button" id="r_toggle" title="Mostrar menú">›</button>
+<button type="button" id="r_run" title="Calcular">▶</button>
+<button type="button" id="r_rep" title="Reporte">▤</button>
+<button type="button" id="r_rep3" title="Descargar reporte">⬇</button>
+<button type="button" id="r_sismo" title="Sismo…">◈</button>
+<button type="button" id="r_viento" title="Viento…">≋</button>
+<button type="button" id="r_guide" title="Guía">?</button>
+<button type="button" id="r_help" title="Ayuda">i</button>
 </div>
 <div id="tb2">
 <span class="grup"><span class="lb">Vista</span><button type="button" id="v_iso">Iso</button><button type="button" id="v_xy">Planta</button><button type="button" id="v_xz">Frente</button><button type="button" id="v_yz">Lateral</button><button type="button" id="b_fit">Encuadrar</button><button type="button" id="zi">＋</button><button type="button" id="zo">－</button><label class="ck"><input type="checkbox" id="vs" checked> Secciones</label><label class="ck"><input type="checkbox" id="cm" checked> Cotas</label><button type="button" id="b_an">▶ Animar</button><span class="grup">×<input id="df" type="number" value="1" step="0.5" min="0.1" style="width:52px"></span></span>
@@ -3185,7 +3198,8 @@ if(cv)cv.title='Órbita: botón central o Alt + arrastrar · Zoom: rueda · Desp
  try{localStorage.setItem('zapel-toolbar-collapsed',col?'1':'0')}catch(e){}
  draw();
 }
-if($('b_tbcol'))$('b_tbcol').onclick=toggleBarra;if($('lvlVis'))$('lvlVis').onchange=()=>{ZV=$('lvlVis').value?+$('lvlVis').value:null;draw()};
+if($('b_tbcol'))$('b_tbcol').onclick=toggleBarra;
+[['r_toggle',null],['r_run','b_run'],['r_rep','b_rep'],['r_rep3','b_rep3'],['r_sismo','b_sismo'],['r_viento','b_viento'],['r_guide','b_guide'],['r_help','b_help']].forEach(([r,b])=>{const rb=$(r),bb=$(b);if(rb&&bb)rb.onclick=()=>bb.click();if(r==='r_toggle')rb.onclick=toggleBarra});if($('lvlVis'))$('lvlVis').onchange=()=>{ZV=$('lvlVis').value?+$('lvlVis').value:null;draw()};
 try{if(localStorage.getItem('zapel-toolbar-collapsed')==='1'){$('side').classList.add('colapsada');$('b_tbcol').title='Mostrar barra de herramientas'}}catch(e){}
 function togglePanel(){
  const pn=$('pn'),b=$('b_pncol'),col=!pn.classList.contains('colapsada');
