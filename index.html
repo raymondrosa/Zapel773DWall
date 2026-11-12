@@ -121,6 +121,7 @@ button,select,input{touch-action:manipulation}
 <div id="tb">
 <span id="brand">Zapel773DWall</span>
 <span class="grup"><b id="langLbl">Idioma</b><select id="lang" title="Idioma de la interfaz"><option value="es">Español</option><option value="en">English</option></select></span>
+<span class="grup"><span class="lb">Vista</span><button type="button" id="t_orb" title="Órbita: arrastra con el botón izquierdo alrededor del punto bajo el cursor">Órbita</button><button type="button" id="t_pan" title="Pan: arrastra para desplazar la vista">Pan</button></span>
 <span class="grup"><span class="lb">Dibujar</span><button type="button" id="t_sel" class="on">Seleccionar</button><button type="button" id="t_mov">Mover</button><button type="button" id="t_bar">Barra</button><button type="button" id="t_wal">Muro</button><button type="button" id="t_walp">Muro poli</button><button type="button" id="t_slb">Losa</button><button type="button" id="t_are">Carga de área</button><button type="button" id="t_zap">Zapata</button><button type="button" id="t_pla">Matre</button><button type="button" id="b_del">Eliminar</button></span>
 <span class="sp"></span>
 <span class="grup"><span class="lb">Apoyos</span><button type="button" id="t_supf" title="Apoyo fijo (empotrado): restringe Ux, Uy, Uz, Rx, Ry y Rz">Fijo</button><button type="button" id="t_supp" title="Apoyo articulado: restringe las traslaciones y deja libres los giros">Artic.</button><button type="button" id="t_supr" title="Apoyo de rodillo: restringe el descenso vertical Uz">Rodillo</button><button type="button" id="t_supn" title="Quita el apoyo del nudo (lo deja libre)">Libre</button></span>
@@ -134,6 +135,7 @@ button,select,input{touch-action:manipulation}
 <span class="grup"><span class="lb">Resultados</span><select id="mdsel"></select><button type="button" id="smC" class="smbtn" disabled title="Ver la envolvente sísmica en los contornos (disponible después del análisis sísmico)">Sismo</button>
 <button type="button" id="vwC" class="smbtn" disabled title="Ver la envolvente de viento (disponible después del análisis de viento)">Viento</button></span>
 <button type="button" class="go" id="b_run">▶ Calcular</button>
+<button type="button" id="b_rust" style="display:none" title="Analizar con el núcleo Rust (beta)">Rust β</button>
 <button type="button" id="b_rep">📄 Reporte</button>
 <button type="button" id="b_rep3" title="Descargar el reporte como archivo HTML">⬇</button>
 <button type="button" id="b_sismo">Sismo…</button>
@@ -323,6 +325,7 @@ function prism(r,a,z,col){const s=sp(r),ax=axes(r);if(ax.L<1e-9)return;const at=
  g.restore()}
 const PLS={XY:[0,1,2],XZ:[0,2,1],YZ:[1,2,0]},RL=['Ux','Uy','Uz','Rx','Ry','Rz'],FL=['Fx','Fy','Fz','Mx','My','Mz'];
 const D={ty:'rect',b:.3,h:.5,bf:.15,hf:.12,bw:.25,Dm:.4,d:.3,tf:.01,tw:.007,tt:.01,pts:[[0,0],[.3,0],[.3,.5],[0,.5]],mat:'H',fc:28,E:25,ang:0,wa:0,wb:0,xa:0,xb:0,ya:0,yb:0,pza:0,pzb:0,pya:0,pyb:0,kz:0,ky:0,div:4,a1:0,a2:0};
+const DESKTOP_MODE=!!(window.ZAPEL_DESKTOP&&window.ZAPEL_DESKTOP.isDesktop),MAX_DOF=DESKTOP_MODE?9000:6000,WARN_DOF=DESKTOP_MODE?5000:3500;
 let cu='IM';const UN={SI:{L:['m',1],F:['kN',1],FL:['kN·m',1],q:['kN/m',1],E:['GPa',1],k:['kN/m³',1],d:['mm',1000],s:['mm',1000],fc:['MPa',1],A:['cm²',1e4],I:['cm⁴',1e8],p:['kN/m²',1],gw:['kN/m³',1],ar:['m²',1]},IM:{L:['ft',3.28084],F:['kip',.224809],FL:['kip·ft',.737562],q:['kip/ft',.068522],E:['ksi',145.038],k:['kip/ft³',.006366],d:['in',39.3701],s:['in',39.3701],fc:['ksi',.145038],A:['in²',1550.003],I:['in⁴',2402510],p:['ksf',.0208854],gw:['kip/ft³',.00636588],ar:['ft²',10.7639]}},UF=k=>k?UN[cu][k][1]:1,UL=k=>UN[cu][k][0],fmtv=v=>+v.toPrecision(6),KM={N:'F',Vy:'F',Vz:'F',T:'FL',My:'FL',Mz:'FL',Sy:'q',Sz:'q'};
 let FUS_DUP=0;
 let N=[],B=[],MUROS=[],LOSAS=[],CARGAS=[],ZAPATAS=[],PLATEAS=[],ANOT=[],SEL=[],GRUPOS=[],rubber=null,moveBase=null,sismoRes=null,MODAL=null,vientoRes=null,resV=null,vieOn=false,tool='sel',sel=null,res=null,resG=null,resS=null,sisOn=false,mode='model',chain=null,poly=null,drag=null,ms=null,C={a:-.6,p:.45,S:40,ox:300,oy:300},dpr=devicePixelRatio||1;
@@ -485,8 +488,8 @@ function analyze(keepK){
  const n=nd.length*6;
  /* El solver global es denso: G ocupa ~n² y la eliminación gaussiana duplica ese espacio.
     Se avisa/bloquea antes de que el navegador se quede sin memoria. */
- if(n>6000)return{err:'Modelo demasiado grande para el solver denso del navegador: '+nd.length+' nudos ('+n+' GDL). Reduce subdivisiones (div), simplifica losas/muros o divide el modelo en partes.'};
- if(n>3500)avisos.push('Modelo grande ('+nd.length+' nudos, '+n+' GDL): el análisis puede tardar y consumir bastante memoria.');
+ if(n>MAX_DOF)return{err:'Modelo demasiado grande para el solver denso'+(DESKTOP_MODE?'':' del navegador')+': '+nd.length+' nudos ('+n+' GDL). Reduce subdivisiones (div), simplifica losas/muros o divide el modelo en partes.'};
+ if(n>WARN_DOF)avisos.push('Modelo grande ('+nd.length+' nudos, '+n+' GDL): el análisis puede tardar y consumir bastante memoria.');
  const G=Array.from({length:n},()=>Array(n).fill(0)),F=Array(n).fill(0);
  E.forEach(e=>{const r=e.M.r,{ax,L}=e,sc=r._sec||sp(r),Em=r.E*1e6,ad=e.M.bi>=0?addB[e.M.bi]:0,
   K=kl(Em,Em/2.4,sc.A,sc.I,sc.Iz,sc.J,L),kz=(r.kz||0)*sc.w,ky=(r.ky||0)*sc.d,Rm=[ax.ex,ax.ey,ax.ez],T=Array.from({length:12},()=>Array(12).fill(0));
@@ -1237,6 +1240,29 @@ function plateaCalc0(ip){
 /* ---------- Vista 3D ---------- */
 const pj=()=>{const ca=Math.cos(C.a),sa=Math.sin(C.a),cp=Math.cos(C.p),sp=Math.sin(C.p);return[[ca,sa*sp],[-sa,ca*sp],[0,cp]]};
 function proj(x,y,z){const P=pj();return[C.ox+C.S*(x*P[0][0]+y*P[1][0]),C.oy-C.S*(x*P[0][1]+y*P[1][1]+z*P[2][1])]}
+/* Proyeccion sin pan, usada para mantener fijo el pivote de orbita. */
+function viewRaw(a,p,pt){
+ const ca=Math.cos(a),sa=Math.sin(a),cp=Math.cos(p),sp=Math.sin(p);
+ return [C.S*(ca*pt[0]-sa*pt[1]), -C.S*(sa*sp*pt[0]+ca*sp*pt[1]+cp*pt[2])];
+}
+function modelCenter(){
+ if(!N.length)return [0,0,0];
+ let x0=1e30,y0=1e30,z0=1e30,x1=-1e30,y1=-1e30,z1=-1e30;
+ N.forEach(n=>{x0=Math.min(x0,n.x);y0=Math.min(y0,n.y);z0=Math.min(z0,n.z);x1=Math.max(x1,n.x);y1=Math.max(y1,n.y);z1=Math.max(z1,n.z)});
+ return [(x0+x1)/2,(y0+y1)/2,(z0+z1)/2];
+}
+function orbitPivotAt(px,py){
+ let best=null,bd=18;
+ N.forEach(n=>{const s=proj(n.x,n.y,n.z),d=Math.hypot(s[0]-px,s[1]-py);if(d<bd){bd=d;best=[n.x,n.y,n.z]}});
+ if(best)return best;
+ const c=modelCenter();
+ const ca=Math.cos(C.a),sa=Math.sin(C.a),cp=Math.cos(C.p),sp=Math.sin(C.p);
+ if(Math.abs(sp)>.08){
+  const u=(px-C.ox)/C.S,v=(C.oy-py)/C.S,z=c[2],q=(v-cp*z)/sp;
+  return [ca*u+sa*q,-sa*u+ca*q,z];
+ }
+ return c;
+}
 function planePt(px,py){const P=pj(),[k1,k2,k3]=PLS[$('pl').value],c=(+$('lv').value||0)/UF('L'),u=(px-C.ox)/C.S,v=(C.oy-py)/C.S,a=P[k1],b=P[k2],d=P[k3],ru=u-c*d[0],rv=v-c*d[1],det=a[0]*b[1]-a[1]*b[0];
  if(Math.abs(det)<.05)return null;const p=[0,0,0];p[k1]=(ru*b[1]-rv*b[0])/det;p[k2]=(a[0]*rv-a[1]*ru)/det;p[k3]=c;return p}
 /* Pinzamiento a extremos (END snap): nudos, vértices de losas/cargas/matres y extremos de cotas y guías */
@@ -2211,9 +2237,9 @@ function verContornosSismo(){
  const h=document.getElementById('hint');
  if(h)h.textContent='Contornos sísmicos: elige σ en muros, q/Mx/My en la matre, q en zapatas o Mx/My en losas. Botón Sismo para volver a gravedad.'}
 function setT(t){tool=t;chain=null;poly=null;wchain=null;widx=[];dimA=null;aline=null;SNAP=null;rubber=null;if(t!='mov')moveBase=null;
- ['sel','mov','bar','wal','walp','slb','are','zap','pla','cot','lin','txt','supf','supp','supr','supn'].forEach(k=>{const b=$('t_'+k);if(b)b.classList.toggle('on',t==k)});
- const h={sel:'Seleccionar: clic en un elemento; Ctrl+clic añade o quita; arrastra en vacío para ventana/cruce. Clic derecho arrastrado gira la vista.',mov:'Mover: selecciona elementos, haz clic en un punto de esquina (snap FIN) y luego en el destino.',bar:'Barra: clic en cada nodo; clic derecho o Esc termina la cadena.',wal:'Muro: clic en el inicio y en el fin del muro (en planta); se levanta desde el nivel actual.',walp:'Muro poligonal: clic en cada vértice de la planta; clic derecho, Esc o doble clic termina. Vuelve al primer vértice para cerrar el polígono.',slb:'Losa: clic en los vértices; cambia el Nivel entre clics para darle desnivel. Clic derecho, Esc o doble clic cierra el polígono.',zap:'Zapata: clic en un nodo con apoyo para crear o seleccionar su zapata aislada.',pla:'Matre: dibuja el rectángulo en planta; calcula con las reacciones de los pilares que caen dentro.',are:'Carga de área: clic sobre una losa para aplicarla, o dibuja el polígono de la carga.',cot:'Cota: clic en el inicio y en el fin. «Orto» la mantiene horizontal o vertical; «Cota diag.» la alinea entre los dos puntos; el pinzamiento FIN engancha nudos y extremos.',lin:'Guía: clic en cada punto; mientras dibujas se muestran el tramo y el total. Cerca de una línea aparece el snap perpendicular ⊥. Clic derecho, Esc o doble clic termina.',txt:'Texto: clic donde quieras la nota y escribe el texto en el panel.',supf:'Apoyo fijo: clic en cada nudo que quieras empotrar (Ux, Uy, Uz, Rx, Ry, Rz).',supp:'Apoyo articulado: clic en los nudos; restringe las traslaciones y deja libres los giros.',supr:'Apoyo de rodillo: clic en los nudos; restringe Uz (apoyo vertical).',supn:'Quitar apoyo: clic en los nudos para dejarlos libres.'}[t]||'';
- $('hint').textContent=h;draw()}
+ ['sel','mov','orb','pan','bar','wal','walp','slb','are','zap','pla','cot','lin','txt','supf','supp','supr','supn'].forEach(k=>{const b=$('t_'+k);if(b)b.classList.toggle('on',t==k)});
+ const h={sel:'Seleccionar: clic en un elemento; Ctrl+clic añade o quita; arrastra en vacío para ventana/cruce. Clic derecho arrastrado gira la vista.',mov:'Mover: selecciona elementos, haz clic en un punto de esquina (snap FIN) y luego en el destino.',bar:'Barra: clic en cada nodo; clic derecho o Esc termina la cadena.',wal:'Muro: clic en el inicio y en el fin del muro (en planta); se levanta desde el nivel actual.',walp:'Muro poligonal: clic en cada vértice de la planta; clic derecho, Esc o doble clic termina. Vuelve al primer vértice para cerrar el polígono.',slb:'Losa: clic en los vértices; cambia el Nivel entre clics para darle desnivel. Clic derecho, Esc o doble clic cierra el polígono.',zap:'Zapata: clic en un nodo con apoyo para crear o seleccionar su zapata aislada.',pla:'Matre: dibuja el rectángulo en planta; calcula con las reacciones de los pilares que caen dentro.',are:'Carga de área: clic sobre una losa para aplicarla, o dibuja el polígono de la carga.',cot:'Cota: clic en el inicio y en el fin. «Orto» la mantiene horizontal o vertical; «Cota diag.» la alinea entre los dos puntos; el pinzamiento FIN engancha nudos y extremos.',lin:'Guía: clic en cada punto; mientras dibujas se muestran el tramo y el total. Cerca de una línea aparece el snap perpendicular ⊥. Clic derecho, Esc o doble clic termina.',txt:'Texto: clic donde quieras la nota y escribe el texto en el panel.',supf:'Apoyo fijo: clic en cada nudo que quieras empotrar (Ux, Uy, Uz, Rx, Ry, Rz).',supp:'Apoyo articulado: clic en los nudos; restringe las traslaciones y deja libres los giros.',supr:'Apoyo de rodillo: clic en los nudos; restringe Uz (apoyo vertical).',supn:'Quitar apoyo: clic en los nudos para dejarlos libres.',orb:'Órbita: arrastra con el botón izquierdo alrededor del punto bajo el cursor. Botón central y Alt+arrastrar también orbitan; rueda: zoom.',pan:'Pan: arrastra para desplazar la vista. Rueda: zoom; botón Órbita para girar.'}[t]||'';
+ $('hint').textContent=h;cv.style.cursor=t==='orb'?'grab':t==='pan'?'move':'crosshair';draw()}
 function view(a,p,pl){C.a=a;C.p=p;if(pl)$('pl').value=pl;fit();draw()}
 function load(n,b,ms,ls,cs,zs,pt,an,gr){N=n;B=b;MUROS=ms||[];LOSAS=ls||[];CARGAS=cs||[];ZAPATAS=zs||[];PLATEAS=pt||[];ANOT=an||[];GRUPOS=gr||[];SEL=[];rubber=null;moveBase=null;sel=null;fusionarNodos();res=null;chain=null;poly=null;wchain=null;widx=[];dimA=null;aline=null;$('out').innerHTML='';form();mode='model';fit();setM('model')}
 
@@ -2270,7 +2296,7 @@ function run(){res=analyze();vieOn=false;vientoRes=null;resV=null;const o=$('out
  h+='<b>Equilibrio</b>Cargas ΣF = ('+res.ap.map(v=>f(v*F_)).join(', ')+') · residuo = ('+res.resid.map(v=>f(v*F_,2)).join(', ')+') '+UL('F');
  if(res.avisos&&res.avisos.length)h+='<div class="er" style="margin-top:6px">'+res.avisos.join('<br>')+'</div>';
  o.innerHTML=h;setM('def')}
-$('t_sel').onclick=()=>setT('sel');$('t_mov').onclick=()=>setT('mov');$('t_bar').onclick=()=>setT('bar');$('t_wal').onclick=()=>setT('wal');$('t_walp').onclick=()=>setT('walp');$('t_slb').onclick=()=>setT('slb');$('t_are').onclick=()=>setT('are');$('t_zap').onclick=()=>setT('zap');$('t_pla').onclick=()=>setT('pla');$('t_supf').onclick=()=>setT('supf');$('t_supp').onclick=()=>setT('supp');$('t_supr').onclick=()=>setT('supr');$('t_supn').onclick=()=>setT('supn');$('t_cot').onclick=()=>setT('cot');$('t_lin').onclick=()=>setT('lin');$('t_txt').onclick=()=>setT('txt');$('b_del').onclick=del;$('b_run').onclick=runUI;$('b_fit').onclick=()=>{fit();draw()};$('zi').onclick=()=>{zoomAt(cv.clientWidth/2,cv.clientHeight/2,1.25);draw()};$('zo').onclick=()=>{zoomAt(cv.clientWidth/2,cv.clientHeight/2,.8);draw()};$('b_an').onclick=async()=>{if(anim){stopAnim();return}if(!res)await runUI();if(!res)return;setM('def');$('b_an').textContent='■ Detener';anim=requestAnimationFrame(tick)};$('b_clr').onclick=()=>load([],[]);
+$('t_orb').onclick=()=>setT('orb');$('t_pan').onclick=()=>setT('pan');$('t_sel').onclick=()=>setT('sel');$('t_mov').onclick=()=>setT('mov');$('t_bar').onclick=()=>setT('bar');$('t_wal').onclick=()=>setT('wal');$('t_walp').onclick=()=>setT('walp');$('t_slb').onclick=()=>setT('slb');$('t_are').onclick=()=>setT('are');$('t_zap').onclick=()=>setT('zap');$('t_pla').onclick=()=>setT('pla');$('t_supf').onclick=()=>setT('supf');$('t_supp').onclick=()=>setT('supp');$('t_supr').onclick=()=>setT('supr');$('t_supn').onclick=()=>setT('supn');$('t_cot').onclick=()=>setT('cot');$('t_lin').onclick=()=>setT('lin');$('t_txt').onclick=()=>setT('txt');$('b_del').onclick=del;$('b_run').onclick=runUI;$('b_fit').onclick=()=>{fit();draw()};$('zi').onclick=()=>{zoomAt(cv.clientWidth/2,cv.clientHeight/2,1.25);draw()};$('zo').onclick=()=>{zoomAt(cv.clientWidth/2,cv.clientHeight/2,.8);draw()};$('b_an').onclick=async()=>{if(anim){stopAnim();return}if(!res)await runUI();if(!res)return;setM('def');$('b_an').textContent='■ Detener';anim=requestAnimationFrame(tick)};$('b_clr').onclick=()=>load([],[]);
 if($('ort'))$('ort').onchange=()=>{ortho=$('ort').checked;if(ortho){polar=0;const p=$('pol');if(p)p.value='0'}draw()};
 if($('pol'))$('pol').onchange=()=>{polar=+$('pol').value||0;if(polar>0){ortho=false;const o=$('ort');if(o)o.checked=false}draw()};
 if($('cdiag'))$('cdiag').onchange=()=>{cdiag=$('cdiag').checked;draw()};
@@ -2341,7 +2367,7 @@ function verAyuda(t){
   '<tr><td><b>Pinzamiento FIN</b></td><td>Con cualquier herramienta, al acercarte a un nudo, vértice de losa/carga o extremo de cota/guía aparece un cuadro «FIN». Al hacer clic engancha ese punto exacto, aunque esté en diagonal (tiene prioridad sobre «Orto»).</td></tr>'+
   '<tr><td><b>Desnivel</b></td><td>En la losa seleccionada usa «Desnivel / rampa» o edita x, y, z de cada vértice. Las vigas de borde inclinadas reciben el peso.</td></tr>'+
   '<tr><td><b>Zapata</b></td><td>Clic sobre un nudo con apoyo.</td></tr>'+
-  '<tr><td><b>Girar</b></td><td>Arrastrar con el botón derecho. En Seleccionar, arrastrar con el izquierdo en vacío crea una ventana/cruce de selección.</td></tr>'+
+  '<tr><td><b>Girar</b></td><td>Botón central o Alt + arrastrar, como SketchUp: gira alrededor del punto bajo el cursor. También botón derecho. En Seleccionar, arrastrar con el izquierdo en vacío crea una ventana/cruce de selección.</td></tr>'+
   '<tr><td><b>Desplazar</b></td><td>Mayús + arrastrar.</td></tr>'+
   '<tr><td><b>Zoom</b></td><td>Rueda del ratón, o pellizcar en pantalla táctil.</td></tr>'+
   '<tr><td><b>Eliminar</b></td><td>Supr con el objeto seleccionado.</td></tr>'+
@@ -2829,7 +2855,13 @@ function zoomAt(px,py,k){C.ox=px-(px-C.ox)*k;C.oy=py-(py-C.oy)*k;C.S*=k}
 const pc=()=>{const [a,b]=[...PT.values()];return[(a[0]+b[0])/2,(a[1]+b[1])/2,Math.hypot(a[0]-b[0],a[1]-b[1])]};
 function pinchMove(){const c=pc();if(pin&&pin[2]>0){zoomAt(c[0],c[1],c[2]/pin[2]);C.ox+=c[0]-pin[0];C.oy+=c[1]-pin[1]}pin=c;draw()}
 cv.onpointerdown=e=>{const r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top;try{cv.setPointerCapture(e.pointerId)}catch(err){}PT.set(e.pointerId,[px,py]);if(PT.size==2){pin=pc();drag=null;return}
- if(e.button==2){if(poly){cerrarPoly();return}if(aline){cerrarGuia();return}if(wchain){cerrarMuroPoli();return}if(dimA){dimA=null;draw();return}if(chain!=null){chain=null;draw();return}drag={t:'o',x:px,y:py,a:C.a,p:C.p,mv:0};return}
+ if(e.button===0&&(tool==='orb'||tool==='pan')){
+  if(tool==='orb'&&!e.shiftKey){const pv=orbitPivotAt(px,py),s=proj(pv[0],pv[1],pv[2]);drag={t:'o',x:px,y:py,a:C.a,p:C.p,pivot:pv,sx:s[0],sy:s[1],mv:0};cv.style.cursor='grabbing'}
+  else{drag={t:'p',x:px,y:py,a:C.a,p:C.p,ox:C.ox,oy:C.oy,mv:0};cv.style.cursor='grabbing'}
+  return;
+ }
+ if(e.button==1||(e.button===0&&e.altKey)){e.preventDefault();const pv=orbitPivotAt(px,py),s=proj(pv[0],pv[1],pv[2]);drag={t:'o',x:px,y:py,a:C.a,p:C.p,pivot:pv,sx:s[0],sy:s[1],mv:0};return}
+ if(e.button==2){if(poly){cerrarPoly();return}if(aline){cerrarGuia();return}if(wchain){cerrarMuroPoli();return}if(dimA){dimA=null;draw();return}if(chain!=null){chain=null;draw();return}const pv=orbitPivotAt(px,py),s=proj(pv[0],pv[1],pv[2]);drag={t:'o',x:px,y:py,a:C.a,p:C.p,pivot:pv,sx:s[0],sy:s[1],mv:0};return}
  if(tool=='bar'){const p=snap(px,py);if(!p)return;const ni=nodeAt(p);if(chain!=null){if(ni==chain){chain=null;draw();return}if(!B.some(q=>(q.i==chain&&q.j==ni)||(q.i==ni&&q.j==chain)))B.push(bk(chain,ni));res=null;mode='model'}chain=ni;draw();return}
  if(tool=='zap'){const hz=hitZap(px,py);if(hz>=0){sel={t:'z',i:hz};form();draw();return}
   const hn=hitN(px,py);if(hn<0){$('hint').textContent='Zapata: haz clic sobre un nodo de apoyo.';return}
@@ -2887,8 +2919,8 @@ cv.onpointermove=e=>{const r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e
  if(dimA&&ms.p&&!cdiag&&!(SNAP&&SNAP.type=='end'))ms.p=constrainPt(dimA,ms.p);
  if(tool=='lin'&&aline&&aline.length&&ms.p&&!(SNAP&&(SNAP.type=='end'||SNAP.type=='perp')))ms.p=constrainPt(aline[aline.length-1],ms.p);if(PT.has(e.pointerId))PT.set(e.pointerId,[px,py]);if(PT.size==2){pinchMove();return}
   if(rubber){rubber.x1=px;rubber.y1=py;rubber.mv=(rubber.mv||0)+1;draw();return}
- if(drag){drag.mv+=Math.abs(px-drag.x)+Math.abs(py-drag.y)>0?1:0;if(drag.t=='o'){C.a=drag.a+(px-drag.x)*.01;C.p=Math.max(0,Math.min(Math.PI/2,drag.p+(py-drag.y)*.01))}else{C.ox=drag.ox+px-drag.x;C.oy=drag.oy+py-drag.y}}draw()};
-cv.onpointerup=cv.onpointercancel=e=>{PT.delete(e.pointerId);pin=null;if(rubber){const r=rubber;rubber=null;if(Math.hypot(r.x1-r.x0,r.y1-r.y0)<3){if(!r.add){SEL=[];sel=null;form()}}else rectSelect(r);draw();return}if(drag&&drag.mv<3&&tool=='bar')chain=null;drag=null;draw()};cv.onpointerleave=()=>{SNAP=null;draw()};cv.oncontextmenu=e=>e.preventDefault();cv.ondblclick=()=>{if(poly)cerrarPoly();else if(aline)cerrarGuia();else if(wchain)cerrarMuroPoli()};
+ if(drag){drag.mv+=Math.abs(px-drag.x)+Math.abs(py-drag.y)>0?1:0;if(drag.t=='o'){const na=drag.a+(px-drag.x)*.01,np=Math.max(0,Math.min(Math.PI/2,drag.p+(py-drag.y)*.01));C.a=na;C.p=np;if(drag.pivot){const r=viewRaw(na,np,drag.pivot);C.ox=drag.sx-r[0];C.oy=drag.sy-r[1]}}else{C.ox=drag.ox+px-drag.x;C.oy=drag.oy+py-drag.y}}draw()};
+cv.onpointerup=cv.onpointercancel=e=>{PT.delete(e.pointerId);pin=null;cv.style.cursor=tool==='orb'?'grab':tool==='pan'?'move':'crosshair';if(rubber){const r=rubber;rubber=null;if(Math.hypot(r.x1-r.x0,r.y1-r.y0)<3){if(!r.add){SEL=[];sel=null;form()}}else rectSelect(r);draw();return}if(drag&&drag.mv<3&&tool=='bar')chain=null;drag=null;draw()};cv.onpointerleave=()=>{SNAP=null;draw()};cv.oncontextmenu=e=>e.preventDefault();cv.onauxclick=e=>e.preventDefault();cv.ondblclick=()=>{if(poly)cerrarPoly();else if(aline)cerrarGuia();else if(wchain)cerrarMuroPoli()};
 cv.onwheel=e=>{e.preventDefault();const r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top,k=e.deltaY<0?1.15:1/1.15;C.ox=px-(px-C.ox)*k;C.oy=py-(py-C.oy)*k;C.S*=k;draw()};
 addEventListener('keydown',e=>{if(e.target.tagName=='INPUT'||e.target.tagName=='SELECT')return;
  if(e.key=='Shift'){shiftDown=true;draw();return}
@@ -2904,7 +2936,32 @@ $('wt').onchange=()=>{const v=+$('wt').value/UF('s');if(v>0)DEF.wt=v};
 $('wh').onchange=()=>{const v=+$('wh').value/UF('L');if(v>0)DEF.wh=v};
 $('sth').onchange=()=>{const v=+$('sth').value/UF('s');if(v>0)DEF.st=v};
 $('aq').onchange=()=>{const v=+$('aq').value/UF('p');if(isFinite(v))DEF.aq=v};
-addEventListener('resize',draw);$('un').value=cu;$('gs').value=1;document.querySelectorAll('[data-u]').forEach(s=>s.textContent=UL(s.dataset.u));$('b_ex4').click();setM('model');syncDef();
+function verDeformadaRust(){
+ const r=window.__RUST_RESULT__;if(!r||!r.smp)return;
+ res={u:(r.u||[]).slice(0,N.length*6),R:(r.reactions||[]).slice(0,N.length*6),smp:r.smp,dmax:(r.analysis&&r.analysis.dmax)||0,ext:{},wsm:[],muros:[],memb:[]};
+ resG=null;resS=null;resV=null;sisOn=false;vieOn=false;updateSisUI();updateVieUI();setM('def');draw();
+}
+async function rustRun(){
+ const o=$('out');if(!o)return;
+ if(!(window.ZAPEL_DESKTOP&&window.ZAPEL_DESKTOP.solveRust)){o.innerHTML='<span class="er">El análisis Rust solo está disponible en la versión de escritorio.</span>';return}
+ const modelo={app:'zapel-3d',v:5,units:cu,N,B,MUROS,LOSAS,CARGAS,ZAPATAS,PLATEAS,ANOT,GRUPOS};
+ o.innerHTML='<span class="m">Ejecutando solver Rust…</span>';
+ try{
+  const r=await window.ZAPEL_DESKTOP.solveRust(modelo);
+  if(!r||!r.ok){o.innerHTML='<span class="er">Rust: '+((r&&r.error)||'sin respuesta')+'</span>';return}
+  let h='<b>Análisis Rust (beta)</b><div class="m">'+(r.solver||'')+'</div>';
+  if(r.analysis){h+='<table><tr><th>Nudos</th><td>'+(r.analysis.nodes_total||r.analysis.dof/6||'')+'</td></tr><tr><th>GDL</th><td>'+(r.analysis.dof||'')+'</td></tr><tr><th>Elementos</th><td>'+(r.analysis.elements||'')+'</td></tr><tr><th>No-cero</th><td>'+(r.analysis.nnz||'')+'</td></tr>'+(r.analysis.dmax!=null?'<tr><th>dmax</th><td>'+fmtEsc(r.analysis.dmax)+'</td></tr>':'')+(r.analysis.total_weight!=null?'<tr><th>Peso</th><td>'+fmtEsc(r.analysis.total_weight)+'</td></tr>':'')+'</table>'}
+  if(r.mats&&r.mats.length){h+='<b>Matres</b><table><tr><th>#</th><th>qmax</th><th>qmin</th></tr>'+r.mats.map(m=>'<tr><td>'+m.index+'</td><td>'+fmtEsc(m.qmax)+'</td><td>'+fmtEsc(m.qmin)+'</td></tr>').join('')+'</table>'}
+  if(r.directions){h+='<b>Sismo</b><table><tr><th>Dir</th><th>Cortante</th><th>dmax</th></tr>'+['X','Y'].map(d=>'<tr><td>'+d+'</td><td>'+fmtEsc(r.directions[d].base_shear)+'</td><td>'+fmtEsc(r.directions[d].dmax)+'</td></tr>').join('')+'</table>'}
+  if(r.warnings&&r.warnings.length)h+='<div class="m" style="font-size:11px">'+r.warnings.slice(0,8).join('<br>')+'</div>';
+  if(r.smp&&r.smp.length){window.__RUST_RESULT__=r;h+='<button id="b_rust_def" style="width:100%;margin-top:6px">Ver deformada Rust</button>'}
+  o.innerHTML=h;
+  const bd=$('b_rust_def');if(bd)bd.onclick=verDeformadaRust;
+  if($('stz'))$('stz').textContent='Análisis Rust completado.';
+ }catch(e){o.innerHTML='<span class="er">Rust: '+e.message+'</span>'}
+}
+if(window.ZAPEL_DESKTOP&&window.ZAPEL_DESKTOP.isDesktop){const br=$('b_rust');if(br){br.style.display='inline-block';br.onclick=rustRun}}
+if(cv)cv.title='Órbita: botón central o Alt + arrastrar · Zoom: rueda · Desplazar: Shift + arrastrar';addEventListener('resize',draw);$('un').value=cu;$('gs').value=1;document.querySelectorAll('[data-u]').forEach(s=>s.textContent=UL(s.dataset.u));$('b_ex4').click();setM('model');syncDef();
 if($('lang'))$('lang').onchange=()=>setLang($('lang').value);
 try{const lg=localStorage.getItem('zapel-lang');if(lg==='en'){LANG='en';if($('lang'))$('lang').value='en'}}catch(e){}
 if(LANG==='en')setLang('en');else applyLang(document.body);
