@@ -1699,7 +1699,12 @@ function draw(){
   if(resC&&resC.mats&&resC.mats.length){
    resC.mats.forEach(M=>{const gg=M.grid||[],nx=M.nx||0,ny=M.ny||0;if(!gg.length||!nx||!ny)return;let mn=Math.min(...gg),mx=Math.max(...gg),rg=Math.max(mx-mn,1e-12);
     for(let j=0;j<=ny;j++)for(let i=0;i<=nx;i++){const q=gg[j*(nx+1)+i];if(!isFinite(q))continue;const x=M.x0+i*M.sx,y=M.y0+j*M.sy,t=(q-mn)/rg;
-     const p=proj(x,y,M.z);g.fillStyle='hsl('+(240-240*t)+',85%,50%)';g.globalAlpha=.6;g.beginPath();g.arc(p[0],p[1],5,0,7);g.fill();g.globalAlpha=1}
+     const p=proj(x,y,M.z);g.fillStyle='hsl('+(240-240*t)+',85%,50%)';g.globalAlpha=.6;g.beginPath();g.arc(p[0],p[1],4,0,7);g.fill();g.globalAlpha=1}
+    const lv=5;for(let z=1;z<lv;z++){const level=mn+rg*z/lv;g.strokeStyle='hsl('+(240-240*z/lv)+',85%,45%)';g.lineWidth=2;g.beginPath();
+     for(let j=0;j<ny;j++)for(let i=0;i<nx;i++){const q=[gg[j*(nx+1)+i],gg[j*(nx+1)+i+1],gg[(j+1)*(nx+1)+i+1],gg[(j+1)*(nx+1)+i]];const pts=[];
+      for(let e=0;e<4;e++){const a=q[e],b=q[(e+1)%4];if((a<level&&b>=level)||(b<level&&a>=level)){const t=(level-a)/(b-a);const x1=i+(e===0||e===3?0:1),y1=j+(e>=2?1:0),x2=i+((e+1)%4===0||(e+1)%4===3?0:1),y2=j+((e+1)%4>=2?1:0);pts.push([x1+(x2-x1)*t,y1+(y2-y1)*t])}}
+      if(pts.length>=2){const p=proj(M.x0+pts[0][0]*M.sx,M.y0+pts[0][1]*M.sy,M.z);g.moveTo(p[0],p[1]);const r=proj(M.x0+pts[1][0]*M.sx,M.y0+pts[1][1]*M.sy,M.z);g.lineTo(r[0],r[1])}}
+     g.stroke()}
    });
    g.fillStyle=fg;g.font='11px system-ui';g.fillText('Presión de matres Rust',12,18);
   }
@@ -3227,7 +3232,12 @@ async function rustSismoRun(){
   }catch(_){}
   so.report=true;const r=await window.ZAPEL_DESKTOP.solveRust(modelo,so);
   if(!r||!r.ok){o.innerHTML='<span class="er">Rust sísmico: '+((r&&r.error)||'sin respuesta')+'</span>';return}
-  let h='<b>Sismo modal espectral · Rust</b><div class="m">'+(r.solver||'')+'</div>';
+  let h='<b>Sismo modal espectral · Rust</b>';
+  try{const pp={...DEFSIS,...(SISMO||{})};const cod=pp.cod==='prbc18'?'PRBC 2018 (ASCE 7-16)':'ASCE 7-22';
+   if(pp.met==='rec'){const es=(typeof escSel==='function')?escSel():null;h+='<div class="m">Evento: '+(es&&es.r?es.r.nom:'seleccionado')+' · PGA '+(es?fmtEsc(es.pga):'')+' g</div>'}
+   else h+='<div class="m">'+cod+' · '+(pp.met==='mod'?'modal espectral':'modal espectral')+'</div>';
+  }catch(_){}
+  h+='<div class="m">'+(r.solver||'')+'</div>';
   if(r.spectrum)h+='<table><tr><th>SDS</th><td>'+fmtEsc(r.spectrum.sds)+'</td></tr><tr><th>SD1</th><td>'+fmtEsc(r.spectrum.sd1)+'</td></tr><tr><th>T0</th><td>'+fmtEsc(r.spectrum.t0)+' s</td></tr><tr><th>Ts</th><td>'+fmtEsc(r.spectrum.ts)+' s</td></tr></table>';
   if(r.analysis)h+='<table><tr><th>GDL</th><td>'+(r.analysis.dof||'')+'</td></tr><tr><th>Modos</th><td>'+(r.analysis.modes||'')+'</td></tr><tr><th>Peso</th><td>'+fmtEsc(r.analysis.total_weight)+'</td></tr></table>';
   if(r.directions){h+='<table><tr><th>Dir</th><th>Cortante</th><th>dmax</th></tr>'+['X','Y'].map(d=>'<tr><td>'+d+'</td><td>'+fmtEsc(r.directions[d].base_shear)+'</td><td>'+fmtEsc(r.directions[d].dmax)+'</td></tr>').join('')+'</table>'}
