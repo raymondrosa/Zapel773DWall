@@ -1682,6 +1682,27 @@ function draw(){
    g.lineWidth=1}
   if(!R){g.strokeStyle=g.fillStyle='#dc2626';[0,1,2].forEach(k=>{const v=n.f[k];if(v){const d=[0,0,0];d[k]=Math.sign(v)*38/C.S;const q=proj(n.x-d[0],n.y-d[1],n.z-d[2]);arrow(q[0],q[1],p[0],p[1])}});
    if(n.f.slice(3).some(v=>v))g.fillText('M'+n.f.slice(3).map(v=>+(v*UF('FL')).toFixed(2)),p[0]+8,p[1]-8)}});
+  if(resC&&resC.slabs&&resC.slabs.length){
+   let all=[];resC.slabs.forEach(a=>{if(a)all.push(...a.map(q=>q.s1))});if(all.length){const mn=Math.min(...all),mx=Math.max(...all),rg=Math.max(mx-mn,1e-12);
+    resC.slabs.forEach(a=>{(a||[]).forEach(q=>{const t=(q.s1-mn)/rg,p=proj(q.p[0],q.p[1],q.p[2]);g.fillStyle='hsl('+(240-240*t)+',85%,50%)';g.globalAlpha=.65;g.beginPath();g.arc(p[0],p[1],5,0,7);g.fill();g.globalAlpha=1})});
+    g.fillStyle=fg;g.font='11px system-ui';g.fillText('Tensión de losas Rust · σ1 '+mn.toPrecision(3)+' – '+mx.toPrecision(3),12,18);
+   }
+  }
+  if(resC&&resC.wall&&resC.wall.length){
+   MUROS.forEach((w,wi)=>{const vals=resC.wall[wi];if(!vals||!vals.length||!wallGeo(w))return;const wg=wallGeo(w);
+    const mn=Math.min(...vals),mx=Math.max(...vals),t=(mx-mn)>1e-12?((vals[Math.floor(vals.length/2)]||0)-mn)/(mx-mn):.5;
+    g.strokeStyle='hsl('+(240-240*t)+',85%,45%)';g.lineWidth=5;g.beginPath();g.moveTo(...proj(wg.p[0].x,wg.p[0].y,wg.p[0].z));g.lineTo(...proj(wg.p[1].x,wg.p[1].y,wg.p[1].z));g.stroke();
+    g.lineWidth=1;g.fillStyle=fg;g.font='10px system-ui';g.fillText((mx-mn)>1e-12?mn.toPrecision(3)+'–'+mx.toPrecision(3):mn.toPrecision(3),proj(wg.p[0].x,wg.p[0].y,wg.p[0].z)[0]+4,proj(wg.p[0].x,wg.p[0].y,wg.p[0].z)[1]-6);
+   });
+   g.fillStyle=fg;g.font='11px system-ui';g.fillText('Tensión de muros Rust',12,18);
+  }
+  if(resC&&resC.mats&&resC.mats.length){
+   resC.mats.forEach(M=>{const gg=M.grid||[],nx=M.nx||0,ny=M.ny||0;if(!gg.length||!nx||!ny)return;let mn=Math.min(...gg),mx=Math.max(...gg),rg=Math.max(mx-mn,1e-12);
+    for(let j=0;j<=ny;j++)for(let i=0;i<=nx;i++){const q=gg[j*(nx+1)+i];if(!isFinite(q))continue;const x=M.x0+i*M.sx,y=M.y0+j*M.sy,t=(q-mn)/rg;
+     const p=proj(x,y,M.z);g.fillStyle='hsl('+(240-240*t)+',85%,50%)';g.globalAlpha=.6;g.beginPath();g.arc(p[0],p[1],5,0,7);g.fill();g.globalAlpha=1}
+   });
+   g.fillStyle=fg;g.font='11px system-ui';g.fillText('Presión de matres Rust',12,18);
+  }
   if(resC&&resC.disp&&resC.disp.length){
    const vs=resC.disp.filter(v=>isFinite(v)),mn=Math.min(...vs),mx=Math.max(...vs),rg=Math.max(mx-mn,1e-12);
    N.forEach((n,i)=>{if(VZ!=null&&n.z>VZ+1e-6)return;const v=resC.disp[i];if(!isFinite(v))return;const q=proj(n.x,n.y,n.z),t=(v-mn)/rg;
@@ -3087,6 +3108,33 @@ async function rustVientoRun(){
   o.innerHTML=h;bindInforme(r);const wc=$('b_rust_wcont');if(wc)wc.onclick=verContornosVientoRust;const wd=$('b_rust_wdrift');if(wd)wd.onclick=verDerivasVientoRust;if($('stz'))$('stz').textContent='Viento Rust completado.';
  }catch(e){o.innerHTML='<span class="er">Rust viento: '+e.message+'</span>'}
 }
+function validarRustApp(){
+ const o=$('out'),r=window.__RUST_RESULT__;if(!r||!r.u){o.innerHTML='<span class="er">Ejecuta primero Rust β estático.</span>';return}
+ let js;try{js=analyze()}catch(e){o.innerHTML='<span class="er">La app no pudo analizar este modelo: '+e.message+'</span>';return}
+ if(js.err){o.innerHTML='<span class="er">App: '+js.err+'</span>';return}
+ const n=N.length*6,ru=r.u,ju=js.u;
+ let du=0,dr=0;for(let i=0;i<Math.min(n,ru.length,ju.length);i++)du=Math.max(du,Math.abs(ru[i]-ju[i]));
+ const rr=r.reactions||[],jr=js.R||[];for(let i=0;i<Math.min(n,rr.length,jr.length);i++)dr=Math.max(dr,Math.abs(rr[i]-jr[i]));
+ const rd=(r.analysis&&r.analysis.dmax)||0,jd=js.dmax||0;
+ const rel=(v,b)=>b>1e-12?Math.abs(v-b)/b:Math.abs(v);
+ o.innerHTML='<b>Validación Rust vs app</b><table><tr><th></th><th>App</th><th>Rust</th><th>Δ máx</th><th>rel.</th></tr>'+
+  '<tr><td>dmax</td><td>'+fmtEsc(jd)+'</td><td>'+fmtEsc(rd)+'</td><td>'+fmtEsc(Math.abs(rd-jd))+'</td><td>'+fmtEsc(rel(rd,jd))+'</td></tr>'+
+  '<tr><td>Desplazamiento</td><td colspan=4>Δ máx = '+fmtEsc(du)+'</td></tr>'+
+  '<tr><td>Reacciones</td><td colspan=4>Δ máx = '+fmtEsc(dr)+'</td></tr></table>'+
+  '<div class="m">Comparación estática nodal. Los análisis modal, sísmico, ELF y viento requieren sus propios controles.</div>';
+}
+function verContornosLosasRust(){
+ const r=window.__RUST_RESULT__;if(!r||!r.slab_stress)return;
+ resC={slabs:r.slab_stress,label:'Tensión de losas'};draw();
+}
+function verContornoTensionMurosRust(){
+ const r=window.__RUST_RESULT__;if(!r||!r.wall_stress)return;
+ resC={wall:r.wall_stress,label:'Tensión de muros'};draw();
+}
+function verContornosMatresRust(){
+ const r=window.__RUST_RESULT__;if(!r||!r.mats||!r.mats.length)return;
+ resC={mats:r.mats,label:'Presión de matres'};draw();
+}
 function verContornosSismoRust(){
  const r=window.__RUST_RESULT__;if(!r||!r.directions)return;
  const nx=(r.directions.X&&r.directions.X.u)||[],ny=(r.directions.Y&&r.directions.Y.u)||[];
@@ -3181,12 +3229,20 @@ async function rustRun(){
   if(r.directions){h+='<b>Sismo</b><table><tr><th>Dir</th><th>Cortante</th><th>dmax</th></tr>'+['X','Y'].map(d=>'<tr><td>'+d+'</td><td>'+fmtEsc(r.directions[d].base_shear)+'</td><td>'+fmtEsc(r.directions[d].dmax)+'</td></tr>').join('')+'</table>'}
   if(r.warnings&&r.warnings.length)h+='<div class="m" style="font-size:11px">'+r.warnings.slice(0,8).join('<br>')+'</div>';
   if(r.smp&&r.smp.length){window.__RUST_RESULT__=r;h+='<button id="b_rust_def" style="width:100%;margin-top:6px">Ver deformada Rust</button>'}
+  if(r.u){window.__RUST_RESULT__=r;h+='<button id="b_rust_valid" style="width:100%;margin-top:4px">Validar Rust vs app</button>'}
   if(r.contours){window.__RUST_RESULT__=r;h+='<button id="b_rust_cont" style="width:100%;margin-top:4px">Ver contornos Rust</button>'}
+  if(r.mats&&r.mats.length){window.__RUST_RESULT__=r;h+='<button id="b_rust_matc" style="width:100%;margin-top:4px">Ver presión de matres Rust</button>'}
+  if(r.wall_stress&&r.wall_stress.length){window.__RUST_RESULT__=r;h+='<button id="b_rust_wallc" style="width:100%;margin-top:4px">Ver tensión de muros Rust</button>'}
+  if(r.slab_stress&&r.slab_stress.length){window.__RUST_RESULT__=r;h+='<button id="b_rust_slabc" style="width:100%;margin-top:4px">Ver tensión de losas Rust</button>'}
   h+=botonInforme(r);
   o.innerHTML=h;
   bindInforme(r);
   const bd=$('b_rust_def');if(bd)bd.onclick=verDeformadaRust;
+  const bval=$('b_rust_valid');if(bval)bval.onclick=validarRustApp;
   const bc=$('b_rust_cont');if(bc)bc.onclick=()=>{resC=window.__RUST_RESULT__?window.__RUST_RESULT__.contours:null;draw()};
+  const bm=$('b_rust_matc');if(bm)bm.onclick=verContornosMatresRust;
+  const bw=$('b_rust_wallc');if(bw)bw.onclick=verContornoTensionMurosRust;
+  const bsl=$('b_rust_slabc');if(bsl)bsl.onclick=verContornosLosasRust;
   if($('stz'))$('stz').textContent='Análisis Rust completado.';
  }catch(e){o.innerHTML='<span class="er">Rust: '+e.message+'</span>'}
 }
