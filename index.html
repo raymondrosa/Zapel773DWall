@@ -123,11 +123,11 @@ button,select,input{touch-action:manipulation}
 
 /* Menu lateral izquierdo */
 body{flex-direction:row;overflow:hidden}
-#side{width:210px;max-width:210px;flex:0 0 210px;height:100vh;overflow-y:auto;overflow-x:hidden;background:var(--pn);border-right:1px solid var(--bd);z-index:60;display:flex;flex-direction:column;gap:2px;padding:6px}
-#side button{font-size:12px;padding:4px 5px;white-space:normal;line-height:1.2;text-align:left;display:inline-flex;align-items:center;gap:4px;min-width:0;width:100%}
+#side{width:205px;max-width:205px;flex:0 0 205px;height:100vh;overflow-y:auto;overflow-x:hidden;background:var(--pn);border-right:1px solid var(--bd);z-index:60;display:flex;flex-direction:column;gap:2px;padding:6px}
+#side button{font-size:13px;padding:4px 5px;white-space:normal;line-height:1.2;text-align:left;display:inline-flex;align-items:center;gap:4px;min-width:0;width:100%}
 #side .grup{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;width:100%;align-items:stretch;margin:0 0 5px}
 #side .grup button{width:100%;min-width:0;justify-content:flex-start;overflow-wrap:anywhere}
-#side .grup .lb{grid-column:1/-1;width:100%;line-height:1.3;margin-top:3px;font-size:11px}
+#side .grup .lb{grid-column:1/-1;width:100%;line-height:1.3;margin-top:3px;font-size:12px}
 #side .grup #hint,#side .grup input,#side .grup select{grid-column:1/-1;width:100%}
 #side #tb,#side #tb2{display:flex;flex-direction:column;flex-wrap:nowrap;gap:3px;width:100%;padding:0;border:0;background:transparent;overflow:visible;align-items:stretch}
 #side .grup{display:flex;flex-wrap:wrap;gap:3px;width:100%;align-items:center;margin:0 0 5px}
@@ -137,13 +137,13 @@ body{flex-direction:row;overflow:hidden}
 #side #b_tbcol{width:100%;order:-1}
 #side #hint{font-size:10px;line-height:1.3;max-height:52px;overflow:auto}
 #side.colapsada{width:0;flex-basis:0;padding:0;border-right:0;overflow:visible}
-#side.colapsada #tb .grup,#side.colapsada #tb2,#side.colapsada #brand{display:none!important}
+#side.colapsada #tb .grup,#side.colapsada #tb2,#side.colapsada #brand,#side.colapsada #hint{display:none!important}
 #side.colapsada #tb{display:block;padding:0;border:0}
-#b_tbcol{position:fixed;left:245px;top:50%;transform:translateY(-50%);z-index:90;width:22px;height:38px;padding:0;font-size:15px;line-height:1;border-radius:0 7px 7px 0;background:var(--pn);box-shadow:0 1px 5px #0003}
-#side.colapsada #b_tbcol{left:0;border-radius:0 7px 7px 0;width:24px;height:44px}
+#b_tbcol{position:fixed;left:205px;top:50%;transform:translateY(-50%);z-index:90;width:24px!important;min-width:24px!important;max-width:24px!important;height:40px;padding:0!important;font-size:16px;line-height:1;border-radius:0 7px 7px 0;background:var(--pn);box-shadow:0 1px 5px #0003}
+#side.colapsada #b_tbcol{left:0!important;border-radius:0 7px 7px 0;width:24px!important;height:44px}
 #mn{flex:1;min-width:0}
 #pn{width:300px}
-@media(max-width:760px){#side{width:180px;max-width:180px;flex-basis:180px}#pn{width:230px}}
+@media(max-width:760px){#side{width:180px;max-width:180px;flex-basis:180px}#pn{width:230px}#b_tbcol{left:180px}}
 
 
 /* Panel derecho desplegable */
