@@ -3215,6 +3215,31 @@ async function rustElfRun(){
   h+=botonInforme(r);o.innerHTML=h;bindInforme(r);if($('stz'))$('stz').textContent='ELF Rust completado.';
  }catch(e){o.innerHTML='<span class="er">Rust ELF: '+e.message+'</span>'}
 }
+function rustSismoOpen(){
+ const s=$('rsmSis');if(!s.options.length)s.innerHTML=SISTEMAS.map((q,i)=>'<option value="'+i+'">'+q[0]+'</option>').join('');
+ const ev=$('rsmEvent');if(!ev.options.length)ev.innerHTML=SISMOS_ESC.map(q=>'<option value="'+q.code+'">'+q.nom+' · '+q.fecha+'</option>').join('');
+ $('rsm').style.display='flex';
+}
+function rustSismoClose(){$('rsm').style.display='none'}
+async function rustSismoDlgRun(){
+ const o=$('out');const cod=$('rsmCod').value,met=$('rsmMet').value,site=$('rsmSite').value,risk=+$('rsmRisk').value;
+ const ss=+$('rsmSs').value,s1=+$('rsmS1').value,tl=+$('rsmTL').value,fa=+$('rsmFA').value,ecc=Math.max(5,+$('rsmEcc').value||5),nmo=Math.max(1,Math.min(10,+$('rsmNmo').value||3));
+ const sis=SISTEMAS[+$('rsmSis').value]||SISTEMAS[3];const Si=cod==='prbc18'?SITIO16[site]:SITIO[site];
+ const {Fa,Fv}=coefSitio({cod,clase:site,ss,s1},Si);const SDS=2*Fa*ss/3,SD1=2*Fv*s1/3;const R=sis[1]||8,Ie=[1,1,1.25,1.5][risk]||1;
+ const modelo={app:'zapel-3d',v:5,units:cu,N,B,MUROS,LOSAS,CARGAS,ZAPATAS,PLATEAS,ANOT,GRUPOS};
+ let opt={report:true};
+ if(met==='elf')opt={elf:true,sds:SDS,sd1:SD1,tl,r:R,ie:Ie,ct:sis[4]||.0466,x:sis[5]||.9,ecc,report:true};
+ else {opt={sismo:true,modes:nmo,sds:SDS,sd1:SD1,tl,r:R,ie:Ie,fA:fa,ecc,report:true};
+  if(met==='rec'){const sel=escSel({code:$('rsmEvent').value,pga:+$('rsmPga').value||0});if(sel&&sel.r){opt.eventT=sel.r.T;opt.eventSa=sel.r.Sa;opt.eventScale=sel.scale}}}
+ o.innerHTML='<span class="m">Ejecutando análisis Rust…</span>';
+ try{const r=await window.ZAPEL_DESKTOP.solveRust(modelo,opt);if(!r||!r.ok){o.innerHTML='<span class="er">Rust: '+((r&&r.error)||'sin respuesta')+'</span>';return}
+  let out='<b>'+(met==='elf'?'ELF Rust':met==='rec'?'Evento sísmico Rust':'Modal espectral Rust')+'</b><div class="m">'+cod.toUpperCase()+' · sitio '+site+' · R='+R+' · Ie='+Ie+'</div>';
+  if(r.spectrum)out+='<table><tr><th>SDS</th><td>'+fmtEsc(r.spectrum.sds)+'</td></tr><tr><th>SD1</th><td>'+fmtEsc(r.spectrum.sd1)+'</td></tr></table>';
+  if(r.elf)out+='<table><tr><th>T</th><td>'+fmtEsc(r.elf.T)+' s</td></tr><tr><th>V</th><td>'+fmtEsc(r.elf.V)+'</td></tr></table>';
+  if(r.directions)out+='<table><tr><th>Dir</th><th>V</th><th>dmax</th></tr>'+['X','Y'].map(d=>'<tr><td>'+d+'</td><td>'+fmtEsc(r.directions[d].base_shear)+'</td><td>'+fmtEsc(r.directions[d].dmax)+'</td></tr>').join('')+'</table>';
+  if(r.directions)window.__RUST_RESULT__=r;if(r.elf)window.__RUST_RESULT__=r;
+  out+=botonInforme(r);o.innerHTML=out;bindInforme(r);
+ }catch(e){o.innerHTML='<span class="er">Rust: '+e.message+'</span>'}}
 async function rustSismoRun(){
  const o=$('out');if(!o)return;
  if(!(window.ZAPEL_DESKTOP&&window.ZAPEL_DESKTOP.solveRust)){o.innerHTML='<span class="er">El análisis Rust solo está disponible en la versión de escritorio.</span>';return}
@@ -3277,7 +3302,7 @@ async function rustRun(){
   if($('stz'))$('stz').textContent='Análisis Rust completado.';
  }catch(e){o.innerHTML='<span class="er">Rust: '+e.message+'</span>'}
 }
-if(window.ZAPEL_DESKTOP&&window.ZAPEL_DESKTOP.isDesktop){const br=$('b_rust');if(br){br.style.display='inline-block';br.onclick=rustRun}const bs=$('b_rust_sismo');if(bs){bs.style.display='inline-block';bs.onclick=rustSismoRun}const be=$('b_rust_elf');if(be){be.style.display='inline-block';be.onclick=rustElfRun}const bv=$('b_rust_viento');if(bv){bv.style.display='inline-block';bv.onclick=rustVientoRun}}
+if(window.ZAPEL_DESKTOP&&window.ZAPEL_DESKTOP.isDesktop){const br=$('b_rust');if(br){br.style.display='inline-block';br.onclick=rustRun}const bs=$('b_rust_sismo');if(bs){bs.style.display='inline-block';bs.onclick=rustSismoOpen}const be=$('b_rust_elf');if(be){be.style.display='inline-block';be.onclick=rustElfRun}const bv=$('b_rust_viento');if(bv){bv.style.display='inline-block';bv.onclick=rustVientoRun}}
 if(cv)cv.title='Órbita: botón central o Alt + arrastrar · Zoom: rueda · Desplazar: Shift + arrastrar';function toggleBarra(){
  const tb=$('side'),b=$('b_tbcol'),col=!tb.classList.contains('colapsada');
  tb.classList.toggle('colapsada',col);b.textContent=col?'›':'‹';
@@ -3286,6 +3311,7 @@ if(cv)cv.title='Órbita: botón central o Alt + arrastrar · Zoom: rueda · Desp
  draw();
 }
 if($('b_tbcol'))$('b_tbcol').onclick=toggleBarra;
+if($('rsmClose'))$('rsmClose').onclick=rustSismoClose;if($('rsmRun'))$('rsmRun').onclick=rustSismoDlgRun;if($('rsmMet'))$('rsmMet').onchange=()=>{$('rsmEventBox').style.display=$('rsmMet').value==='rec'?'block':'none'};
 [['r_toggle',null],['r_run','b_run'],['r_rep','b_rep'],['r_rep3','b_rep3'],['r_sismo','b_sismo'],['r_viento','b_viento'],['r_guide','b_guide'],['r_help','b_help']].forEach(([r,b])=>{const rb=$(r),bb=$(b);if(rb&&bb)rb.onclick=()=>bb.click();if(r==='r_toggle')rb.onclick=toggleBarra});if($('lvlVis'))$('lvlVis').onchange=()=>{ZV=$('lvlVis').value?+$('lvlVis').value:null;draw()};
 try{if(localStorage.getItem('zapel-toolbar-collapsed')==='1'){$('side').classList.add('colapsada');$('b_tbcol').title='Mostrar barra de herramientas'}}catch(e){}
 function togglePanel(){
@@ -3301,4 +3327,29 @@ addEventListener('resize',draw);$('un').value=cu;$('gs').value=1;document.queryS
 if($('lang'))$('lang').onchange=()=>setLang($('lang').value);
 try{const lg=localStorage.getItem('zapel-lang');if(lg==='en'){LANG='en';if($('lang'))$('lang').value='en'}}catch(e){}
 if(LANG==='en')setLang('en');else applyLang(document.body);
-</script></body></html>
+</script>
+<div id="rsm" style="position:fixed;inset:0;background:#0006;display:none;z-index:300;align-items:center;justify-content:center">
+ <div style="background:var(--pn);border:1px solid var(--bd);border-radius:10px;padding:14px;width:min(560px,94vw);max-height:92vh;overflow:auto;box-shadow:0 8px 30px #0005">
+  <h3 style="margin:0 0 8px">Análisis sísmico nativo Rust</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+   <label>Norma<select id="rsmCod" style="width:100%"><option value="asce22">ASCE 7-22</option><option value="prbc18">PRBC 2018 (ASCE 7-16)</option></select></label>
+   <label>Método<select id="rsmMet" style="width:100%"><option value="elf">Fuerza lateral equivalente</option><option value="mod">Modal espectral CQC</option><option value="rec">Evento sísmico</option></select></label>
+   <label>Clase de sitio<select id="rsmSite" style="width:100%"><option>A</option><option>B</option><option>C</option><option selected>D</option><option>E</option><option>F</option></select></label>
+   <label>Categoría de riesgo<select id="rsmRisk" style="width:100%"><option value="1">I</option><option value="2">II</option><option value="3">III</option><option value="4">IV</option></select></label>
+   <label>Ss<input id="rsmSs" type="number" step="0.01" value="1" style="width:100%"></label>
+   <label>S1<input id="rsmS1" type="number" step="0.01" value="0.4" style="width:100%"></label>
+   <label>Sistema resistente<select id="rsmSis" style="width:100%"></select></label>
+   <label>TL (s)<input id="rsmTL" type="number" step="0.1" value="8" style="width:100%"></label>
+   <label>fA<input id="rsmFA" type="number" step="0.05" value="0.25" style="width:100%"></label>
+   <label>Excentricidad (%)<input id="rsmEcc" type="number" step="1" min="5" value="5" style="width:100%"></label>
+   <label>Nº de modos<input id="rsmNmo" type="number" step="1" min="1" max="10" value="3" style="width:100%"></label>
+  </div>
+  <div id="rsmEventBox" style="margin-top:10px;padding-top:8px;border-top:1px solid var(--bd)">
+   <label>Evento sísmico<select id="rsmEvent" style="width:100%"></select></label>
+   <label>PGA objetivo (g), opcional<input id="rsmPga" type="number" step="0.01" placeholder="usar PGA del evento" style="width:100%"></label>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:12px"><button class="go" id="rsmRun" style="flex:1">Ejecutar Rust</button><button id="rsmClose" style="width:110px">Cerrar</button></div>
+  <div class="m" style="font-size:11px;margin-top:6px">El análisis usa este selector, no la ventana Sismo general.</div>
+ </div>
+</div>
+</body></html>
