@@ -2522,6 +2522,17 @@ function verAyuda(t){
   '<tr><td><b>Resultados</b></td><td>Lista «Resultados» de la barra: modelo, deformada, contornos y diagramas.</td></tr>'+
   '<tr><td><b>Reporte</b></td><td>«📄 Reporte» abre la memoria; «⬇» la descarga como archivo.</td></tr>'+
   '<tr><td><b>Pantalla</b></td><td>Automático, Computadora, Tableta o Celular.</td></tr></table>';
+ if(c){
+  const pay='https://www.paypal.com/ncp/payment/BPBZKAY3U24CQ';
+  const es=LANG!=='en';
+  c.innerHTML+='<div style="margin-top:14px;padding:10px;border:1px solid var(--bd);border-radius:8px;background:var(--pn);text-align:center">'+
+   '<b>'+(es?'¿Te resulta útil Zapel773DWall?':'Is Zapel773DWall useful to you?')+'</b><div class="m" style="margin-top:3px">'+
+   (es?'Puedes apoyar el desarrollo con un donativo. Gracias.':'You can support development with a donation. Thank you.')+'</div>'+
+   '<a id="donateLink" href="'+pay+'" target="_blank" rel="noopener" style="display:inline-block;margin-top:7px;padding:7px 16px;background:#0070ba;color:#fff;border-radius:6px;text-decoration:none;font-weight:600">'+
+   (es?'Donar con PayPal':'Donate with PayPal')+'</a></div>';
+  const dl=$('donateLink');
+  if(dl)dl.onclick=e=>{try{if(window.ZAPEL_DESKTOP&&window.ZAPEL_DESKTOP.openExternal){e.preventDefault();window.ZAPEL_DESKTOP.openExternal(pay)}}catch(_){}};
+ }
  if($('hmt'))$('hmt').textContent=(t=='acerca'?'Acerca de Zapel773DWall':'Atajos y consejos');
  if($('hm'))$('hm').style.display='flex'}
 function esMov(){try{const d=document.documentElement;return !!(d&&d.dataset&&d.dataset.dev==='mov')}catch(e){return false}}
