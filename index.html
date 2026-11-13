@@ -200,7 +200,7 @@ body{flex-direction:row;overflow:hidden}
 <span class="sp"></span>
 <span class="grup"><span class="lb">Ejemplos</span><button type="button" id="b_ex4">Edificio</button><button type="button" id="b_ex">Pórtico</button><button type="button" id="b_ex2">Viga suelo</button><button type="button" id="b_ex3">Viga acero</button></span>
 <span class="sp"></span>
-<span class="grup"><span class="lb">Resultados</span><select id="mdsel"></select><button type="button" id="smC" class="smbtn" disabled title="Ver la envolvente sísmica en los contornos (disponible después del análisis sísmico)">Sismo</button>
+<span class="grup"><span class="lb">Resultados</span><label class="ck" title="Incluir el peso propio de losas y muros"><input type="checkbox" id="swOn" checked> Peso propio</label><select id="mdsel"></select><button type="button" id="smC" class="smbtn" disabled title="Ver la envolvente sísmica en los contornos (disponible después del análisis sísmico)">Sismo</button>
 <button type="button" id="vwC" class="smbtn" disabled title="Ver la envolvente de viento (disponible después del análisis de viento)">Viento</button></span>
 <button type="button" class="go" id="b_run">▶ Calcular</button>
 <button type="button" id="b_rust" style="display:none" title="Analizar con el núcleo Rust (beta)">Rust β</button>
@@ -411,7 +411,7 @@ const D={ty:'rect',b:0.4572,h:0.4572,bf:.15,hf:.12,bw:.25,Dm:.4,d:.3,tf:.01,tw:.
 const DESKTOP_MODE=!!(window.ZAPEL_DESKTOP&&window.ZAPEL_DESKTOP.isDesktop),MAX_DOF=DESKTOP_MODE?9000:6000,WARN_DOF=DESKTOP_MODE?5000:3500;
 let cu='IM';const UN={SI:{L:['m',1],F:['kN',1],FL:['kN·m',1],q:['kN/m',1],E:['GPa',1],k:['kN/m³',1],d:['mm',1000],s:['mm',1000],fc:['MPa',1],A:['cm²',1e4],I:['cm⁴',1e8],p:['kN/m²',1],gw:['kN/m³',1],ar:['m²',1]},IM:{L:['ft',3.28084],F:['kip',.224809],FL:['kip·ft',.737562],q:['kip/ft',.068522],E:['ksi',145.038],k:['kip/ft³',.006366],d:['in',39.3701],s:['in',39.3701],fc:['ksi',.145038],A:['in²',1550.003],I:['in⁴',2402510],p:['ksf',.0208854],gw:['kip/ft³',.00636588],ar:['ft²',10.7639]}},UF=k=>k?UN[cu][k][1]:1,UL=k=>UN[cu][k][0],fmtv=v=>+v.toPrecision(6),KM={N:'F',Vy:'F',Vz:'F',T:'FL',My:'FL',Mz:'FL',Sy:'q',Sz:'q'};
 let FUS_DUP=0;
-let N=[],B=[],MUROS=[],LOSAS=[],CARGAS=[],ZAPATAS=[],PLATEAS=[],ANOT=[],SEL=[],GRUPOS=[],rubber=null,moveBase=null,sismoRes=null,MODAL=null,vientoRes=null,resV=null,vieOn=false,tool='sel',sel=null,res=null,resG=null,resS=null,sisOn=false,mode='model',chain=null,poly=null,drag=null,ms=null,C={a:-.6,p:.45,S:40,ox:300,oy:300},ZV=null,resC=null,dpr=devicePixelRatio||1;
+let N=[],B=[],MUROS=[],LOSAS=[],CARGAS=[],ZAPATAS=[],PLATEAS=[],ANOT=[],SEL=[],GRUPOS=[],rubber=null,moveBase=null,sismoRes=null,MODAL=null,vientoRes=null,resV=null,vieOn=false,tool='sel',sel=null,res=null,resG=null,resS=null,sisOn=false,mode='model',chain=null,poly=null,drag=null,ms=null,C={a:-.6,p:.45,S:40,ox:300,oy:300},ZV=null,resC=null,SW_ON=true,dpr=devicePixelRatio||1;
 /* estado de dibujo: muro poligonal, cotas y guías */
 let WGRP=0,wchain=null,widx=[],dimA=null,aline=null,ortho=true,polar=0,shiftDown=false,cdiag=false,SNAP=null;
 /* valores por defecto de los objetos nuevos (siempre en unidades internas: m, kN, kN/m²) */
@@ -524,10 +524,11 @@ function wallGeo(w){
 /* Etiqueta del muro: los tramos de un muro poligonal comparten número de grupo */
 const wallTag=i=>{const w=MUROS[i];return w&&w.grp?('M'+w.grp+'.'+(w.gk+1)):'M'+(i+1)};
 
+function barSW(r){if(!SW_ON||!r)return 0;try{const s=sp(r);return (GAM[r.mat]||24)*(s.A||0)}catch(e){return 0}}
 /* Reúne el reparto de losas y cargas de área: add = total, area = sólo cargas de área */
 function cargasSup(){
  const add=new Float64Array(B.length),area=new Float64Array(B.length),avisos=[];let losas=0,areas=0;
- LOSAS.forEach((s,i)=>{if(!(s.pts&&s.pts.length>=3))return;const q=(+s.gw||0)*(+s.t||0);if(!(q>0))return;
+ if(SW_ON)LOSAS.forEach((s,i)=>{if(!(s.pts&&s.pts.length>=3))return;const q=(+s.gw||0)*(+s.t||0);if(!(q>0))return;
   const A=reparteLosa(s,q,add);if(A>0)losas+=q*A;
   if(A<=0)avisos.push('Losa '+(i+1)+': no hay vigas en su plano que reciban el peso propio ('+fmtv(q*UF('p'))+' '+UL('p')+').'+(slabIsFlat(s)?'':" Dibuja las vigas de borde siguiendo la pendiente."))});
  CARGAS.forEach((c,i)=>{if(!(c.pts&&c.pts.length>=3)||!(c.q>0))return;
@@ -546,14 +547,14 @@ function analyze(keepK){
  /* --- muros --- */
  const wsm=MUROS.map(()=>null);
  MUROS.forEach((w,wi)=>{const gg=wallGeo(w);if(!gg){avisos.push('Muro '+(wi+1)+': sus nodos ya no existen.');return}
-  if(!w.rig){const q=(+w.gw||24)*(+w.t||0)*gg.H;
+  if(!w.rig){const q=SW_ON?((+w.gw||24)*(+w.t||0)*gg.H):0;
    if(!reparteLinea(gg.p[0].z,[gg.p[0].x,gg.p[0].y],[gg.p[1].x,gg.p[1].y],q,addB))avisos.push('Muro '+(wi+1)+' (sin rigidez): no hay vigas en su base que reciban su peso.');
    qMuros+=q*gg.L;return}
   w.n.forEach(i=>used.add(i));
   if(!(gg.L>1e-6&&gg.H>1e-6))return;
   /* columna equivalente en el eje del muro + 4 brazos rígidos a sus esquinas */
   const c0=nd.push({x:gg.m0[0],y:gg.m0[1],z:gg.m0[2]})-1,c1=nd.push({x:gg.m1[0],y:gg.m1[1],z:gg.m1[2]})-1;
-  const cb=Object.assign(bk(c0,c1,{}),{ty:'rect',b:+w.t,h:gg.L,ang:gg.th,E:+w.E,div:1,wa:(+w.gw||24)*w.t*gg.L,wb:(+w.gw||24)*w.t*gg.L});
+  const cb=Object.assign(bk(c0,c1,{}),{ty:'rect',b:+w.t,h:gg.L,ang:gg.th,E:+w.E,div:1,wa:SW_ON?((+w.gw||24)*w.t*gg.L):0,wb:SW_ON?((+w.gw||24)*w.t*gg.L):0});
   MEM.push({r:cb,bi:-1,wi});qMuros+=cb.wa*gg.H;
   const sc=sp(cb),Ew=w.E*1e6,Sm=Math.max(sc.A*Ew/gg.H,12*Ew*sc.I/gg.H**3,12*Ew*sc.Iz/gg.H**3),Kr=1e4*Sm;
   [[w.n[0],c0],[w.n[1],c0],[w.n[3],c1],[w.n[2],c1]].forEach(par=>{const a=par[0],z=par[1],pa=nd[a],pb=nd[z];
@@ -574,11 +575,11 @@ function analyze(keepK){
  if(n>MAX_DOF)return{err:'Modelo demasiado grande para el solver denso'+(DESKTOP_MODE?'':' del navegador')+': '+nd.length+' nudos ('+n+' GDL). Reduce subdivisiones (div), simplifica losas/muros o divide el modelo en partes.'};
  if(n>WARN_DOF)avisos.push('Modelo grande ('+nd.length+' nudos, '+n+' GDL): el análisis puede tardar y consumir bastante memoria.');
  const G=Array.from({length:n},()=>Array(n).fill(0)),F=Array(n).fill(0);
- E.forEach(e=>{const r=e.M.r,{ax,L}=e,sc=r._sec||sp(r),Em=r.E*1e6,ad=e.M.bi>=0?addB[e.M.bi]:0,
+ E.forEach(e=>{const r=e.M.r,{ax,L}=e,sc=r._sec||sp(r),Em=r.E*1e6,ad=e.M.bi>=0?addB[e.M.bi]:0,qsw=e.M.bi>=0?barSW(r):0,
   K=kl(Em,Em/2.4,sc.A,sc.I,sc.Iz,sc.J,L),kz=(r.kz||0)*sc.w,ky=(r.ky||0)*sc.d,Rm=[ax.ex,ax.ey,ax.ez],T=Array.from({length:12},()=>Array(12).fill(0));
   if(kz||ky)GP.forEach(([x,w])=>{const h=hm(x,L),nz=[h[0],-h[1],h[2],-h[3]],iy=[1,5,7,11],iz=[2,4,8,10];for(let a=0;a<4;a++)for(let b=0;b<4;b++){K[iy[a]][iy[b]]+=ky*L*w*h[a]*h[b];K[iz[a]][iz[b]]+=kz*L*w*nz[a]*nz[b]}});
   for(let b=0;b<4;b++)for(let i=0;i<3;i++)for(let j=0;j<3;j++)T[3*b+i][3*b+j]=Rm[i][j];
-  const t0=(e.k-1)/e.m,t1=e.k/e.m,ip=(a,b,s)=>a+(b-a)*s,fa=[ip(r.xa,r.xb,t0),ip(r.ya,r.yb,t0),-ip(r.wa,r.wb,t0)-ad],fb=[ip(r.xa,r.xb,t1),ip(r.ya,r.yb,t1),-ip(r.wa,r.wb,t1)-ad],qxa=dot(fa,ax.ex),qxb=dot(fb,ax.ex),qya=dot(fa,ax.ey)+ip(r.pya,r.pyb,t0),qyb=dot(fb,ax.ey)+ip(r.pya,r.pyb,t1),qza=dot(fa,ax.ez)-ip(r.pza,r.pzb,t0),qzb=dot(fb,ax.ez)-ip(r.pza,r.pzb,t1);wF+=(fa[2]+fb[2])/2*L;wH[0]+=(fa[0]+fb[0])/2*L;wH[1]+=(fa[1]+fb[1])/2*L;const gy=(ip(r.pya,r.pyb,t0)+ip(r.pya,r.pyb,t1))/2,gz=-(ip(r.pza,r.pzb,t0)+ip(r.pza,r.pzb,t1))/2;wH[0]+=(gy*ax.ey[0]+gz*ax.ez[0])*L;wH[1]+=(gy*ax.ey[1]+gz*ax.ez[1])*L;wF+=(gy*ax.ey[2]+gz*ax.ez[2])*L;
+  const t0=(e.k-1)/e.m,t1=e.k/e.m,ip=(a,b,s)=>a+(b-a)*s,fa=[ip(r.xa,r.xb,t0),ip(r.ya,r.yb,t0),-ip((r.wa||0)+qsw,(r.wb||0)+qsw,t0)-ad],fb=[ip(r.xa,r.xb,t1),ip(r.ya,r.yb,t1),-ip((r.wa||0)+qsw,(r.wb||0)+qsw,t1)-ad],qxa=dot(fa,ax.ex),qxb=dot(fb,ax.ex),qya=dot(fa,ax.ey)+ip(r.pya,r.pyb,t0),qyb=dot(fb,ax.ey)+ip(r.pya,r.pyb,t1),qza=dot(fa,ax.ez)-ip(r.pza,r.pzb,t0),qzb=dot(fb,ax.ez)-ip(r.pza,r.pzb,t1);wF+=(fa[2]+fb[2])/2*L;wH[0]+=(fa[0]+fb[0])/2*L;wH[1]+=(fa[1]+fb[1])/2*L;const gy=(ip(r.pya,r.pyb,t0)+ip(r.pya,r.pyb,t1))/2,gz=-(ip(r.pza,r.pzb,t0)+ip(r.pza,r.pzb,t1))/2;wH[0]+=(gy*ax.ey[0]+gz*ax.ez[0])*L;wH[1]+=(gy*ax.ey[1]+gz*ax.ez[1])*L;wF+=(gy*ax.ey[2]+gz*ax.ez[2])*L;
   const tf=(qa,qb)=>[qa*L/2+3*(qb-qa)*L/20,qa*L*L/12+(qb-qa)*L*L/30,qa*L/2+7*(qb-qa)*L/20,-qa*L*L/12-(qb-qa)*L*L/20],Y=tf(qya,qyb),Z=tf(qza,qzb),fe=[L*(2*qxa+qxb)/6,Y[0],Z[0],0,-Z[1],Y[1],L*(qxa+2*qxb)/6,Y[2],Z[2],0,-Z[3],Y[3]],rel=[];
   if(e.k==1&&r.a1)rel.push(4,5);if(e.k==e.m&&r.a2)rel.push(10,11);
   const Kc=K.map(x=>x.slice()),fc=fe.slice();cond(Kc,fc,rel);
@@ -854,10 +855,10 @@ function pesoNodos(fA){
  const W=new Float64Array(N.length),CS=cargasSup();
  B.forEach((b,i)=>{const a=N[b.i],c=N[b.j];if(!a||!c)return;
   const L=Math.hypot(c.x-a.x,c.y-a.y,c.z-a.z);
-  const w=((+b.wa||0)+(+b.wb||0))/2+(CS.add[i]-CS.area[i])+fA*CS.area[i];
+  const w=((+b.wa||0)+(+b.wb||0))/2+barSW(b)+(CS.add[i]-CS.area[i])+fA*CS.area[i];
   W[b.i]+=w*L/2;W[b.j]+=w*L/2});
  N.forEach((n,i)=>{if(n.f[2]<0)W[i]+=-n.f[2]});
- MUROS.forEach(w=>{if(!w.rig)return;const wg=wallGeo(w);if(!wg)return;
+ MUROS.forEach(w=>{if(!SW_ON||!w.rig)return;const wg=wallGeo(w);if(!wg)return;
   const ww=(+w.gw||24)*(+w.t||0)*wg.L*wg.H/4;w.n.forEach(i=>{W[i]+=ww})});
  return W}
 function nivelPeso(fA){
@@ -2958,7 +2959,7 @@ function reportePDF(soloDescarga){
   let listo=true;try{const ims=w.document.images;for(let i=0;i<ims.length;i++)if(!ims[i].complete)listo=false}catch(e){listo=true}
   if(listo||k>40){clearInterval(tid);w.focus();w.print()}},150)}
 
-function saveModel(){const d={app:'zapel-3d',v:5,units:cu,N,B,MUROS,LOSAS,CARGAS,ZAPATAS,PLATEAS,ANOT,GRUPOS},blob=new Blob([JSON.stringify(d,null,1)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Zapel773DWall-modelo.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function saveModel(){const d={app:'zapel-3d',v:5,units:cu,N,B,MUROS,LOSAS,CARGAS,ZAPATAS,PLATEAS,ANOT,GRUPOS,sw:SW_ON},blob=new Blob([JSON.stringify(d,null,1)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Zapel773DWall-modelo.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 function parseModel(d){
  if(!d||d.app!='zapel-3d'||!Array.isArray(d.N)||!Array.isArray(d.B))throw 0;
  const a6=v=>Array.from({length:6},(_,k)=>+(v&&v[k])||0),n=d.N.map(q=>({x:+q.x||0,y:+q.y||0,z:+q.z||0,r:a6(q.r),f:a6(q.f)})),b=d.B.map(q=>({...D,...q})).filter(q=>n[q.i]&&n[q.j]);
@@ -2973,10 +2974,10 @@ function parseModel(d){
  const pt=(d.PLATEAS||[]).filter(q=>q&&Array.isArray(q.pts)&&q.pts.length>2).map(q=>({...DEFPL,...q}));
  const lens={n:n.length,b:b.length,w:mw.length,s:ls.length,c:cs.length,z:zp.length,p:pt.length,a:an.length};
  const gr=(d.GRUPOS||[]).map((g,gi)=>({id:+g.id||gi+1,name:String(g.name||('Grupo '+(gi+1))),items:(g.items||[]).filter(q=>q&&lens[q.t]!==undefined&&+q.i>=0&&+q.i<lens[q.t]).map(q=>({t:q.t,i:+q.i}))})).filter(g=>g.items.length>=2);
- return {n,b,mw,ls,cs,zp,pt,an,gr,units:d.units=='IM'?'IM':'SI'}}
+ return {n,b,mw,ls,cs,zp,pt,an,gr,units:d.units=='IM'?'IM':'SI',sw:d.sw!==false}}
 function openModel(f){const rd=new FileReader();rd.onload=()=>{try{
  const m=parseModel(JSON.parse(rd.result));
- cu=m.units;$('un').value=cu;$('gs').value=cu=='SI'?.5:1;$('lv').value=0;
+ cu=m.units;SW_ON=m.sw!==false;if($('swOn'))$('swOn').checked=SW_ON;$('un').value=cu;$('gs').value=cu=='SI'?.5:1;$('lv').value=0;
  document.querySelectorAll('[data-u]').forEach(s=>s.textContent=UL(s.dataset.u));syncDef();
  load(m.n,m.b,m.mw,m.ls,m.cs,m.zp,m.pt,m.an,m.gr);if(m.b.length||m.mw.length)run()}
  catch(e){$('out').innerHTML='<span class="er">El archivo no es un modelo válido de Zapel773DWall.</span>'}};rd.readAsText(f)}
@@ -3090,17 +3091,24 @@ function deformadaRustU(u,label){
  let dm=0;for(let i=0;i<u.length;i+=6)dm=Math.max(dm,Math.hypot(u[i]||0,u[i+1]||0,u[i+2]||0));
  res={u:u.slice(0,N.length*6),R:[],smp,dmax:dm,ext:{}};resC=null;mode='def';setM('def');draw();
 }
-function verDeformadaSismoRust(){
+function verDeformadaSismoRust(dir){
  const r=window.__RUST_RESULT__;if(!r||!r.directions)return;
+ if(dir&&r.directions[dir]&&r.directions[dir].u){deformadaRustU(r.directions[dir].u,'Sismo '+dir);return}
  const X=r.directions.X&&r.directions.X.u,Y=r.directions.Y&&r.directions.Y.u;
  const dx=(r.directions.X&&r.directions.X.dmax)||0,dy=(r.directions.Y&&r.directions.Y.dmax)||0;
  deformadaRustU(dy>dx?Y:X,dy>dx?'Sismo Y':'Sismo X');
+}
+function verDeformadaElfCaso(dir,sign){
+ const r=window.__RUST_RESULT__;if(!r||!r.elf||!r.elf.cases)return;
+ const c=r.elf.cases.find(q=>q.dir===dir&&Math.sign(q.sign)===Math.sign(sign));
+ if(c&&c.u)deformadaRustU(c.u,'ELF '+dir+(sign>0?'+':'-'));
 }
 function verDeformadaVientoRust(){
  const r=window.__RUST_RESULT__;if(!r||!r.cases)return;
  let best=null;for(const c of r.cases)if(c.u&&(!best||(c.dmax||0)>(best.dmax||0)))best=c;
  if(best)deformadaRustU(best.u,'Viento '+best.dir+(best.sign>0?'+':'-'));
 }
+function fmtU(v,k){const x=+v;if(!isFinite(x))return '-';return fmtEsc(x*UF(k))+' '+UL(k)}
 function descargarInformeRust(html){
  try{const blob=new Blob([html],{type:'text/html;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='informe-rust-'+new Date().toISOString().slice(0,10)+'.html';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),3000)}catch(e){if($('stz'))$('stz').textContent='No se pudo descargar el informe: '+e.message}
 }
@@ -3114,7 +3122,7 @@ function verDeformadaRust(){
 async function rustVientoRun(){
  const o=$('out');if(!o)return;
  if(!(window.ZAPEL_DESKTOP&&window.ZAPEL_DESKTOP.solveRust)){o.innerHTML='<span class="er">El análisis Rust solo está disponible en la versión de escritorio.</span>';return}
- const modelo={app:'zapel-3d',v:5,units:cu,N,B,MUROS,LOSAS,CARGAS,ZAPATAS,PLATEAS,ANOT,GRUPOS};
+ const modelo={app:'zapel-3d',v:5,units:cu,N,B,MUROS,LOSAS,CARGAS,ZAPATAS,PLATEAS,ANOT,GRUPOS,sw:SW_ON};
  o.innerHTML='<span class="m">Calculando viento con Rust…</span>';
  try{
   const wv=(typeof VIENTO!=='undefined'&&VIENTO)||{};
@@ -3123,9 +3131,9 @@ async function rustVientoRun(){
   if(!r||!r.ok){o.innerHTML='<span class="er">Rust viento: '+((r&&r.error)||'sin respuesta')+'</span>';return}
   const w=r.wind||{};
   let h='<b>Viento ASCE 7-22 · Rust</b><div class="m">V = '+fmtEsc(w.V)+' mph · exposición '+w.exposure+' · h = '+fmtEsc(w.h)+' m · qh = '+fmtEsc(w.qh)+' psf</div>';
-  h+='<table><tr><th>Cortante basal</th><td>'+fmtEsc(w.Vbase)+'</td></tr><tr><th>Vuelco</th><td>'+fmtEsc(w.Mbase)+'</td></tr><tr><th>Succión techo</th><td>'+fmtEsc(w.roofF)+'</td></tr></table>';
+  h+='<table><tr><th>Cortante basal</th><td>'+fmtU(w.Vbase,'F')+'</td></tr><tr><th>Vuelco</th><td>'+fmtU(w.Mbase,'FL')+'</td></tr><tr><th>Succión techo</th><td>'+fmtEsc(w.roofF)+'</td></tr></table>';
   if(w.levels&&w.levels.length)h+='<table><tr><th>z</th><th>Kz</th><th>pN</th><th>FX</th></tr>'+w.levels.map(L=>'<tr><td>'+fmtEsc(L.z)+'</td><td>'+fmtEsc(L.kz)+'</td><td>'+fmtEsc(L.pN)+'</td><td>'+fmtEsc(L.FX)+'</td></tr>').join('')+'</table>';
-  if(r.cases&&r.cases.length)h+='<table><tr><th>Caso</th><th>Cortante</th><th>dmax</th></tr>'+r.cases.map(c=>'<tr><td>'+c.dir+(c.sign>0?'+':'-')+'</td><td>'+fmtEsc(c.base_shear)+'</td><td>'+fmtEsc(c.dmax)+'</td></tr>').join('')+'</table>';
+  if(r.cases&&r.cases.length)h+='<table><tr><th>Caso</th><th>Cortante</th><th>dmax</th></tr>'+r.cases.map(c=>'<tr><td>'+c.dir+(c.sign>0?'+':'-')+'</td><td>'+fmtU(c.base_shear,'F')+'</td><td>'+fmtU(c.dmax,'d')+'</td></tr>').join('')+'</table>';
   if(r.warnings&&r.warnings.length)h+='<div class="m" style="font-size:11px">'+r.warnings.slice(0,8).join('<br>')+'</div>';
   window.__RUST_RESULT__=r;h+='<button id="b_rust_wcont" style="width:100%;margin-top:6px">Ver presiones de viento Rust</button><button id="b_rust_wdrift" style="width:100%;margin-top:4px">Ver derivas de viento Rust</button><button id="b_rust_wdef" style="width:100%;margin-top:4px">Ver deformada de viento Rust</button>'+botonInforme(r);
   o.innerHTML=h;bindInforme(r);const wc=$('b_rust_wcont');if(wc)wc.onclick=verContornosVientoRust;const wd=$('b_rust_wdrift');if(wd)wd.onclick=verDerivasVientoRust;const wdf=$('b_rust_wdef');if(wdf)wdf.onclick=verDeformadaVientoRust;if($('stz'))$('stz').textContent='Viento Rust completado.';
@@ -3146,8 +3154,8 @@ function validarRustApp(){
   '<tr><td>Reacciones</td><td colspan=4>Δ máx = '+fmtEsc(dr)+'</td></tr></table>'+
   '<div class="m">Comparación nodal estática. Se agregan comparaciones disponibles.</div>';
   if(r.directions&&typeof modalCalc==='function'){try{const m=modalCalc();if(m&&!m.err&&m.dirs){const x=m.dirs.X||{},y=m.dirs.Y||{},rx=r.directions.X||{},ry=r.directions.Y||{};o.innerHTML+='<b>Modal</b><table><tr><th>Dir</th><th>App V</th><th>Rust V</th><th>Δ</th></tr><tr><td>X</td><td>'+fmtEsc(x.V)+'</td><td>'+fmtEsc(rx.base_shear)+'</td><td>'+fmtEsc(Math.abs((x.V||0)-(rx.base_shear||0)))+'</td></tr><tr><td>Y</td><td>'+fmtEsc(y.V)+'</td><td>'+fmtEsc(ry.base_shear)+'</td><td>'+fmtEsc(Math.abs((y.V||0)-(ry.base_shear||0)))+'</td></tr></table>'}}catch(e){o.innerHTML+='<div class="er">Modal: '+e.message+'</div>'}}
-  if(r.elf&&typeof sismoCalc==='function'){try{const s=sismoCalc();if(s&&!s.err){o.innerHTML+='<b>ELF</b><table><tr><th></th><th>App</th><th>Rust</th><th>Δ</th></tr><tr><td>T</td><td>'+fmtEsc(s.T)+'</td><td>'+fmtEsc(r.elf.T)+'</td><td>'+fmtEsc(Math.abs((s.T||0)-(r.elf.T||0)))+'</td></tr><tr><td>V</td><td>'+fmtEsc(s.V)+'</td><td>'+fmtEsc(r.elf.V)+'</td><td>'+fmtEsc(Math.abs((s.V||0)-(r.elf.V||0)))+'</td></tr></table>'}}catch(e){o.innerHTML+='<div class="er">ELF: '+e.message+'</div>'}}
-  if(r.wind&&typeof vientoCalc==='function'){try{const w=vientoCalc();if(w&&!w.err){o.innerHTML+='<b>Viento</b><table><tr><th></th><th>App</th><th>Rust</th><th>Δ</th></tr><tr><td>qh</td><td>'+fmtEsc(w.qh)+'</td><td>'+fmtEsc(r.wind.qh)+'</td><td>'+fmtEsc(Math.abs((w.qh||0)-(r.wind.qh||0)))+'</td></tr><tr><td>Vbase</td><td>'+fmtEsc(w.Vbase)+'</td><td>'+fmtEsc(r.wind.Vbase)+'</td><td>'+fmtEsc(Math.abs((w.Vbase||0)-(r.wind.Vbase||0)))+'</td></tr><tr><td>Mbase</td><td>'+fmtEsc(w.Mbase)+'</td><td>'+fmtEsc(r.wind.Mbase)+'</td><td>'+fmtEsc(Math.abs((w.Mbase||0)-(r.wind.Mbase||0)))+'</td></tr></table>'}}catch(e){o.innerHTML+='<div class="er">Viento: '+e.message+'</div>'}}
+  if(r.elf&&typeof sismoCalc==='function'){try{const s=sismoCalc();if(s&&!s.err){o.innerHTML+='<b>ELF</b><table><tr><th></th><th>App</th><th>Rust</th><th>Δ</th></tr><tr><td>T</td><td>'+fmtEsc(s.T)+'</td><td>'+fmtEsc(r.elf.T)+'</td><td>'+fmtEsc(Math.abs((s.T||0)-(r.elf.T||0)))+'</td></tr><tr><td>V</td><td>'+fmtEsc(s.V)+'</td><td>'+fmtU(r.elf.V,'F')+'</td><td>'+fmtEsc(Math.abs((s.V||0)-(r.elf.V||0)))+'</td></tr></table>'}}catch(e){o.innerHTML+='<div class="er">ELF: '+e.message+'</div>'}}
+  if(r.wind&&typeof vientoCalc==='function'){try{const w=vientoCalc();if(w&&!w.err){o.innerHTML+='<b>Viento</b><table><tr><th></th><th>App</th><th>Rust</th><th>Δ</th></tr><tr><td>qh</td><td>'+fmtEsc(w.qh)+'</td><td>'+fmtEsc(r.wind.qh)+'</td><td>'+fmtEsc(Math.abs((w.qh||0)-(r.wind.qh||0)))+'</td></tr><tr><td>Vbase</td><td>'+fmtU(w.Vbase,'F')+'</td><td>'+fmtEsc(r.wind.Vbase)+'</td><td>'+fmtEsc(Math.abs((w.Vbase||0)-(r.wind.Vbase||0)))+'</td></tr><tr><td>Mbase</td><td>'+fmtU(w.Mbase,'FL')+'</td><td>'+fmtEsc(r.wind.Mbase)+'</td><td>'+fmtEsc(Math.abs((w.Mbase||0)-(r.wind.Mbase||0)))+'</td></tr></table>'}}catch(e){o.innerHTML+='<div class="er">Viento: '+e.message+'</div>'}}
 }
 function verContornosLosasRust(){
  const r=window.__RUST_RESULT__;if(!r||!r.slab_stress)return;
@@ -3199,7 +3207,7 @@ function verContornosVientoRust(){
 async function rustElfRun(){
  const o=$('out');if(!o)return;
  if(!(window.ZAPEL_DESKTOP&&window.ZAPEL_DESKTOP.solveRust)){o.innerHTML='<span class="er">El análisis Rust solo está disponible en la versión de escritorio.</span>';return}
- const modelo={app:'zapel-3d',v:5,units:cu,N,B,MUROS,LOSAS,CARGAS,ZAPATAS,PLATEAS,ANOT,GRUPOS};
+ const modelo={app:'zapel-3d',v:5,units:cu,N,B,MUROS,LOSAS,CARGAS,ZAPATAS,PLATEAS,ANOT,GRUPOS,sw:SW_ON};
  o.innerHTML='<span class="m">Calculando ELF con Rust…</span>';
  try{
   const p={...DEFSIS,...(SISMO||{})},Si=SITIO[p.clase]||SITIO.D,{Fa,Fv}=coefSitio(p,Si);
@@ -3221,29 +3229,63 @@ function rustSismoOpen(){
  $('rsm').style.display='flex';
 }
 function rustSismoClose(){$('rsm').style.display='none'}
+let RSM_T0=0,RSM_TIMER=null,RSM_PCT=8;
+function rsmBusy(on,msg,ok){
+ const p=$('rsmProg'),b=$('rsmBar'),s=$('rsmStatus'),btn=$('rsmRun');
+ if(on){RSM_T0=Date.now();RSM_PCT=8;p.style.display='block';b.style.width='8%';btn.disabled=true;btn.textContent='Calculando…';s.textContent=msg||'Preparando…';s.className='m';s.style.color='';
+  clearInterval(RSM_TIMER);RSM_TIMER=setInterval(()=>{RSM_PCT=Math.min(92,RSM_PCT+Math.max(1,(92-RSM_PCT)*.08));b.style.width=RSM_PCT.toFixed(1)+'%';const t=((Date.now()-RSM_T0)/1000).toFixed(1);s.textContent=(msg||'Calculando…')+' · '+t+' s'},250);
+ }else{clearInterval(RSM_TIMER);RSM_TIMER=null;p.style.display='block';b.style.width='100%';btn.disabled=false;btn.textContent='Ejecutar Rust';const t=((Date.now()-RSM_T0)/1000).toFixed(2);s.textContent=(msg||'Completado')+' · '+t+' s';s.className=ok===false?'er':'m';s.style.color=ok===false?'var(--er)':'var(--ok)'}
+}
 async function rustSismoDlgRun(){
  const o=$('out');const cod=$('rsmCod').value,met=$('rsmMet').value,site=$('rsmSite').value,risk=+$('rsmRisk').value;
  const ss=+$('rsmSs').value,s1=+$('rsmS1').value,tl=+$('rsmTL').value,fa=+$('rsmFA').value,ecc=Math.max(5,+$('rsmEcc').value||5),nmo=Math.max(1,Math.min(10,+$('rsmNmo').value||3));
  const sis=SISTEMAS[+$('rsmSis').value]||SISTEMAS[3];const Si=cod==='prbc18'?SITIO16[site]:SITIO[site];
  const {Fa,Fv}=coefSitio({cod,clase:site,ss,s1},Si);const SDS=2*Fa*ss/3,SD1=2*Fv*s1/3;const R=sis[1]||8,Ie=[1,1,1.25,1.5][risk]||1;
- const modelo={app:'zapel-3d',v:5,units:cu,N,B,MUROS,LOSAS,CARGAS,ZAPATAS,PLATEAS,ANOT,GRUPOS};
+ const modelo={app:'zapel-3d',v:5,units:cu,N,B,MUROS,LOSAS,CARGAS,ZAPATAS,PLATEAS,ANOT,GRUPOS,sw:SW_ON};
  let opt={report:true};
  if(met==='elf')opt={elf:true,sds:SDS,sd1:SD1,tl,r:R,ie:Ie,ct:sis[4]||.0466,x:sis[5]||.9,ecc,report:true};
  else {opt={sismo:true,modes:nmo,sds:SDS,sd1:SD1,tl,r:R,ie:Ie,fA:fa,ecc,report:true};
   if(met==='rec'){const sel=escSel({code:$('rsmEvent').value,pga:+$('rsmPga').value||0});if(sel&&sel.r){opt.eventT=sel.r.T;opt.eventSa=sel.r.Sa;opt.eventScale=sel.scale}}}
  o.innerHTML='<span class="m">Ejecutando análisis Rust…</span>';
- try{const r=await window.ZAPEL_DESKTOP.solveRust(modelo,opt);if(!r||!r.ok){o.innerHTML='<span class="er">Rust: '+((r&&r.error)||'sin respuesta')+'</span>';return}
+ rsmBusy(true,'Preparando modelo…');
+ try{rsmBusy(true,'Calculando con el solver…');const r=await window.ZAPEL_DESKTOP.solveRust(modelo,opt);if(!r||!r.ok){rsmBusy(false,'Error del solver',false);o.innerHTML='<span class="er">Rust: '+((r&&r.error)||'sin respuesta')+'</span>';return}
   let out='<b>'+(met==='elf'?'ELF Rust':met==='rec'?'Evento sísmico Rust':'Modal espectral Rust')+'</b><div class="m">'+cod.toUpperCase()+' · sitio '+site+' · R='+R+' · Ie='+Ie+'</div>';
   if(r.spectrum)out+='<table><tr><th>SDS</th><td>'+fmtEsc(r.spectrum.sds)+'</td></tr><tr><th>SD1</th><td>'+fmtEsc(r.spectrum.sd1)+'</td></tr></table>';
-  if(r.elf)out+='<table><tr><th>T</th><td>'+fmtEsc(r.elf.T)+' s</td></tr><tr><th>V</th><td>'+fmtEsc(r.elf.V)+'</td></tr></table>';
-  if(r.directions)out+='<table><tr><th>Dir</th><th>V</th><th>dmax</th></tr>'+['X','Y'].map(d=>'<tr><td>'+d+'</td><td>'+fmtEsc(r.directions[d].base_shear)+'</td><td>'+fmtEsc(r.directions[d].dmax)+'</td></tr>').join('')+'</table>';
+  if(r.elf)out+='<table><tr><th>T</th><td>'+fmtEsc(r.elf.T)+' s</td></tr><tr><th>V</th><td>'+fmtU(r.elf.V,'F')+'</td></tr></table>';
+  if(r.directions)out+='<table><tr><th>Dir</th><th>V</th><th>dmax</th></tr>'+['X','Y'].map(d=>'<tr><td>'+d+'</td><td>'+fmtU(r.directions[d].base_shear,'F')+'</td><td>'+fmtU(r.directions[d].dmax,'d')+'</td></tr>').join('')+'</table>';
   if(r.directions)window.__RUST_RESULT__=r;if(r.elf)window.__RUST_RESULT__=r;
+  if(r.directions){out+='<button id="rsmDX" style="width:49%;margin-top:4px">Deformada X</button><button id="rsmDY" style="width:49%;margin-top:4px">Deformada Y</button>'}
+  if(r.elf&&r.elf.cases){out+='<div class="m">Deformadas por caso:</div>'+r.elf.cases.map((c,i)=>'<button data-elf="'+i+'" style="width:49%;margin-top:3px">'+c.dir+(c.sign>0?'+':'-')+'</button>').join('')}
+  out+=botonInforme(r);o.innerHTML=out;bindInforme(r);const sx=$('rsmDX'),sy=$('rsmDY');if(sx)sx.onclick=()=>verDeformadaSismoRust('X');if(sy)sy.onclick=()=>verDeformadaSismoRust('Y');document.querySelectorAll('[data-elf]').forEach(b=>b.onclick=()=>{const c=r.elf.cases[+b.dataset.elf];verDeformadaElfCaso(c.dir,c.sign)});rsmBusy(false,'Análisis completado',true);
+ }catch(e){rsmBusy(false,'Error del solver',false);o.innerHTML='<span class="er">Rust: '+e.message+'</span>'}}
+function rustVientoOpen(){
+ const w=(typeof VIENTO!=='undefined'&&VIENTO)||{};
+ if(w.V)$('rwmV').value=w.V;if(w.exp)$('rwmExp').value=w.exp;if(w.norma)$('rwmNorm').value=w.norma;if(w.evento)$('rwmEvento').value=w.evento;if(w.Kzt!=null)$('rwmKzt').value=w.Kzt;if(w.Kd!=null)$('rwmKd').value=w.Kd;if(w.Ke!=null)$('rwmKe').value=w.Ke;if(w.G!=null)$('rwmG').value=w.G;if(w.Cpw!=null)$('rwmCpw').value=w.Cpw;if(w.Cpl!=null)$('rwmCpl').value=w.Cpl;if(w.GCpi!=null)$('rwmGcpi').value=w.GCpi;$('rwmTecho').checked=w.techo!==false;
+ $('rwm').style.display='flex';
+}
+function rustVientoClose(){$('rwm').style.display='none'}
+let RWM_T0=0,RWM_TIMER=null,RWM_PCT=8;
+function rwmBusy(on,msg,ok){const p=$('rwmProg'),b=$('rwmBar'),s=$('rwmStatus'),btn=$('rwmRun');
+ if(on){RWM_T0=Date.now();RWM_PCT=8;p.style.display='block';b.style.width='8%';btn.disabled=true;btn.textContent='Calculando…';s.textContent=msg||'';clearInterval(RWM_TIMER);RWM_TIMER=setInterval(()=>{RWM_PCT=Math.min(92,RWM_PCT+(92-RWM_PCT)*.08);b.style.width=RWM_PCT+'%';s.textContent=(msg||'Calculando…')+' · '+((Date.now()-RWM_T0)/1000).toFixed(1)+' s'},250)}
+ else{clearInterval(RWM_TIMER);p.style.display='block';b.style.width='100%';btn.disabled=false;btn.textContent='Ejecutar viento Rust';const t=((Date.now()-RWM_T0)/1000).toFixed(2);s.textContent=(msg||'Completado')+' · '+t+' s';s.className=ok===false?'er':'m';s.style.color=ok===false?'var(--er)':'var(--ok)'}}
+async function rustVientoDlgRun(){
+ const o=$('out'),modelo={app:'zapel-3d',v:5,units:cu,N,B,MUROS,LOSAS,CARGAS,ZAPATAS,PLATEAS,ANOT,GRUPOS,sw:SW_ON};
+ const opt={viento:true,v:+$('rwmV').value,exp:$('rwmExp').value,norma:$('rwmNorm').value,evento:$('rwmEvento').value,kzt:+$('rwmKzt').value,kd:+$('rwmKd').value,ke:+$('rwmKe').value,g:+$('rwmG').value,cpw:+$('rwmCpw').value,cpl:+$('rwmCpl').value,gcpi:+$('rwmGcpi').value,techo:$('rwmTecho').checked,report:true};
+ rwmBusy(true,'Calculando viento…');
+ try{const r=await window.ZAPEL_DESKTOP.solveRust(modelo,opt);if(!r||!r.ok){rwmBusy(false,'Error del solver',false);o.innerHTML='<span class="er">Rust viento: '+((r&&r.error)||'sin respuesta')+'</span>';return}
+  window.__RUST_RESULT__=r;const w=r.wind||{};
+  let out='<b>Viento Rust</b><div class="m">V = '+fmtEsc(w.V)+' mph · exposición '+w.exposure+' · qh = '+fmtEsc(w.qh)+' psf</div>';
+  out+='<table><tr><th>Vbase X</th><td>'+fmtU(w.Vbase,'F')+'</td></tr><tr><th>Vbase Y</th><td>'+fmtEsc(r.cases&&r.cases[2]?r.cases[2].base_shear:'')+'</td></tr><tr><th>Mbase</th><td>'+fmtU(w.Mbase,'FL')+'</td></tr></table>';
+  if(r.cases){out+='<div class="m">Deformadas por caso:</div>'+r.cases.map((c,i)=>'<button data-wcase="'+i+'" style="width:49%;margin-top:3px">'+c.dir+(c.sign>0?'+':'-')+'</button>').join('');out+='<button id="rwmPres" style="width:100%;margin-top:5px">Ver presiones</button><button id="rwmDrift" style="width:100%;margin-top:4px">Ver derivas</button>'}
   out+=botonInforme(r);o.innerHTML=out;bindInforme(r);
- }catch(e){o.innerHTML='<span class="er">Rust: '+e.message+'</span>'}}
+  document.querySelectorAll('[data-wcase]').forEach(b=>b.onclick=()=>{const c=r.cases[+b.dataset.wcase];if(c&&c.u)deformadaRustU(c.u,'Viento '+c.dir+(c.sign>0?'+':'-'))});
+  const rp=$('rwmPres'),rd=$('rwmDrift');if(rp)rp.onclick=verContornosVientoRust;if(rd)rd.onclick=verDerivasVientoRust;
+  rwmBusy(false,'Análisis completado',true);
+ }catch(e){rwmBusy(false,'Error del solver',false);o.innerHTML='<span class="er">Rust viento: '+e.message+'</span>'}}
 async function rustSismoRun(){
  const o=$('out');if(!o)return;
  if(!(window.ZAPEL_DESKTOP&&window.ZAPEL_DESKTOP.solveRust)){o.innerHTML='<span class="er">El análisis Rust solo está disponible en la versión de escritorio.</span>';return}
- const modelo={app:'zapel-3d',v:5,units:cu,N,B,MUROS,LOSAS,CARGAS,ZAPATAS,PLATEAS,ANOT,GRUPOS};
+ const modelo={app:'zapel-3d',v:5,units:cu,N,B,MUROS,LOSAS,CARGAS,ZAPATAS,PLATEAS,ANOT,GRUPOS,sw:SW_ON};
  const p=(typeof SISMO!=='undefined'&&SISMO)||{},nmo=Math.max(1,Math.min(+p.nmo||3,5));
  o.innerHTML='<span class="m">Calculando sismo modal con Rust…</span>';
  try{
@@ -3264,8 +3306,8 @@ async function rustSismoRun(){
   }catch(_){}
   h+='<div class="m">'+(r.solver||'')+'</div>';
   if(r.spectrum)h+='<table><tr><th>SDS</th><td>'+fmtEsc(r.spectrum.sds)+'</td></tr><tr><th>SD1</th><td>'+fmtEsc(r.spectrum.sd1)+'</td></tr><tr><th>T0</th><td>'+fmtEsc(r.spectrum.t0)+' s</td></tr><tr><th>Ts</th><td>'+fmtEsc(r.spectrum.ts)+' s</td></tr></table>';
-  if(r.analysis)h+='<table><tr><th>GDL</th><td>'+(r.analysis.dof||'')+'</td></tr><tr><th>Modos</th><td>'+(r.analysis.modes||'')+'</td></tr><tr><th>Peso</th><td>'+fmtEsc(r.analysis.total_weight)+'</td></tr></table>';
-  if(r.directions){h+='<table><tr><th>Dir</th><th>Cortante</th><th>dmax</th></tr>'+['X','Y'].map(d=>'<tr><td>'+d+'</td><td>'+fmtEsc(r.directions[d].base_shear)+'</td><td>'+fmtEsc(r.directions[d].dmax)+'</td></tr>').join('')+'</table>'}
+  if(r.analysis)h+='<table><tr><th>GDL</th><td>'+(r.analysis.dof||'')+'</td></tr><tr><th>Modos</th><td>'+(r.analysis.modes||'')+'</td></tr><tr><th>Peso</th><td>'+fmtU(r.analysis.total_weight,'F')+'</td></tr></table>';
+  if(r.directions){h+='<table><tr><th>Dir</th><th>Cortante</th><th>dmax</th></tr>'+['X','Y'].map(d=>'<tr><td>'+d+'</td><td>'+fmtU(r.directions[d].base_shear,'F')+'</td><td>'+fmtU(r.directions[d].dmax,'d')+'</td></tr>').join('')+'</table>'}
   if(r.warnings&&r.warnings.length)h+='<div class="m" style="font-size:11px">'+r.warnings.slice(0,8).join('<br>')+'</div>';
   if(r.directions){window.__RUST_RESULT__=r;h+='<button id="b_rust_scont" style="width:100%;margin-top:6px">Ver contornos sísmicos Rust</button><button id="b_rust_sdrift" style="width:100%;margin-top:4px">Ver derivas sísmicas Rust</button>'+"<button id=\"b_rust_sdef\" style=\"width:100%;margin-top:4px\">Ver deformada sísmica Rust</button>"}
   h+=botonInforme(r);o.innerHTML=h;bindInforme(r);const sc=$('b_rust_scont');if(sc)sc.onclick=verContornosSismoRust;const sd=$('b_rust_sdrift');if(sd)sd.onclick=verDerivasSismoRust;const sdf=$('b_rust_sdef');if(sdf)sdf.onclick=verDeformadaSismoRust;if($('stz'))$('stz').textContent='Sismo modal Rust completado.';
@@ -3274,15 +3316,15 @@ async function rustSismoRun(){
 async function rustRun(){
  const o=$('out');if(!o)return;
  if(!(window.ZAPEL_DESKTOP&&window.ZAPEL_DESKTOP.solveRust)){o.innerHTML='<span class="er">El análisis Rust solo está disponible en la versión de escritorio.</span>';return}
- const modelo={app:'zapel-3d',v:5,units:cu,N,B,MUROS,LOSAS,CARGAS,ZAPATAS,PLATEAS,ANOT,GRUPOS};
+ const modelo={app:'zapel-3d',v:5,units:cu,N,B,MUROS,LOSAS,CARGAS,ZAPATAS,PLATEAS,ANOT,GRUPOS,sw:SW_ON};
  o.innerHTML='<span class="m">Ejecutando solver Rust…</span>';
  try{
   const r=await window.ZAPEL_DESKTOP.solveRust(modelo,{report:true});
   if(!r||!r.ok){o.innerHTML='<span class="er">Rust: '+((r&&r.error)||'sin respuesta')+'</span>';return}
   let h='<b>Análisis Rust (beta)</b><div class="m">'+(r.solver||'')+'</div>';
-  if(r.analysis){h+='<table><tr><th>Nudos</th><td>'+(r.analysis.nodes_total||r.analysis.dof/6||'')+'</td></tr><tr><th>GDL</th><td>'+(r.analysis.dof||'')+'</td></tr><tr><th>Elementos</th><td>'+(r.analysis.elements||'')+'</td></tr><tr><th>No-cero</th><td>'+(r.analysis.nnz||'')+'</td></tr>'+(r.analysis.dmax!=null?'<tr><th>dmax</th><td>'+fmtEsc(r.analysis.dmax)+'</td></tr>':'')+(r.analysis.total_weight!=null?'<tr><th>Peso</th><td>'+fmtEsc(r.analysis.total_weight)+'</td></tr>':'')+'</table>'}
-  if(r.mats&&r.mats.length){h+='<b>Matres</b><table><tr><th>#</th><th>qmax</th><th>qmin</th></tr>'+r.mats.map(m=>'<tr><td>'+m.index+'</td><td>'+fmtEsc(m.qmax)+'</td><td>'+fmtEsc(m.qmin)+'</td></tr>').join('')+'</table>'}
-  if(r.directions){h+='<b>Sismo</b><table><tr><th>Dir</th><th>Cortante</th><th>dmax</th></tr>'+['X','Y'].map(d=>'<tr><td>'+d+'</td><td>'+fmtEsc(r.directions[d].base_shear)+'</td><td>'+fmtEsc(r.directions[d].dmax)+'</td></tr>').join('')+'</table>'}
+  if(r.analysis){h+='<table><tr><th>Nudos</th><td>'+(r.analysis.nodes_total||r.analysis.dof/6||'')+'</td></tr><tr><th>GDL</th><td>'+(r.analysis.dof||'')+'</td></tr><tr><th>Elementos</th><td>'+(r.analysis.elements||'')+'</td></tr><tr><th>No-cero</th><td>'+(r.analysis.nnz||'')+'</td></tr>'+(r.analysis.dmax!=null?'<tr><th>dmax</th><td>'+fmtU(r.analysis.dmax,'d')+'</td></tr>':'')+(r.analysis.total_weight!=null?'<tr><th>Peso</th><td>'+fmtU(r.analysis.total_weight,'F')+'</td></tr>':'')+'</table>'}
+  if(r.mats&&r.mats.length){h+='<b>Matres</b><table><tr><th>#</th><th>qmax</th><th>qmin</th></tr>'+r.mats.map(m=>'<tr><td>'+m.index+'</td><td>'+fmtU(m.qmax,'p')+'</td><td>'+fmtU(m.qmin,'p')+'</td></tr>').join('')+'</table>'}
+  if(r.directions){h+='<b>Sismo</b><table><tr><th>Dir</th><th>Cortante</th><th>dmax</th></tr>'+['X','Y'].map(d=>'<tr><td>'+d+'</td><td>'+fmtU(r.directions[d].base_shear,'F')+'</td><td>'+fmtU(r.directions[d].dmax,'d')+'</td></tr>').join('')+'</table>'}
   if(r.warnings&&r.warnings.length)h+='<div class="m" style="font-size:11px">'+r.warnings.slice(0,8).join('<br>')+'</div>';
   if(r.smp&&r.smp.length){window.__RUST_RESULT__=r;h+='<button id="b_rust_def" style="width:100%;margin-top:6px">Ver deformada Rust</button>'}
   if(r.u){window.__RUST_RESULT__=r;h+='<button id="b_rust_valid" style="width:100%;margin-top:4px">Validar Rust vs app</button>'}
@@ -3302,7 +3344,7 @@ async function rustRun(){
   if($('stz'))$('stz').textContent='Análisis Rust completado.';
  }catch(e){o.innerHTML='<span class="er">Rust: '+e.message+'</span>'}
 }
-if(window.ZAPEL_DESKTOP&&window.ZAPEL_DESKTOP.isDesktop){const br=$('b_rust');if(br){br.style.display='inline-block';br.onclick=rustRun}const bs=$('b_rust_sismo');if(bs){bs.style.display='inline-block';bs.onclick=rustSismoOpen}const be=$('b_rust_elf');if(be){be.style.display='inline-block';be.onclick=rustElfRun}const bv=$('b_rust_viento');if(bv){bv.style.display='inline-block';bv.onclick=rustVientoRun}}
+if(window.ZAPEL_DESKTOP&&window.ZAPEL_DESKTOP.isDesktop){const br=$('b_rust');if(br){br.style.display='inline-block';br.onclick=rustRun}const bs=$('b_rust_sismo');if(bs){bs.style.display='inline-block';bs.onclick=rustSismoOpen}const be=$('b_rust_elf');if(be){be.style.display='inline-block';be.onclick=rustElfRun}const bv=$('b_rust_viento');if(bv){bv.style.display='inline-block';bv.onclick=rustVientoOpen}}
 if(cv)cv.title='Órbita: botón central o Alt + arrastrar · Zoom: rueda · Desplazar: Shift + arrastrar';function toggleBarra(){
  const tb=$('side'),b=$('b_tbcol'),col=!tb.classList.contains('colapsada');
  tb.classList.toggle('colapsada',col);b.textContent=col?'›':'‹';
@@ -3311,6 +3353,7 @@ if(cv)cv.title='Órbita: botón central o Alt + arrastrar · Zoom: rueda · Desp
  draw();
 }
 if($('b_tbcol'))$('b_tbcol').onclick=toggleBarra;
+if($('swOn')){ $('swOn').checked=SW_ON; $('swOn').onchange=()=>{SW_ON=$('swOn').checked;res=null;resG=null;resS=null;resV=null;$('out').innerHTML='';setM('model');draw();}; }
 if($('rsmClose'))$('rsmClose').onclick=rustSismoClose;if($('rsmRun'))$('rsmRun').onclick=rustSismoDlgRun;if($('rsmMet'))$('rsmMet').onchange=()=>{$('rsmEventBox').style.display=$('rsmMet').value==='rec'?'block':'none'};
 [['r_toggle',null],['r_run','b_run'],['r_rep','b_rep'],['r_rep3','b_rep3'],['r_sismo','b_sismo'],['r_viento','b_viento'],['r_guide','b_guide'],['r_help','b_help']].forEach(([r,b])=>{const rb=$(r),bb=$(b);if(rb&&bb)rb.onclick=()=>bb.click();if(r==='r_toggle')rb.onclick=toggleBarra});if($('lvlVis'))$('lvlVis').onchange=()=>{ZV=$('lvlVis').value?+$('lvlVis').value:null;draw()};
 try{if(localStorage.getItem('zapel-toolbar-collapsed')==='1'){$('side').classList.add('colapsada');$('b_tbcol').title='Mostrar barra de herramientas'}}catch(e){}
@@ -3333,7 +3376,7 @@ if(LANG==='en')setLang('en');else applyLang(document.body);
   <h3 style="margin:0 0 8px">Análisis sísmico nativo Rust</h3>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
    <label>Norma<select id="rsmCod" style="width:100%"><option value="asce22">ASCE 7-22</option><option value="prbc18">PRBC 2018 (ASCE 7-16)</option></select></label>
-   <label>Método<select id="rsmMet" style="width:100%"><option value="elf">Fuerza lateral equivalente</option><option value="mod">Modal espectral CQC</option><option value="rec">Evento sísmico</option></select></label>
+   <label>Método<select id="rsmMet" style="width:100%" onchange="document.getElementById(\'rsmEventBox\').style.display=this.value===\'rec\'?\'block\':\'none"><option value="elf">Fuerza lateral equivalente</option><option value="mod">Modal espectral CQC</option><option value="rec">Evento sísmico</option></select></label>
    <label>Clase de sitio<select id="rsmSite" style="width:100%"><option>A</option><option>B</option><option>C</option><option selected>D</option><option>E</option><option>F</option></select></label>
    <label>Categoría de riesgo<select id="rsmRisk" style="width:100%"><option value="1">I</option><option value="2">II</option><option value="3">III</option><option value="4">IV</option></select></label>
    <label>Ss<input id="rsmSs" type="number" step="0.01" value="1" style="width:100%"></label>
@@ -3348,8 +3391,33 @@ if(LANG==='en')setLang('en');else applyLang(document.body);
    <label>Evento sísmico<select id="rsmEvent" style="width:100%"></select></label>
    <label>PGA objetivo (g), opcional<input id="rsmPga" type="number" step="0.01" placeholder="usar PGA del evento" style="width:100%"></label>
   </div>
-  <div style="display:flex;gap:8px;margin-top:12px"><button class="go" id="rsmRun" style="flex:1">Ejecutar Rust</button><button id="rsmClose" style="width:110px">Cerrar</button></div>
+  <div style="display:flex;gap:8px;margin-top:12px"><button class="go" id="rsmRun" style="flex:1" onclick="rustSismoDlgRun()">Ejecutar Rust</button><button id="rsmClose" style="width:110px" onclick="rustSismoClose()">Cerrar</button></div>
+  <div id="rsmProg" style="display:none;margin-top:10px;height:12px;background:#0001;border:1px solid var(--bd);border-radius:7px;overflow:hidden"><div id="rsmBar" style="height:100%;width:8%;background:var(--ok);transition:width .25s"></div></div>
+  <div id="rsmStatus" class="m" style="margin-top:5px;font-size:12px"></div>
   <div class="m" style="font-size:11px;margin-top:6px">El análisis usa este selector, no la ventana Sismo general.</div>
+ </div>
+</div>
+
+<div id="rwm" style="position:fixed;inset:0;background:#0006;display:none;z-index:310;align-items:center;justify-content:center">
+ <div style="background:var(--pn);border:1px solid var(--bd);border-radius:10px;padding:14px;width:min(520px,94vw);max-height:92vh;overflow:auto;box-shadow:0 8px 30px #0005">
+  <h3 style="margin:0 0 8px">Análisis de viento nativo Rust</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+   <label>Velocidad V (mph)<input id="rwmV" type="number" step="1" value="165" style="width:100%"></label>
+   <label>Exposición<select id="rwmExp" style="width:100%"><option>B</option><option selected>C</option><option>D</option></select></label>
+   <label>Norma<select id="rwmNorm" style="width:100%"><option value="asce22">ASCE 7-22</option><option value="prbc18">PRBC 2018</option></select></label>
+   <label>Escenario<select id="rwmEvento" style="width:100%" onchange="if(this.value==='maria')document.getElementById('rwmV').value=155"><option value="diseno">Diseño (mapa)</option><option value="maria">Huracán María 2017</option></select></label>
+   <label>Kzt<input id="rwmKzt" type="number" step="0.01" value="1" style="width:100%"></label>
+   <label>Kd<input id="rwmKd" type="number" step="0.01" value="0.85" style="width:100%"></label>
+   <label>Ke<input id="rwmKe" type="number" step="0.01" value="1" style="width:100%"></label>
+   <label>G<input id="rwmG" type="number" step="0.01" value="0.85" style="width:100%"></label>
+   <label>Cp barlovento<input id="rwmCpw" type="number" step="0.1" value="0.8" style="width:100%"></label>
+   <label>Cp sotavento<input id="rwmCpl" type="number" step="0.1" value="-0.5" style="width:100%"></label>
+   <label>GCpi<input id="rwmGcpi" type="number" step="0.01" value="0.18" style="width:100%"></label>
+   <label class="ck" style="align-self:end"><input type="checkbox" id="rwmTecho" checked> Succión de techo</label>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:12px"><button class="go" id="rwmRun" style="flex:1" onclick="rustVientoDlgRun()">Ejecutar viento Rust</button><button id="rwmClose" style="width:110px" onclick="rustVientoClose()">Cerrar</button></div>
+  <div id="rwmProg" style="display:none;margin-top:10px;height:12px;background:#0001;border:1px solid var(--bd);border-radius:7px;overflow:hidden"><div id="rwmBar" style="height:100%;width:8%;background:var(--ok);transition:width .25s"></div></div>
+  <div id="rwmStatus" class="m" style="margin-top:5px;font-size:12px"></div>
  </div>
 </div>
 </body></html>
