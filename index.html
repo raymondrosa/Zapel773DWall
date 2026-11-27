@@ -182,6 +182,57 @@ body{flex-direction:row;overflow:hidden}
 #b_guide::before{color:#0891b2}#b_help::before{color:#64748b}
 /* Que el boton activo conserve el icono blanco */
 #side button.on::before{color:#fff!important}
+
+#iaw{position:fixed;inset:0;background:rgba(15,23,42,.35);z-index:202;display:none;align-items:center;justify-content:center;padding:10px;overflow-y:auto;overscroll-behavior:contain}
+#iaw .smbox{display:flex;flex-direction:column;width:100%;max-width:480px;min-width:0;max-height:92vh;max-height:min(92vh,calc(100dvh - 20px));background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:14px;box-shadow:0 12px 40px rgba(0,0,0,.3);box-sizing:border-box}
+#iaw .smscroll{min-height:0;flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-right:2px}
+#iaw .smact{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid var(--bd);flex:0 0 auto}
+#iaw .smact button{min-height:38px;flex:1 1 auto;min-width:0}
+#iaw label{display:block;margin:7px 0 2px}#iaw label.ck{display:flex;gap:5px;align-items:center;margin:4px 0}
+#iaw input[type=text],#iaw input[type=password],#iaw select,#iaw textarea{width:100%;box-sizing:border-box}
+#iaw textarea{resize:vertical}#iaSt{margin-top:8px;font-size:12px;line-height:1.45;overflow-wrap:anywhere}
+#iaJson{font:11px ui-monospace,Consolas,monospace}
+@media(max-width:760px){
+ #iaw{padding:6px}
+ #iaw .smbox{max-height:calc(100dvh - 12px);padding:10px;border-radius:8px}
+ #iaw .smact{padding-bottom:calc(2px + env(safe-area-inset-bottom,0px))}
+ #iaw .smact button{flex:1 1 100%}
+}
+/* --- Revisión del modelo --- */
+#revw{position:fixed;inset:0;background:rgba(15,23,42,.35);z-index:203;display:none;align-items:center;justify-content:center;padding:10px;overflow-y:auto;overscroll-behavior:contain;width:100vw;max-width:100vw;height:100dvh;max-height:100dvh;box-sizing:border-box}
+#revw .smbox{display:flex;flex-direction:column;width:100%;max-width:640px;min-width:0;max-height:92vh;max-height:min(92vh,calc(100dvh - 20px));background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:14px;box-shadow:0 12px 40px rgba(0,0,0,.3);box-sizing:border-box}
+#revw .revscroll{min-height:0;flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-right:2px;margin-top:2px}
+#revw .smact{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid var(--bd);flex:0 0 auto}
+#revw .smact button{min-height:36px;flex:1 1 auto;min-width:0}
+#revSum{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0 4px}
+.revscore{font-size:30px;font-weight:700;line-height:1;color:var(--ok);min-width:58px;text-align:center}
+.revscore.warn{color:#d97706}.revscore.err{color:var(--er)}
+.revchip{font-size:11px;border:1px solid var(--bd);border-radius:999px;padding:2px 8px;background:var(--pn);white-space:nowrap}
+.revchip.err{color:#b91c1c;border-color:#fca5a5}.revchip.warn{color:#b45309;border-color:#fcd34d}.revchip.ok{color:#15803d;border-color:#86efac}
+#revFilters{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin:2px 0 4px}
+#revFilters button{font-size:11px;padding:3px 8px}
+#revFilters button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+#revFilters select{font-size:11px;padding:2px 5px}
+.revitem{border:1px solid var(--bd);border-left-width:4px;border-radius:7px;padding:7px 9px;margin:6px 0;background:var(--bg)}
+.revitem.err{border-left-color:var(--er)}.revitem.warn{border-left-color:#d97706}.revitem.info{border-left-color:var(--ac)}
+.revitem .rc{font-size:10px;text-transform:uppercase;letter-spacing:.3px;color:var(--mut);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.revitem .rm{font-size:12.5px;margin-top:3px;line-height:1.45;overflow-wrap:anywhere}
+.revitem .rf{font-size:11.5px;margin-top:4px;color:var(--mut);line-height:1.4}
+.revgo{font-size:10.5px;padding:1px 7px;margin-left:auto}
+.revempty{padding:18px 8px;text-align:center;color:var(--mut);font-size:12px}
+#revAI{border-top:1px solid var(--bd);margin-top:8px;padding-top:8px}
+#revAISt{font-size:11.5px;color:var(--mut);margin-top:4px;line-height:1.45;overflow-wrap:anywhere}
+#revAISt b{color:var(--fg)}
+#revAIList .revitem{border-left-color:#7c3aed}
+#revAIList .revitem .rc{text-transform:none;font-size:11px}
+@media(max-width:760px){
+ #revw,#iaw{width:100vw;max-width:100vw;height:100dvh;max-height:100dvh;box-sizing:border-box}
+ #revw{padding:6px}
+ #revw .smbox{max-height:calc(100dvh - 12px);padding:10px;border-radius:8px}
+ #revw .smact{padding-bottom:calc(2px + env(safe-area-inset-bottom,0px))}
+ #revw .smact button{flex:1 1 100%}
+ .revscore{font-size:26px;min-width:48px}
+}
 </style></head><body>
 <div id="side">
 <div id="tb">
@@ -197,6 +248,8 @@ body{flex-direction:row;overflow:hidden}
 <span class="grup"><span class="lb">Anotar</span><button type="button" id="t_cot">Cota</button><button type="button" id="t_lin">Guía</button><button type="button" id="t_txt">Texto</button></span>
 <span class="sp"></span>
 <span class="grup"><span class="lb">Archivo</span><button type="button" id="b_clr">Nuevo</button><button type="button" id="b_open">Abrir</button><button type="button" id="b_save">Guardar</button></span>
+<span class="sp"></span>
+<span class="grup"><span class="lb">IA</span><button type="button" id="b_ia" title="Crear un modelo describiéndolo en texto (gratis sin clave, o con tu clave de ChatGPT, Claude, Grok…)">🤖 IA…</button><button type="button" id="b_rev" title="Revisar el modelo: comprobar que esté bien definido y listo para calcular">🔍 Revisar</button></span>
 <span class="sp"></span>
 <span class="grup"><span class="lb">Ejemplos</span><button type="button" id="b_ex4">Edificio</button><button type="button" id="b_ex">Pórtico</button><button type="button" id="b_ex2">Viga suelo</button><button type="button" id="b_ex3">Viga acero</button></span>
 <span class="sp"></span>
@@ -216,6 +269,7 @@ body{flex-direction:row;overflow:hidden}
 </div>
 <div id="rail">
 <button type="button" id="r_toggle" title="Mostrar menú">›</button>
+<button type="button" id="r_rev" title="Revisar modelo">🔍</button>
 <button type="button" id="r_run" title="Calcular">▶</button>
 <button type="button" id="r_rep" title="Reporte">▤</button>
 <button type="button" id="r_rep3" title="Descargar reporte">⬇</button>
@@ -240,6 +294,40 @@ body{flex-direction:row;overflow:hidden}
 <span id="hint"></span>
 </div>
 </div>
+<div id="iaw"><div class="smbox"><div class="smscroll">
+ <b>🤖 Crear modelo con IA</b>
+ <div class="m" style="margin-top:3px">Describe la estructura con tus palabras. La IA solo arma la geometría y cargas básicas (malla regular); el análisis lo calcula Zapel.</div>
+ <label for="iaTxt">Descripción</label>
+ <textarea id="iaTxt" rows="4" maxlength="2000" placeholder="Ej.: Edificio de 5 niveles, 4 vanos de 6 m en X y 3 de 5 m en Y, entrepisos de 3.2 m, muros de corte de 200 mm en los ejes extremos en Y, columnas 450 mm, vigas 300×600, unidades SI"></textarea>
+ <label class="ck" style="display:none"><input type="checkbox" id="iaPrev" checked> Modificar el modelo anterior (en vez de empezar de nuevo)</label>
+ <label for="iaProv">Motor de IA</label>
+ <select id="iaProv" title="Modelo de lenguaje que interpreta la descripción">
+  <option value="libre" selected>Gratis · sin clave ni registro (recomendado)</option>
+  <option value="openrouter">OpenRouter · cientos de modelos, gratis y de pago</option>
+  <option value="openai">ChatGPT · OpenAI</option>
+  <option value="anthropic">Claude · Anthropic</option>
+  <option value="xai">Grok · xAI</option>
+  <option value="mistral">Mistral</option>
+  <option value="custom">Otro servicio compatible con OpenAI…</option>
+ </select>
+ <div id="iaLibreInfo" class="m" style="font-size:11px">Usa un modelo gratuito público (GPT-OSS 20B, servicio Pollinations) desde el propio programa: no hay que instalar nada ni pegar claves. Límites orientativos: ~1 respuesta cada 45 s y ~100 al día. Ese servicio puede guardar lo que escribes: no incluyas datos confidenciales.</div>
+ <div id="iaORBox" style="display:none">
+  <div id="iaUrlW" style="display:none"><label for="iaUrl">URL del servicio</label>
+   <input type="text" id="iaUrl" placeholder="https://…/v1/chat/completions" autocomplete="off" spellcheck="false"></div>
+  <label for="iaModel" id="iaModelLb">Modelo</label>
+  <input type="text" id="iaModel" list="iaModels" autocomplete="off" spellcheck="false">
+  <datalist id="iaModels"></datalist>
+  <div class="m" id="iaModelHelp" style="font-size:11px"></div>
+  <label for="iaKey" id="iaKeyLb">Clave de API</label>
+  <input type="password" id="iaKey" autocomplete="off">
+  <label class="ck"><input type="checkbox" id="iaRec" checked> Recordar la clave en este navegador</label>
+  <div class="m" id="iaKeyHelp" style="font-size:11px"></div>
+ </div>
+ <div id="iaSt" class="m" role="status" aria-live="polite"></div>
+ <div id="iaJsonW" style="display:none"><label for="iaJson">Especificación generada (editable; también puedes pegar aquí un JSON de otra IA)</label><textarea id="iaJson" rows="9" spellcheck="false"></textarea></div>
+ <label class="ck" style="margin-top:6px"><input type="checkbox" id="iaRev" checked> Revisar automáticamente el modelo al construirlo</label>
+ <div style="margin-top:4px"><button type="button" id="iaRevNow" style="width:100%;font-size:12px">🔍 Revisar el modelo actual</button></div>
+</div><div class="smact"><button type="button" id="iaGen" class="go">Generar con IA</button><button type="button" id="iaOk">Construir modelo</button><button type="button" id="iaX">Cerrar</button></div></div></div>
 <input type="file" id="fo" accept=".json,application/json" style="display:none">
 <div id="hm"><div id="hmb"><b id="hmt">Ayuda</b><div id="hmc"></div><button type="button" id="hmx" style="width:100%">Cerrar</button></div></div>
 <div id="mn"><div id="cw"><canvas id="cv"></canvas><div id="stz"></div></div>
@@ -271,6 +359,22 @@ body{flex-direction:row;overflow:hidden}
  <label class="ck"><input id="wnTecho" type="checkbox" checked> Incluir succión de techo</label>
  <div id="wnInfo" class="m"></div>
 </div><div class="smact"><button type="button" id="wnOk" class="go">Calcular viento</button><button type="button" id="wnX">Cerrar</button></div></div></div>
+
+<div id="revw" role="dialog" aria-modal="true" aria-label="Revisión del modelo"><div class="smbox">
+ <b>🔍 Revisión del modelo</b>
+ <div class="m" id="revSub" style="margin-top:3px;font-size:11px">Comprueba que el modelo esté bien definido y realizado: geometría, apoyos, cargas, secciones, sismo/viento y fundaciones. La revisión automática es una ayuda; no sustituye el criterio del ingeniero.</div>
+ <div id="revSum"></div>
+ <div id="revFilters"></div>
+ <div id="revBody" class="revscroll">
+  <div id="revList"></div>
+  <div id="revAI" data-no-lang="1">
+   <div style="display:flex;gap:8px;align-items:center;justify-content:space-between"><b id="revAIH" style="font-size:12px">Revisión con IA</b><button type="button" id="revIABtn" style="font-size:11px;padding:3px 9px">🔍 Revisar con IA</button></div>
+   <div id="revAISt">Opcional: envía un resumen del modelo al motor configurado en «🤖 IA…» para una segunda opinión. Es orientativa y no envía datos personales.</div>
+   <div id="revAIList"></div>
+  </div>
+ </div>
+ <div class="smact"><button type="button" id="revRe" class="go">↻ Revisar de nuevo</button><button type="button" id="revCopy">Copiar informe</button><button type="button" id="revTxt">Descargar informe</button><button type="button" id="revX2">Cerrar</button></div>
+</div></div>
 
 <script>
 const $=id=>document.getElementById(id),cv=$('cv'),g=cv.getContext('2d');
@@ -309,7 +413,12 @@ const EN_DICT={
 "Velocidad básica V (mph)":"Basic wind speed V (mph)","Incluir succión de techo":"Include roof suction","Calcular viento":"Run wind",
 "Diseño (mapa)":"Design (map)","Huracán María 2017 · 155 mph sostenido":"Hurricane Maria 2017 · 155 mph sustained",
 "GCpi (presión interna)":"GCpi (internal pressure)","Cp barlovento":"Windward Cp","Cp sotavento":"Leeward Cp",
-"Cortante basal":"Base shear","Momento de vuelco":"Overturning moment","Deriva admisible usada: H/400 por entrepiso.":"Service drift limit used: H/400 per story."
+"Cortante basal":"Base shear","Momento de vuelco":"Overturning moment","Deriva admisible usada: H/400 por entrepiso.":"Service drift limit used: H/400 per story.",
+"Revisar":"Review","Revisar modelo":"Review model","Revisar el modelo":"Review the model","Revisión del modelo":"Model review","Revisar con IA":"Review with AI","Revisar de nuevo":"Review again","Revisar automáticamente el modelo al construirlo":"Automatically review the model after building it","Revisar el modelo actual":"Review the current model","Revisar el modelo: comprobar que esté bien definido y listo para calcular":"Review the model: check that it is well defined and ready to calculate","Copiar informe":"Copy report","Descargar informe":"Download report","Errores":"Errors","Avisos":"Warnings","Sugerencias":"Tips","Todas las categorías":"All categories","Ver elemento":"Show element","Cómo corregir":"How to fix",
+"Definición":"Definition","Apoyos y estabilidad":"Supports and stability","Secciones y materiales":"Sections and materials","Sismo y viento":"Seismic and wind","Fundaciones":"Foundations","Duplicados y limpieza":"Duplicates and cleanup",
+"🔍 Revisión del modelo":"🔍 Model review","🔍 Revisar":"🔍 Review","🔍 Revisar con IA":"🔍 Review with AI","🔍 Revisar el modelo actual":"🔍 Review the current model","↻ Revisar de nuevo":"↻ Review again",
+ "Revisión con IA":"AI review",
+ "Comprueba que el modelo esté bien definido y realizado: geometría, apoyos, cargas, secciones, sismo/viento y fundaciones. La revisión automática es una ayuda; no sustituye el criterio del ingeniero.":"Check that the model is well defined and built: geometry, supports, loads, sections, seismic/wind and foundations. The automatic review is an aid; it does not replace the engineer's judgment."
 };
 const EN_PH=[
 ["Análisis sísmico","Seismic analysis"],["Fracción de cargas de área en W","Area-load fraction in W"],["Fuerza lateral equivalente","Equivalent lateral force"],["Modal espectral (CQC)","Modal response spectrum (CQC)"],["Espectro de evento sísmico","Event response spectrum"],["Sistema resistente","Structural system"],["Clase de sitio","Site class"],["Categoría de riesgo","Risk category"],["PGA objetivo (g)","Target PGA (g)"],["Nº de modos","No. of modes"],["Calcular sismo","Calculate seismic"],["Cerrar","Close"],["Norma","Code"],["Método","Method"],["Evento","Event"],
@@ -342,6 +451,7 @@ function applyLang(root){
   const walk=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null,false);let n;
   while(n=walk.nextNode()){
    const p=n.parentElement;if(!p||/^(SCRIPT|STYLE|CANVAS|TEXTAREA)$/.test(p.tagName))continue;
+   if(p.closest&&p.closest('[data-no-lang]'))continue;
    let es=TXT_ES.get(n);
    if(es===undefined){es=n.data;TXT_ES.set(n,es)}
    else if(LANG==='en'&&n.__en!==undefined&&n.data!==n.__en&&n.data!==es){es=n.data;TXT_ES.set(n,es)}
@@ -349,6 +459,7 @@ function applyLang(root){
    else{if(n.data!==es)n.data=es;n.__en=es}
   }
   root.querySelectorAll&&root.querySelectorAll('[title],[placeholder],[aria-label]').forEach(el=>{
+   if(el.closest&&el.closest('[data-no-lang]'))return;
    let map=ATTR_ES.get(el);if(!map){map={};ATTR_ES.set(el,map)}
    ['title','placeholder','aria-label'].forEach(a=>{
     const cur=el.getAttribute(a);if(cur==null)return;let es=map[a];
@@ -368,6 +479,7 @@ function setLang(v){
  document.title=LANG==='en'?'Zapel773DWall · 3D frames, walls, slabs, foundations and seismic (Stage 7)':'Zapel773DWall · Pórticos, muros, losas, fundaciones y sismo (Etapa 7)';
  applyLang(document.body);
  try{if(typeof form==='function')form()}catch(e){}
+ try{if(REV_LAST&&$('revw')&&$('revw').style.display==='flex')revReauditar()}catch(e){}
 }
 
 /*==NUCLEO:INICIO==*/
@@ -615,6 +727,7 @@ function analyze(keepK){
   const sig=M.D.map(row=>row.reduce((s,v,k)=>s+v*eps[k],0));
   const sx=sig[0],sy=sig[1],txy=sig[2],avg=(sx+sy)/2,Rr=Math.hypot((sx-sy)/2,txy);
   memb.push({si:M.si,q3:M.q3,sx,sy,txy,s1:avg+Rr,s2:avg-Rr})});
+ if(!isFinite(dmax)||!u.every(v=>isFinite(v)))return{err:'El análisis no converge (resultados no finitos). Posible mecanismo o apoyos insuficientes: revisa la estabilidad del modelo.'};
  return{ext,u,R,smp,dmax,resid:[0,1,2].map(k=>ap[k]+sr[k]+soil[k]),ap,avisos,
   muros:MUROS.map((w,i)=>{const q=wsm[i];if(!q||!q.length)return null;return {N:q[0].N,V:q[0].Vz,M:q[0].My,Vp:q[0].Vy,Mp:q[0].Mz}}),
   cargas:{losas:qLosas,areas:qAreas,muros:qMuros},wsm,memb,Km:keepK?G:null,rs}}
@@ -868,7 +981,7 @@ function nivelPeso(fA){
  lv.sort((a,b)=>a.z-b.z);
  lv.forEach(L=>{L.nodos=[];N.forEach((n,i)=>{if(Math.abs(n.z-L.z)<1e-3)L.nodos.push(i)})});
  return lv}
-function despNivel(r,nodos,dir){let s=0,c=0;nodos.forEach(i=>{if(6*i+(dir=='X'?0:1)<r.u.length){s+=r.u[6*i+(dir=='X'?0:1)];c++}});return c?s/c:0}
+function despNivel(r,nodos,dir){if(!r||!r.u||!r.u.length)return 0;let s=0,c=0;nodos.forEach(i=>{if(6*i+(dir=='X'?0:1)<r.u.length){s+=r.u[6*i+(dir=='X'?0:1)];c++}});return c?s/c:0}
 function aplicaSismo(lv,Fv,dir,e){
  const save=N.map(n=>n.f.slice());
  lv.forEach((L,ki)=>{if(!(Fv[ki]>0)||!(L.w>0))return;
@@ -895,20 +1008,25 @@ function sismoCalc(){
  const Ta=Ct*Math.pow(hn,xx),Cu=interp([.1,.15,.2,.3,.4],[1.7,1.6,1.5,1.4,1.4],SD1);
  const pat=k=>lv.map(L=>L.w*Math.pow(Math.max(L.z-z0,0),k));
  const r1=aplicaSismo(lv,pat(1),'X',0),T1=rayleigh(lv,pat(1),r1,'X');
+ if(r1.err)return r1;
  const k=Math.min(2,Math.max(1,1+(T1-.5)/2));
  const Fp=pat(k),r2=aplicaSismo(lv,Fp,'X',0),Tcalc=rayleigh(lv,Fp,r2,'X');
+ if(r2.err)return r2;
  const T=Math.max(.01,Math.min(Tcalc,Cu*Ta));
  let Cs;
  if(T<=T0)Cs=SDS/(R/Ie);else{Cs=SD1/(T*(R/Ie));if(T>+p.TL)Cs=SD1*+p.TL/(T*T*(R/Ie))}
  Cs=Math.max(Cs,.044*SDS*Ie,.01);
  const V=Cs*W,sh=lv.map((L,i)=>Fp[i]/Math.max(Fp.reduce((a,b)=>a+b,0),1e-9)*V);
  const extDir=dir=>{let a=1e9,b=-1e9;N.forEach(n=>{const v=dir=='X'?n.y:n.x;if(v<a)a=v;if(v>b)b=v});return Math.max(b-a,0)};
- const casos=[];let mejor=null,mejorD=0;
+ const casos=[];let mejor=null,mejorD=0,rerr=null;
  [['X',1],['X',-1],['Y',1],['Y',-1]].forEach(([dir,sg])=>{
+  if(rerr)return;
   const ee=sg*Math.max(5,+p.ecc||5)/100*extDir(dir),r=aplicaSismo(lv,sh,dir,ee);
+  if(r.err){rerr=r;return}
   const dTop=Math.abs(despNivel(r,lv[lv.length-1].nodos,dir));
   r.wstress=wallStressFromWsm(r.wsm);casos.push({dir,sg,r});
   if(dTop>mejorD){mejorD=dTop;mejor=r}});
+ if(rerr)return rerr;
  const N2=lv.length,tab=[];
  let Pac=0;const Pab=[];for(let i=N2-1;i>=0;i--){Pab[i]=Pac;Pac+=lv[i].w}
  for(let i=1;i<N2;i++){
@@ -1204,12 +1322,15 @@ function vientoCalc(){
  const top=levels[levels.length-1];
  const pRoof=qh*VIENTO.G*(-0.7)-qh*VIENTO.GCpi;
  const roofF=pRoof*0.0478803*top.Bx*top.By;
- const casos=[];let mejor=null,mejorD=0;
+ const casos=[];let mejor=null,mejorD=0,rerr=null;
  [['X',1],['X',-1],['Y',1],['Y',-1]].forEach(([dir,sg])=>{
+  if(rerr)return;
   const r=aplicaViento({dir,sg,levels,roofF});
+  if(r.err){rerr=r;return}
   const dTop=Math.abs(despNivel(r,top.nodos,dir));
   casos.push({dir,sg,r,dTop});
   if(dTop>mejorD){mejorD=dTop;mejor=r}});
+ if(rerr)return rerr;
  const env=casos.reduce((a,c)=>a?maxRes(a,c.r):c.r,null);
  const tab=levels.map((L,i)=>{
   let dr=0,dir='X';
@@ -2471,6 +2592,7 @@ function abreGuia(){
   '<tr><td><b>6b. Wind</b></td><td>Wind…: ASCE 7-22 or PRBC 2018 directional procedure; V is editable, María scenario, ±X/±Y cases, base shear, overturning and drift. The <b>Wind</b> result button toggles the wind envelope with check ✓.</td></tr>'+
   '<tr><td><b>7. Drafting</b></td><td>Ortho (F8), Polar 45°/30°/15° (F10), Shift for temporary Ortho, FIN/⊥ snaps, guides with live dimensions.</td></tr>'+
   '<tr><td><b>8. Save / report</b></td><td>Save JSON; Report opens the calculation memory (print/PDF).</td></tr>'+
+  '<tr><td><b>9. Review</b></td><td>Review: checks geometry, supports, loads, sections, seismic/wind and foundations, runs a trial analysis and can ask the configured AI engine for a second opinion.</td></tr>'+
   '<tr><td><b>Shortcuts</b></td><td>Esc ends; Del deletes; F8 Ortho; F10 Polar; Shift temporary Ortho.</td></tr></table>'
  :
   '<table>'+
@@ -2484,6 +2606,7 @@ function abreGuia(){
   '<tr><td><b>6b. Viento</b></td><td>Viento…: ASCE 7-22 o PRBC 2018, procedimiento direccional; V editable, escenario María, casos ±X/±Y, cortante basal, vuelco y deriva. El botón <b>Viento</b> de Resultados alterna con la gravedad y muestra check ✓.</td></tr>'+
   '<tr><td><b>7. Dibujo</b></td><td>Orto (F8), Polar 45°/30°/15° (F10), Shift para Orto temporal, snaps FIN/⊥, guías con medidas en vivo.</td></tr>'+
   '<tr><td><b>8. Guardar / reporte</b></td><td>Guardar JSON; Reporte abre la memoria (imprimir/PDF).</td></tr>'+
+  '<tr><td><b>9. Revisar</b></td><td>Revisar: comprueba geometría, apoyos, cargas, secciones, sismo/viento y fundaciones, ejecuta un análisis de prueba y puede pedir una segunda opinión al motor de IA configurado.</td></tr>'+
   '<tr><td><b>Atajos</b></td><td>Esc termina; Supr elimina; F8 Orto; F10 Polar; Shift Orto temporal.</td></tr></table>';
  if($('hm'))$('hm').style.display='flex'}
 
@@ -2942,6 +3065,19 @@ function reportePDF(soloDescarga){
   +'<b style="all:unset;font-weight:600">'+(LANG==='en'?'Contents:':'Contenido:')+'</b> '+inv+'</div></div>';
  if(portada)h+=portada;
  h+='<h2>1. '+(LANG==='en'?'Model data':'Datos del modelo')+'</h2>'+tablaModelo();
+ let revH='';
+ try{
+  const rv=auditarModelo(modeloSnapshot());revProbarEstabilidad(rv);revFinalize(rv);
+  const en=LANG==='en';
+  revH='<h3>'+(en?'Automatic model review':'Revisión automática del modelo')+'</h3>'
+   +'<div class="m">'+(en?'Score':'Puntaje')+': <b>'+rv.score+'/100</b> · '+rv.counts.err+(en?' errors':' errores')+' · '+rv.counts.warn+(en?' warnings':' avisos')+' · '+revEsc(rv.verdict)+'</div>'
+   +(rv.items.length?'<table><tr><th>'+(en?'Severity':'Gravedad')+'</th><th>'+(en?'Topic':'Tema')+'</th><th>'+(en?'Finding':'Observación')+'</th></tr>'
+     +rv.items.slice(0,60).map(it=>'<tr><td style="text-align:left"'+(it.sev==='err'?' class="er"':'')+'>'+(it.sev==='err'?(en?'Error':'Error'):it.sev==='warn'?(en?'Warning':'Aviso'):(en?'Tip':'Sugerencia'))+'</td><td style="text-align:left">'+revEsc(revCat(it.cat))+'</td><td style="text-align:left">'+revEsc(it.msg)+(it.fix?'<br><span class="m">'+revEsc(it.fix)+'</span>':'')+'</td></tr>').join('')+'</table>'
+      +(rv.items.length>60?'<div class="m">'+(en?'… and ':'… y ')+(rv.items.length-60)+(en?' more findings (see the on-screen review).':' observaciones más (ver la revisión en pantalla).')+'</div>':'')
+    :'<div class="m">'+(en?'No findings.':'Sin observaciones.')+'</div>')
+   +'<div class="m">'+(en?'The automatic review is an aid; it does not replace the responsible engineer.':'La revisión automática es una ayuda; no sustituye el criterio del ingeniero responsable.')+'</div>';
+ }catch(e){}
+ h+=revH;
  h+='<h2>2. '+(LANG==='en'?'Analysis results':'Resultados del análisis')+'</h2>'+$('out').innerHTML;
  const sism=tablaSismo();
  if(sism)h+='<h2>3. '+(LANG==='en'?'Seismic analysis':'Análisis sísmico')+'</h2>'+sism;
@@ -3082,6 +3218,7 @@ cv.onpointermove=e=>{const r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e
 cv.onpointerup=cv.onpointercancel=e=>{PT.delete(e.pointerId);pin=null;cv.style.cursor=tool==='orb'?'grab':tool==='pan'?'move':'crosshair';if(rubber){const r=rubber;rubber=null;if(Math.hypot(r.x1-r.x0,r.y1-r.y0)<3){if(!r.add){SEL=[];sel=null;form()}}else rectSelect(r);draw();return}if(drag&&drag.mv<3&&tool=='bar')chain=null;drag=null;draw()};cv.onpointerleave=()=>{SNAP=null;draw()};cv.oncontextmenu=e=>e.preventDefault();cv.onauxclick=e=>e.preventDefault();cv.ondblclick=()=>{if(poly)cerrarPoly();else if(aline)cerrarGuia();else if(wchain)cerrarMuroPoli()};
 cv.onwheel=e=>{e.preventDefault();const r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top,k=e.deltaY<0?1.15:1/1.15;C.ox=px-(px-C.ox)*k;C.oy=py-(py-C.oy)*k;C.S*=k;draw()};
 addEventListener('keydown',e=>{if(e.target.tagName=='INPUT'||e.target.tagName=='SELECT')return;
+if($('revw')&&$('revw').style.display==='flex')return;
  if(e.key=='Shift'){shiftDown=true;draw();return}
  if(e.key=='F8'){e.preventDefault();ortho=!ortho;if(ortho){polar=0;const q=$('pol');if(q)q.value='0'}const o=$('ort');if(o)o.checked=ortho;draw();return}
  if(e.key=='F10'){e.preventDefault();polar=polar?0:45;if(polar>0){ortho=false;const o=$('ort');if(o)o.checked=false}const p=$('pol');if(p)p.value=String(polar);draw();return}
@@ -3489,7 +3626,7 @@ if(cv)cv.title='Órbita: botón central o Alt + arrastrar · Zoom: rueda · Desp
 if($('b_tbcol'))$('b_tbcol').onclick=toggleBarra;
 if($('swOn')){ $('swOn').checked=SW_ON; $('swOn').onchange=()=>{SW_ON=$('swOn').checked;res=null;resG=null;resS=null;resV=null;$('out').innerHTML='';setM('model');draw();}; }
 if($('rsmClose'))$('rsmClose').onclick=rustSismoClose;if($('rsmRun'))$('rsmRun').onclick=rustSismoDlgRun;if($('rsmMet'))$('rsmMet').onchange=()=>{$('rsmEventBox').style.display=$('rsmMet').value==='rec'?'block':'none'};
-[['r_toggle',null],['r_run','b_run'],['r_rep','b_rep'],['r_rep3','b_rep3'],['r_sismo','b_sismo'],['r_viento','b_viento'],['r_guide','b_guide'],['r_help','b_help']].forEach(([r,b])=>{const rb=$(r),bb=$(b);if(rb&&bb)rb.onclick=()=>bb.click();if(r==='r_toggle')rb.onclick=toggleBarra});if($('lvlVis'))$('lvlVis').onchange=()=>{ZV=$('lvlVis').value?+$('lvlVis').value:null;draw()};
+[['r_toggle',null],['r_rev','b_rev'],['r_run','b_run'],['r_rep','b_rep'],['r_rep3','b_rep3'],['r_sismo','b_sismo'],['r_viento','b_viento'],['r_guide','b_guide'],['r_help','b_help']].forEach(([r,b])=>{const rb=$(r),bb=$(b);if(rb&&bb)rb.onclick=()=>bb.click();if(r==='r_toggle')rb.onclick=toggleBarra});if($('lvlVis'))$('lvlVis').onchange=()=>{ZV=$('lvlVis').value?+$('lvlVis').value:null;draw()};
 try{if(localStorage.getItem('zapel-toolbar-collapsed')==='1'){$('side').classList.add('colapsada');$('b_tbcol').title='Mostrar barra de herramientas'}}catch(e){}
 function togglePanel(){
  const pn=$('pn'),b=$('b_pncol'),col=!pn.classList.contains('colapsada');
@@ -3504,6 +3641,882 @@ addEventListener('resize',draw);$('un').value=cu;$('gs').value=1;document.queryS
 if($('lang'))$('lang').onchange=()=>setLang($('lang').value);
 try{const lg=localStorage.getItem('zapel-lang');if(lg==='en'){LANG='en';if($('lang'))$('lang').value='en'}}catch(e){}
 if(LANG==='en')setLang('en');else applyLang(document.body);
+
+/* ---------- IA: crear el modelo desde una descripción en texto ----------
+   Motor predeterminado: servicio gratuito sin clave (Pollinations · GPT-OSS 20B), ya integrado en
+   el programa (no hay que registrarse). Opcional: OpenRouter con clave propia, para más cuota.
+   La IA NO calcula nada: solo traduce el texto a una «especificación» JSON compacta (malla regular).
+   Esta función la valida y construye el modelo con el mismo formato que Guardar/Abrir; el análisis lo hace Zapel. */
+const IA_SYS=`Eres un asistente de ingeniería estructural integrado en el programa Zapel773DWall.
+Tu única tarea: convertir la descripción del usuario en UNA especificación JSON de un edificio o pórtico en malla regular.
+Responde SOLO con el objeto JSON, sin texto antes ni después y sin bloques de código markdown.
+
+Esquema (todas las claves son opcionales salvo xs y stories):
+{
+ "units": "IM" | "SI",            // IM = pies/pulgadas/ksi/psf (por defecto); SI = m/mm/MPa/kPa
+ "xs": [20,20,20],                // anchos de cada vano en dirección X (ft en IM, m en SI)
+ "ys": [24,24],                   // anchos de cada vano en dirección Y; [] = pórtico plano en el plano XZ
+ "stories": [14,12,12,12],        // alturas de entrepiso de abajo hacia arriba (ft o m)
+ "columns": {"b":18,"h":18},      // sección de columnas (in en IM, mm en SI)
+ "beams": {"b":14,"h":24},        // sección de vigas, ambas direcciones (in o mm)
+ "slab": {"t":6,"q":50},          // espesor (in o mm) y carga de área superpuesta (psf en IM, kPa en SI); null = sin losas
+ "fc": 4,                         // resistencia del hormigón (ksi en IM, MPa en SI)
+ "base": "fixed" | "pinned",      // apoyo de las columnas en la base
+ "walls": [ {"dir":"x","at":0,"from":0,"to":3,"s0":1,"s1":4,"t":8} ],
+ "notes": "supuestos que hiciste, en una frase"
+}
+Muros: "dir":"x" = muro paralelo a X sobre la línea de ejes Y número "at" (0 a ys.length), entre las líneas de ejes X "from" y "to".
+"dir":"y" = muro paralelo a Y sobre la línea de ejes X número "at", entre las líneas de ejes Y "from" y "to".
+Los índices de ejes comienzan en 0 (el primer eje). "s0" y "s1" son entrepisos, desde 1 (primer nivel) hasta el último, ambos inclusive. "t" = espesor (in o mm).
+Si ys está vacío solo puede haber muros dir "x" con at 0.
+Alternativa para plantas poligonales regulares (octágono, hexágono, pentágono...): usa "shape":"polygon" en lugar de xs/ys:
+{"shape":"polygon","units":"IM","sides":8,"side":10,"stories":[10,10,10],"columns":{"b":18,"h":18},"center":true,"spokes":true,"ring":false,"beams":{"b":12,"h":24},"slab":{"t":6,"q":60},"fc":4,"base":"fixed","walls":{"t":8},"notes":"..."}
+"side" = longitud de cada lado (o "radius" = distancia del centro a cada vértice) en ft o m. Hay una columna en cada vértice y, si "center":true, una en el centro. "spokes":true = vigas del centro a cada vértice en cada nivel; "ring":true = vigas perimetrales entre vértices. "walls":{"t":8} = muros en todos los lados (opcional "sides":[0,1,...] para solo algunos y "s0","s1" para entrepisos); omite "walls" si no hay muros.
+Si la estructura pedida no cabe en ninguno de los dos esquemas (geometría irregular, curvas, etc.), responde SOLO {"error":"qué no se puede representar"}; nunca la aproximes con otra forma.
+Reglas: si el usuario no da unidades usa "IM". Si faltan datos, supón valores típicos (columnas 18 in, vigas 14x24 in, losa 6 in, q 50 psf, fc 4 ksi, base fixed) y dilo en "notes".
+Unidades y tipos (muy importante): con units="SI" usa xs/ys/stories en METROS (6, 3.2), columns y beams en MILÍMETROS (450, 300x600), slab.t en MILÍMETROS (150), slab.q en kPa (2.4) y fc en MPa (28). Con units="IM" usa xs/ys/stories en PIES (20, 12), columns y beams en PULGADAS (18, 14x24), slab.t en PULGADAS (6), slab.q en psf (50) y fc en ksi (4). "base" debe ser exactamente "fixed" o "pinned". "walls" debe ser una lista JSON (puede ser []), y "slab.t" y "slab.q" deben ser números (no null, no objetos).
+Si te dan un número de vanos y un ancho (por ejemplo «3 vanos de 20 ft»), repite el ancho en el arreglo. «xs», «ys» y «stories» deben ser SIEMPRE arreglos JSON de números (por ejemplo "stories":[12,12]), nunca un número suelto. Nunca inventes elementos que el usuario no pidió (muros, losas) salvo losa por defecto si habla de edificio con pisos.
+Ejemplo: «Edificio de 4 niveles, 3 vanos de 20 ft en X y 2 de 24 ft en Y, entrepisos de 12 ft, muros de corte en los ejes extremos en X» →
+{"units":"IM","xs":[20,20,20],"ys":[24,24],"stories":[12,12,12,12],"columns":{"b":18,"h":18},"beams":{"b":14,"h":24},"slab":{"t":6,"q":50},"fc":4,"base":"fixed","walls":[{"dir":"x","at":0,"from":0,"to":3,"s0":1,"s1":4,"t":8},{"dir":"x","at":2,"from":0,"to":3,"s0":1,"s1":4,"t":8}],"notes":"Secciones, losa y carga típicas supuestas."}`;
+
+let IA_LAST=null;
+
+function iaClean(s){
+ if(!s||typeof s!=='object'||Array.isArray(s))throw new Error('La especificación debe ser un objeto JSON.');
+ if(typeof s.error==='string'&&s.error)throw new Error('La IA indicó que no puede representar esa estructura: '+s.error.slice(0,300));
+ if(s.shape==='polygon')return iaPoly(s);
+ const av=[],u=s.units==='SI'?'SI':'IM';
+ const num=(v,def,lo,hi)=>{if(v==null||v==='')return def;v=+v;return isFinite(v)?Math.min(hi,Math.max(lo,v)):def};
+ const arr=(a,max)=>Array.isArray(a)?a.slice(0,max).map(v=>+v).filter(v=>isFinite(v)&&v>0):[];
+ const xs=arr(s.xs,20),st=arr(s.stories,40);
+ let ys=arr(s.ys,20);
+ if(typeof s.ys==='number'&&s.ys>0){ys=[+s.ys];av.push('«ys» vino como número: se interpretó como un solo vano de '+s.ys+(u=='IM'?' ft':' m')+'.')}
+ if(!xs.length)throw new Error('Falta «xs» (anchos de vano en X).');
+ if(!st.length)throw new Error('Falta «stories» (alturas de entrepiso).');
+ const IM=u=='IM',Lm=v=>IM?v*0.3048:v,sec=v=>IM?v*0.0254:v/1000;
+ const sr=IM?[4,120]:[100,3000];
+ const secO=(o,db,dh)=>{o=o&&typeof o=='object'?o:{};return{b:sec(num(o.b,db,sr[0],sr[1])),h:sec(num(o.h,dh,sr[0],sr[1]))}};
+ const col=secO(s.columns,IM?18:450,IM?18:450),bm=secO(s.beams,IM?14:350,IM?24:600);
+ const fc=num(s.fc,IM?4:28,IM?2:15,IM?15:100)*(IM?6.89476:1),E=+(4.7*Math.sqrt(fc)).toPrecision(5);
+ const X=[0],Y=[0],Z=[0];xs.forEach(v=>X.push(X[X.length-1]+Lm(v)));ys.forEach(v=>Y.push(Y[Y.length-1]+Lm(v)));st.forEach(v=>Z.push(Z[Z.length-1]+Lm(v)));
+ const nx=X.length,ny=Y.length,nz=Z.length,pl=ny==1;
+ if(nx*ny*nz>3000)throw new Error('El modelo tiene demasiados nodos ('+nx*ny*nz+'). Máximo 3000.');
+ const id=(i,j,k)=>k*nx*ny+j*nx+i,Zr=[0,0,0,0,0,0],pin=s.base=='pinned';
+ const n=[];
+ for(let k=0;k<nz;k++)for(let j=0;j<ny;j++)for(let i=0;i<nx;i++){
+  let r;
+  if(k==0)r=pin?(pl?[1,1,1,0,1,1]:[1,1,1,0,0,0]):[1,1,1,1,1,1];
+  else r=pl?[0,1,0,1,0,1]:Zr.slice();
+  n.push({x:X[i],y:Y[j],z:Z[k],r,f:Zr.slice()})}
+ const b=[],bar=(i,j,o)=>b.push({i,j,b:o.b,h:o.h,fc,E});
+ for(let k=0;k<nz-1;k++)for(let j=0;j<ny;j++)for(let i=0;i<nx;i++)bar(id(i,j,k),id(i,j,k+1),col);
+ for(let k=1;k<nz;k++){
+  for(let j=0;j<ny;j++)for(let i=0;i<nx-1;i++)bar(id(i,j,k),id(i+1,j,k),bm);
+  if(!pl)for(let i=0;i<nx;i++)for(let j=0;j<ny-1;j++)bar(id(i,j,k),id(i,j+1,k),bm)}
+ /* muros */
+ const mw=[];if(s.walls&&!Array.isArray(s.walls))av.push('«walls» no es una lista: se ignoraron los muros. Indica los muros como lista (o vuelve a generar).');
+ let wl=Array.isArray(s.walls)?s.walls.slice(0,60):[];
+ wl.forEach((w,q)=>{
+  if(!w||(w.dir!='x'&&w.dir!='y')){av.push('Muro '+(q+1)+' ignorado (dir debe ser "x" o "y").');return}
+  const dx=w.dir=='x',at=Math.round(+w.at),lim=dx?ny-1:nx-1,ln=dx?nx-1:ny-1;
+  if(!(at>=0&&at<=lim)||(pl&&!dx)){av.push('Muro '+(q+1)+' ignorado (eje «at» fuera de la malla).');return}
+  let f=Math.round(+w.from),t2=Math.round(+w.to);if(f>t2)[f,t2]=[t2,f];
+  if(!(f>=0&&t2<=ln&&t2>f)){av.push('Muro '+(q+1)+' ignorado (from/to fuera de la malla).');return}
+  let s0=Math.round(num(w.s0,1,1,nz-1)),s1=Math.round(num(w.s1,nz-1,1,nz-1));if(s0>s1)[s0,s1]=[s1,s0];
+  const t=sec(num(w.t,IM?8:200,IM?2:50,IM?48:1200));
+  for(let k=s0;k<=s1;k++)for(let m=f;m<t2;m++){
+   const P=(a,kk)=>dx?id(m+a,at,kk):id(at,m+a,kk);
+   mw.push({n:[P(0,k-1),P(1,k-1),P(1,k),P(0,k)],t,mat:'H',fc,E,gw:24,rig:1,fix:k==1?1:0})}});
+ /* losas y carga de área (una por panel y por nivel) */
+ const ls=[],cs=[];
+ if(s.slab&&typeof s.slab=='object'&&!pl){
+  const t=sec(num(s.slab.t,IM?6:150,IM?2:50,IM?36:900)),q=num(s.slab.q,IM?50:2.4,0,IM?1000:50)*(IM?0.04788:1);
+  for(let k=1;k<nz;k++)for(let j=0;j<ny-1;j++)for(let i=0;i<nx-1;i++){
+   const pts=[[X[i],Y[j]],[X[i+1],Y[j]],[X[i+1],Y[j+1]],[X[i],Y[j+1]]];
+   ls.push({z:Z[k],pts,t,mat:'H',fc,E,gw:24});
+   if(q>0)cs.push({z:Z[k],pts:pts.map(p=>p.slice()),q})}}
+ else if(s.slab&&pl)av.push('Pórtico plano: no se generan losas.');
+ const d={app:'zapel-3d',v:5,units:u,N:n,B:b,MUROS:mw,LOSAS:ls,CARGAS:cs,ZAPATAS:[],PLATEAS:[],ANOT:[],GRUPOS:[],sw:true};
+ const resumen=(pl?'Pórtico plano':'Edificio')+': '+xs.length+' vano(s) en X'+(pl?'':' × '+ys.length+' en Y')+', '+st.length+' nivel(es) · '+
+  n.length+' nudos, '+b.length+' barras, '+mw.length+' muros, '+ls.length+' losas.';
+ return{d,resumen,av,notes:typeof s.notes=='string'?s.notes.slice(0,300):'',spec:{units:u}}}
+
+/* Planta poligonal regular: columnas en vértices (+centro), vigas radiales y/o perimetrales, muros por lado, losa triangular por lado */
+function iaPoly(s){
+ const av=[],u=s.units==='SI'?'SI':'IM',IM=u=='IM';
+ const num=(v,def,lo,hi)=>{v=+v;return isFinite(v)?Math.min(hi,Math.max(lo,v)):def};
+ const Lm=v=>IM?v*0.3048:v,sec=v=>IM?v*0.0254:v/1000;
+ const n=Math.round(num(s.sides,8,3,16)),st=(Array.isArray(s.stories)?s.stories.slice(0,40):[]).map(v=>+v).filter(v=>isFinite(v)&&v>0);
+ if(!st.length)throw new Error('Falta «stories» (alturas de entrepiso).');
+ let R;const side=+s.side,rad=+s.radius;
+ if(isFinite(side)&&side>0)R=Lm(Math.min(side,500))/(2*Math.sin(Math.PI/n));
+ else if(isFinite(rad)&&rad>0)R=Lm(Math.min(rad,500));
+ else{R=Lm(IM?15:5);av.push('No se indicó el tamaño del polígono: se supuso radio de '+(IM?'15 ft':'5 m')+'.')}
+ const sr=IM?[4,120]:[100,3000],secO=(o,db,dh)=>{o=o&&typeof o=='object'?o:{};return{b:sec(num(o.b,db,sr[0],sr[1])),h:sec(num(o.h,dh,sr[0],sr[1]))}};
+ const col=secO(s.columns,IM?18:450,IM?18:450),bm=secO(s.beams,IM?12:300,IM?24:600);
+ const fc=num(s.fc,IM?4:28,IM?2:15,IM?15:100)*(IM?6.89476:1),E=+(4.7*Math.sqrt(fc)).toPrecision(5);
+ const Z=[0];st.forEach(v=>Z.push(Z[Z.length-1]+Lm(v)));const nz=Z.length,pin=s.base=='pinned';
+ const cen=s.center!==false,spk=s.spokes!==false,ring=s.ring===true;
+ const m=n+1,Zr=[0,0,0,0,0,0],raw=[],keep=[];
+ for(let k=0;k<nz;k++)for(let i=0;i<=n;i++){
+  const a=2*Math.PI*(i-1)/n+Math.PI/n,x=i==0?R:R+R*Math.cos(a),y=i==0?R:R+R*Math.sin(a);
+  const r=k==0?(pin?[1,1,1,0,0,0]:[1,1,1,1,1,1]):Zr.slice();
+  raw.push({x:+x.toFixed(6),y:+y.toFixed(6),z:Z[k],r,f:Zr.slice()});keep.push(!(k==0&&i==0&&!cen))}
+ const map=[];let c=0;raw.forEach((_,q)=>{map.push(keep[q]?c++:-1)});
+ const nodes=raw.filter((_,q)=>keep[q]),id=(k,i)=>map[k*m+i];
+ const b=[],bar=(i,j,o)=>{if(i>=0&&j>=0)b.push({i,j,b:o.b,h:o.h,fc,E})};
+ for(let k=0;k<nz-1;k++)for(let i=0;i<=n;i++){if(i==0&&!cen)continue;bar(id(k,i),id(k+1,i),col)}
+ for(let k=1;k<nz;k++){
+  if(spk)for(let i=1;i<=n;i++)bar(id(k,0),id(k,i),bm);
+  if(ring)for(let i=1;i<=n;i++)bar(id(k,i),id(k,i%n+1),bm)}
+ if(!spk&&!ring)av.push('Sin vigas: las columnas no quedan unidas entre sí en cada nivel.');
+ const mw=[];
+ if(s.walls){
+  const W=typeof s.walls=='object'?s.walls:{},t=sec(num(W.t,IM?8:200,IM?2:50,IM?48:1200));
+  let sides=Array.isArray(W.sides)?W.sides.map(v=>Math.round(+v)).filter(v=>v>=0&&v<n):[...Array(n).keys()];
+  let s0=Math.round(num(W.s0,1,1,nz-1)),s1=Math.round(num(W.s1,nz-1,1,nz-1));if(s0>s1)[s0,s1]=[s1,s0];
+  sides.forEach(q=>{for(let k=s0;k<=s1;k++)mw.push({n:[id(k-1,q+1),id(k-1,q%n+1+1>n?1:q+2),id(k,q%n+1+1>n?1:q+2),id(k,q+1)],t,mat:'H',fc,E,gw:24,rig:1,fix:k==1?1:0})})}
+ const ls=[],cs=[];
+ if(s.slab&&typeof s.slab=='object'){
+  const t=sec(num(s.slab.t,IM?6:150,IM?2:50,IM?36:900)),q=num(s.slab.q,IM?50:2.4,0,IM?1000:50)*(IM?0.04788:1);
+  for(let k=1;k<nz;k++)for(let i=1;i<=n;i++){
+   const A=raw[k*m],B1=raw[k*m+i],C=raw[k*m+i%n+1],pts=[[A.x,A.y],[B1.x,B1.y],[C.x,C.y]];
+   ls.push({z:Z[k],pts,t,mat:'H',fc,E,gw:24});if(q>0)cs.push({z:Z[k],pts:pts.map(p=>p.slice()),q})}}
+ const d={app:'zapel-3d',v:5,units:u,N:nodes,B:b,MUROS:mw,LOSAS:ls,CARGAS:cs,ZAPATAS:[],PLATEAS:[],ANOT:[],GRUPOS:[],sw:true};
+ const lado=2*R*Math.sin(Math.PI/n)/(IM?0.3048:1);
+ const resumen='Polígono de '+n+' lados (lado '+lado.toFixed(2)+(IM?' ft':' m')+'), '+st.length+' nivel(es) · '+nodes.length+' nudos, '+b.length+' barras, '+mw.length+' muros, '+ls.length+' losas.';
+ return{d,resumen,av,notes:typeof s.notes=='string'?s.notes.slice(0,300):'',spec:{units:u}}}
+
+function iaExtraeJSON(t){
+ t=String(t||'').replace(/```(?:json)?/gi,'').trim();
+ try{return JSON.parse(t)}catch(e){}
+ const a=t.indexOf('{');
+ if(a<0)throw new Error('La IA no devolvió un JSON. Reintenta o reformula la descripción.');
+ let d=0,ins=false,esc=false;
+ for(let i=a;i<t.length;i++){
+  const ch=t[i];
+  if(ins){if(esc)esc=false;else if(ch==='\\')esc=true;else if(ch==='"')ins=false}
+  else if(ch==='"')ins=true;
+  else if(ch==='{')d++;
+  else if(ch==='}'){
+   d--;
+   if(d===0){
+    try{return JSON.parse(t.slice(a,i+1))}
+    catch(e2){throw new Error('El JSON de la IA está mal formado. Reintenta (los modelos gratuitos a veces fallan).')}}}}
+ throw new Error('La IA no devolvió un JSON. Reintenta o reformula la descripción.')}
+
+function iaRetrySeg(t){
+ const m=/retry after (\d+)\s*s/i.exec(t)||/retry_after["':\s]+(\d+)/i.exec(t);
+ return m?+m[1]:0}
+
+function iaContenido(j){
+ if(typeof j==='string')return j;
+ if(j&&j.choices&&j.choices[0]){
+  const c=j.choices[0].message&&j.choices[0].message.content;
+  if(typeof c==='string')return c;
+  if(Array.isArray(c))return c.map(x=>typeof x==='string'?x:(x&&x.text)||'').join('')}
+ return null}
+
+/* Motor gratuito integrado: servicio público Pollinations (GPT-OSS 20B), sin clave ni registro.
+   Se prefiere GET: es una petición «simple» (sin preflight CORS) y funciona desde file://.
+   Si la URL quedaría demasiado larga, se envía por POST al endpoint compatible con OpenAI. */
+function iaLibreResp(r,t){
+ if(r.status===402){const s=(r.headers&&+r.headers.get('Retry-After'))||iaRetrySeg(t)||0;throw new Error('El servicio gratuito limita a aprox. 1 respuesta cada 45 s (≈100 al día).'+(s?' Espera '+s+' s y pulsa «Generar con IA» otra vez.':' Espera unos 45 s y reintenta.'))}
+ if(r.status===413||r.status===414||r.status===431)throw new Error('La descripción es demasiado larga para el servicio gratuito. Acórtala a una o dos frases y reintenta.');
+ if(r.status===422)throw new Error('La respuesta gratuita salió incompleta. Reintenta (a veces ayuda describir la estructura con menos detalle).');
+ if(r.status===429)throw new Error('Demasiadas solicitudes al servicio gratuito. Espera un minuto y reintenta.');
+ if(!r.ok)throw new Error('Servicio gratuito: HTTP '+r.status+'. Reintenta en unos segundos.');
+ let j=null;try{j=JSON.parse(t)}catch(e){}
+ if(j&&j.error)throw new Error('Servicio gratuito: '+((j.error.message)||j.error.code||'error'));
+ return iaContenido(j)||t}
+
+async function iaLibrePost(msgs){
+ const ac=new AbortController(),to=setTimeout(()=>ac.abort(),180000);
+ let r,t;
+ try{
+  r=await fetch('https://text.pollinations.ai/openai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:msgs,temperature:0.2}),signal:ac.signal});
+  t=await r.text()
+ }catch(e){throw new Error(e.name=='AbortError'?'El servicio gratuito tardó demasiado (más de 3 min). Reintenta.':'No se pudo conectar con el servicio gratuito de IA. Si la descripción es larga, acórtala a una o dos frases; si no, revisa la conexión a internet.')}
+ finally{clearTimeout(to)}
+ return iaLibreResp(r,t)}
+
+async function iaLibre(msgs){
+ const sys=((msgs||[]).find(m=>m.role==='system')||{}).content||'';
+ const usr=((msgs||[]).find(m=>m.role==='user')||{}).content||'';
+ if(sys.length+usr.length>14000)throw new Error('La descripción es demasiado larga para el servicio gratuito. Resúmela.');
+ const url='https://text.pollinations.ai/'+encodeURIComponent(usr)+'?system='+encodeURIComponent(sys)+'&json=true&temperature=0.2';
+ if(url.length>7000)return iaLibrePost(msgs);
+ const ac=new AbortController(),to=setTimeout(()=>ac.abort(),180000);
+ let r,t;
+ try{r=await fetch(url,{signal:ac.signal,cache:'no-store'});t=await r.text()}
+ catch(e){throw new Error(e.name=='AbortError'?'El servicio gratuito tardó demasiado (más de 3 min). Reintenta.':'No se pudo conectar con el servicio gratuito de IA. Revisa la conexión a internet (y que un cortafuegos no bloquee text.pollinations.ai). También puedes usar «OpenRouter · con tu clave».')}
+ finally{clearTimeout(to)}
+ if(r.status===414||r.status===431)return iaLibrePost(msgs);
+ return iaLibreResp(r,t)}
+
+/* Proveedores con clave propia (de pago o con cuota gratuita). La clave se envía solo al servicio elegido. */
+const IA_PROV={
+ openrouter:{n:'OpenRouter',kind:'oai',url:'https://openrouter.ai/api/v1/chat/completions',def:'openrouter/free',models:['openrouter/free'],ph:'sk-or-…',keyUrl:'openrouter.ai/keys',tok:'max_tokens',mx:6000,
+  help:'«openrouter/free» elige un modelo gratuito disponible. Sirve cualquier modelo de openrouter.ai/models (de pago o gratis; los gratuitos terminan en :free), incluidos los de OpenAI, Anthropic y xAI.'},
+ openai:{n:'OpenAI (ChatGPT)',kind:'oai',url:'https://api.openai.com/v1/chat/completions',def:'gpt-5.6-terra',models:['gpt-5.6-terra','gpt-5.6-luna','gpt-5.6-sol','gpt-5.4-mini'],ph:'sk-…',keyUrl:'platform.openai.com/api-keys',tok:'max_completion_tokens',mx:8000,temp:false,
+  help:'Escribe el nombre exacto del modelo que tengas disponible en tu cuenta de OpenAI.'},
+ anthropic:{n:'Anthropic (Claude)',kind:'anthropic',url:'https://api.anthropic.com/v1/messages',def:'claude-sonnet-5-5',models:['claude-sonnet-5-5','claude-haiku-5-5','claude-opus-5-5'],ph:'sk-ant-…',keyUrl:'console.anthropic.com',mx:4000,
+  help:'Haiku es el más barato y rápido; Sonnet o Opus resuelven mejor descripciones complejas.'},
+ xai:{n:'xAI (Grok)',kind:'oai',url:'https://api.x.ai/v1/chat/completions',def:'grok-4.3',models:['grok-4.3','grok-4-1-fast-non-reasoning'],ph:'xai-…',keyUrl:'console.x.ai',tok:'max_tokens',mx:6000,temp:false,
+  help:'Escribe el nombre exacto del modelo Grok de tu cuenta. Si el navegador bloquea la conexión, usa Grok a través de OpenRouter.'},
+ mistral:{n:'Mistral',kind:'oai',url:'https://api.mistral.ai/v1/chat/completions',def:'mistral-small-latest',models:['mistral-small-latest','mistral-large-latest'],ph:'',keyUrl:'console.mistral.ai',tok:'max_tokens',mx:6000,help:''},
+ custom:{n:'servicio personalizado',kind:'oai',url:'',def:'',models:[],ph:'(vacía si es un servidor local)',keyUrl:'',tok:'max_tokens',mx:6000,optKey:true,
+  help:'Cualquier servicio con formato OpenAI (Together, Groq, DeepSeek, Ollama o LM Studio locales, etc.). Pon la URL completa terminada en /chat/completions y el nombre exacto del modelo.'}
+};
+
+async function iaApi(prov,key,model,msgs,url){
+ const P=IA_PROV[prov],ac=new AbortController(),to=setTimeout(()=>ac.abort(),180000),h={'Content-Type':'application/json'};
+ let u=P.url,body;
+ if(prov==='custom'){u=String(url||'').trim();if(!/^https?:\/\//i.test(u))throw new Error('Escribe la URL completa del servicio (https://…/v1/chat/completions).')}
+ if(P.kind==='anthropic'){
+  h['x-api-key']=key;h['anthropic-version']='2023-06-01';h['anthropic-dangerous-direct-browser-access']='true';
+  body={model,max_tokens:P.mx,system:(msgs.find(m=>m.role==='system')||{}).content||'',messages:msgs.filter(m=>m.role!=='system')}
+ }else{
+  if(key)h['Authorization']='Bearer '+key;
+  if(prov==='openrouter'){h['X-Title']='Zapel773DWall';if(/^https?:/.test(location.origin))h['HTTP-Referer']=location.origin}
+  body={model,messages:msgs};body[P.tok]=P.mx;if(P.temp!==false)body.temperature=0.2}
+ let r,t;
+ try{r=await fetch(u,{method:'POST',headers:h,signal:ac.signal,body:JSON.stringify(body)});t=await r.text()}
+ catch(e){throw new Error(e.name=='AbortError'?'La IA tardó demasiado (más de 3 min). Reintenta o prueba un modelo más rápido.':'No se pudo conectar con '+P.n+'. Revisa la conexión a internet y la URL; si todo está bien, el servicio puede no permitir llamadas directas desde el navegador (CORS): en ese caso usa OpenRouter.')}
+ finally{clearTimeout(to)}
+ let j=null;try{j=JSON.parse(t)}catch(e){}
+ const em=j&&j.error?(typeof j.error=='string'?j.error:(j.error.message||JSON.stringify(j.error))):'';
+ if(r.status==401||r.status==403)throw new Error('Clave de '+P.n+' no válida o sin permiso ('+r.status+').'+(em?' '+em:''));
+ if(r.status==402)throw new Error('Tu cuenta de '+P.n+' no tiene saldo suficiente (402).');
+ if(r.status==429)throw new Error('Límite de uso o de saldo alcanzado en '+P.n+' (429). Espera un momento, revisa tu plan o cambia de modelo.'+(em?' '+em:''));
+ if(r.status==404)throw new Error('No se encontró el modelo o la URL en '+P.n+' (404). Revisa el nombre exacto del modelo.'+(em?' '+em:''));
+ if(!r.ok||em)throw new Error(P.n+': '+(em||('HTTP '+r.status)).slice(0,300));
+ let c=null;
+ if(j&&Array.isArray(j.content))c=j.content.map(x=>(x&&x.type==='text'&&x.text)||'').join('');
+ else c=iaContenido(j);
+ if(!c)throw new Error('El modelo no devolvió texto (puede haber gastado todo su límite razonando). Reintenta o prueba otro modelo.');
+ return c}
+
+async function iaLlama(prov,key,model,msgs,url){
+ return IA_PROV[prov]?iaApi(prov,key,model,msgs,url):iaLibre(msgs)}
+
+function iaAplica(m){
+ const mm=parseModel(m.d);
+ cu=mm.units;SW_ON=mm.sw!==false;if($('swOn'))$('swOn').checked=SW_ON;$('un').value=cu;$('gs').value=cu=='SI'?.5:1;$('lv').value=0;
+ document.querySelectorAll('[data-u]').forEach(s=>s.textContent=UL(s.dataset.u));syncDef();
+ load(mm.n,mm.b,mm.mw,mm.ls,mm.cs,mm.zp,mm.pt,mm.an,mm.gr);
+ if(mm.b.length||mm.mw.length)run();
+ if($('b_fit'))$('b_fit').click()}
+
+(function(){
+ const w=$('iaw');if(!w)return;
+ const st=$('iaSt'),setSt=(t,er)=>{st.className=er?'er':'m';st.textContent=t};
+ const provSel=$('iaProv'),orBox=$('iaORBox'),libreInfo=$('iaLibreInfo');
+ const ls=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v)}catch(e){}return null};
+ const keyK=p=>p==='openrouter'?'zapel-or-key':'zapel-ia-key-'+p,modK=p=>p==='openrouter'?'zapel-or-model':'zapel-ia-model-'+p;
+ const syncProv=()=>{
+  const p=provSel.value,P=IA_PROV[p];
+  orBox.style.display=P?'':'none';libreInfo.style.display=P?'none':'';
+  if(P){
+   $('iaUrlW').style.display=p==='custom'?'':'none';
+   if(p==='custom')$('iaUrl').value=ls('zapel-ia-url')||'';
+   $('iaModelLb').textContent='Modelo de '+P.n;
+   $('iaModels').innerHTML=P.models.map(m=>'<option value="'+m+'">').join('');
+   $('iaModel').value=ls(modK(p))||P.def;$('iaModel').placeholder=P.def||'nombre exacto del modelo';
+   $('iaKeyLb').textContent='Clave de API de '+P.n;
+   $('iaKey').value=ls(keyK(p))||'';$('iaKey').placeholder=P.ph||'';
+   $('iaModelHelp').textContent=P.help||'';
+   $('iaKeyHelp').textContent=(P.keyUrl?'Consigue la clave en '+P.keyUrl+'. ':'')+'Se guarda solo en este navegador (si lo dejas marcado) y se envía únicamente a '+P.n+'. '+(p==='openrouter'?'Los modelos :free no cuestan; los demás se cobran a tu cuenta. ':'Las llamadas se cobran a tu cuenta (o consumen tu cuota). ')+'No incluyas datos confidenciales y nunca escribas la clave dentro del archivo HTML.'}
+  ls('zapel-ia-prov',p)};
+ const provChange=()=>{syncProv();setSt('');$('iaJsonW').style.display='none'};
+ const sp=ls('zapel-ia-prov');
+ if(sp&&IA_PROV[sp]&&(ls(keyK(sp))||sp==='custom'))provSel.value=sp;
+ syncProv();provSel.onchange=provChange;
+ $('b_ia').onclick=()=>{w.style.display='flex';$('iaPrev').parentNode.style.display=IA_LAST?'':'none';setTimeout(()=>{try{$('iaTxt').focus()}catch(e){}},60)};
+ $('iaX').onclick=()=>{w.style.display='none'};
+ addEventListener('keydown',e=>{if(e.key==='Escape'&&w.style.display==='flex'){w.style.display='none'}});
+ $('iaGen').onclick=async()=>{
+  const prov=provSel.value,P=IA_PROV[prov],key=$('iaKey').value.trim(),txt=$('iaTxt').value.trim(),url=$('iaUrl').value.trim();
+  const model=P?($('iaModel').value.trim()||P.def):'';
+  if(!txt){setSt('Describe primero la estructura.',1);$('iaTxt').focus();return}
+  if(P&&!key&&!P.optKey){setSt('Pega tu clave de '+P.n+(P.keyUrl?' (se obtiene en '+P.keyUrl+')':'')+' o vuelve a «Gratis · sin clave ni registro».',1);return}
+  if(P&&!model){setSt('Escribe el nombre del modelo.',1);return}
+  ls('zapel-ia-prov',prov);
+  if(P){
+   if($('iaRec').checked){if(key)ls(keyK(prov),key);ls(modK(prov),model);if(prov==='custom')ls('zapel-ia-url',url)}
+   else ls(keyK(prov),null)}
+  let u=txt;if(IA_LAST&&$('iaPrev').checked)u='Especificación actual (modifícala según el pedido y devuélvela COMPLETA):\n'+JSON.stringify(IA_LAST)+'\n\nPedido: '+txt;
+  $('iaGen').disabled=true;
+  setSt(P?'Consultando a '+P.n+'… (puede tardar hasta un minuto)':'Consultando el modelo gratuito integrado… (suele tardar entre 5 y 40 s)');
+  try{
+   const out=await iaLlama(prov,key,model,[{role:'system',content:IA_SYS},{role:'user',content:u}],url);
+   const sp2=iaExtraeJSON(out);$('iaJson').value=JSON.stringify(sp2,null,1);$('iaJsonW').style.display='';
+   const m=iaClean(sp2);setSt('Listo. '+m.resumen+(m.notes?' Supuestos: '+m.notes:'')+(m.av.length?' ⚠ '+m.av.join(' '):'')+' Revisa y pulsa «Construir modelo».')}
+  catch(e){setSt(e.message||String(e),1)}
+  finally{$('iaGen').disabled=false}};
+ $('iaOk').onclick=()=>{
+  try{
+   const sp2=iaExtraeJSON($('iaJson').value),m=iaClean(sp2);
+   iaAplica(m);IA_LAST=sp2;$('iaPrev').parentNode.style.display='';
+   let rv=null;
+   try{rv=auditarModelo();revProbarEstabilidad(rv);revFinalize(rv)}catch(e){}
+   const c=rv?rv.counts:{err:0,warn:0,info:0};
+   setSt('Modelo construido. '+m.resumen+(m.av.length?' ⚠ '+m.av.join(' '):'')+
+    (c.err?' · ⚠ Revisión: '+c.err+' error(es) y '+c.warn+' aviso(s).':c.warn?' · Revisión: '+c.warn+' aviso(s).':' · ✓ Revisión sin observaciones.'));
+   w.style.display='none';
+   if($('iaRev')&&$('iaRev').checked)setTimeout(()=>{try{revisarModeloActual()}catch(e){}},40);
+  }
+  catch(e){setSt(e.message||String(e),1)}};
+})();
+
+/* ================= Revisión del modelo (definición y realización) =================
+   Comprobación local determinista: no usa la red y no modifica el modelo.
+   Revisión opcional con el motor de IA configurado en «IA…» (solo envía un resumen). */
+const REV_CAT={
+ def:['Definición','Definition'],
+ apoy:['Apoyos y estabilidad','Supports and stability'],
+ carga:['Cargas','Loads'],
+ secc:['Secciones y materiales','Sections and materials'],
+ sismo:['Sismo y viento','Seismic and wind'],
+ fund:['Fundaciones','Foundations'],
+ dup:['Duplicados y limpieza','Duplicates and cleanup']
+};
+let REV_LAST=null,REV_AI=null,REV_FILTER='all',REV_CATF='all',REV_BUSY=false,REV_AI_TOKEN=0,REV_CFG_TMP=null;
+function revT(es,en){return LANG==='en'?en:es}
+function revCat(c){const q=REV_CAT[c];return q?(LANG==='en'?q[1]:q[0]):c}
+function revEsc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function revFmt(v,d){return (v==null||!isFinite(+v))?'—':(+v).toFixed(d==null?2:d)}
+function revSevOrder(it){return it.sev==='err'?0:it.sev==='warn'?1:2}
+function modeloSnapshot(){return {units:cu,sw:SW_ON,N,B,MUROS,LOSAS,CARGAS,ZAPATAS,PLATEAS,GRUPOS,ANOT,sis:SISMO,viento:VIENTO}}
+
+function revFinalize(rev){
+ const c={err:0,warn:0,info:0};
+ rev.items.forEach((it,i)=>{if(c[it.sev]!=null)c[it.sev]++;it._i=i});
+ rev.counts=c;rev.total=rev.items.length;
+ let sc=100;rev.items.forEach(it=>{if(it.sev==='err')sc-=12;else if(it.sev==='warn')sc-=4});
+ rev.score=Math.max(0,Math.min(100,Math.round(sc)));
+ const s=rev.stats||{};
+ const empty=!s.nodes&&!s.bars&&!s.walls&&!s.slabs&&!s.footings&&!s.mats&&!s.loads;
+ if(empty){rev.score=0;rev.verdict=revT('Modelo vacío','Empty model')}
+ else if(c.err)rev.verdict=revT('Corrige los errores antes de calcular','Fix the errors before calculating');
+ else if(c.warn)rev.verdict=revT('Calculable, pero revisa los avisos','Calculable, but review the warnings');
+ else rev.verdict=revT('Modelo bien definido y listo para calcular','Model well defined and ready to calculate');
+ rev.ok=!c.err&&!empty;
+ return rev;
+}
+
+function revStatsTxt(rev){
+ const s=rev.stats||{};
+ return revT(s.nodes+' nudos · '+s.bars+' barras · '+s.walls+' muros · '+s.slabs+' losas · '+s.loads+' cargas de área · '+s.footings+' zapatas · '+s.mats+' matres · '+s.levels+' niveles · '+s.supports+' apoyos',
+  s.nodes+' nodes · '+s.bars+' beams · '+s.walls+' walls · '+s.slabs+' slabs · '+s.loads+' area loads · '+s.footings+' footings · '+s.mats+' mats · '+s.levels+' levels · '+s.supports+' supports');
+}
+
+/* ---------- Comprobación automática del modelo ---------- */
+function auditarModelo(M){
+ M=M||modeloSnapshot();
+ const N=M.N||[],B=M.B||[],MW=M.MUROS||[],LS=M.LOSAS||[],CS=M.CARGAS||[],ZP=M.ZAPATAS||[],PT=M.PLATEAS||[],GR=M.GRUPOS||[],AN=M.ANOT||[];
+ const T=revT,IT=[],add=(sev,cat,msg,o)=>{IT.push(Object.assign({sev,cat,msg},o||{}))};
+ const tags=(a,max)=>a.slice(0,max).join(', ')+(a.length>max?T(' y '+(a.length-max)+' más',', and '+(a.length-max)+' more'):'');
+ const nodeOK=i=>i>=0&&i<N.length&&N[i]&&isFinite(+N[i].x)&&isFinite(+N[i].y)&&isFinite(+N[i].z);
+ const used=new Set(),wallBaseFix=new Set();
+ MW.forEach(w=>{if(w&&w.fix&&w.rig&&Array.isArray(w.n)&&w.n.length===4&&nodeOK(w.n[0])&&nodeOK(w.n[1])){wallBaseFix.add(w.n[0]);wallBaseFix.add(w.n[1])}});
+ const zmin=N.length?Math.min(...N.filter((n,i)=>nodeOK(i)).map(n=>+n.z)):0;
+
+ /* --- 1. Modelo vacío --- */
+ if(!N.length&&!B.length&&!MW.length&&!LS.length&&!CS.length&&!ZP.length&&!PT.length){
+  add('err','def',T('El modelo está vacío.','The model is empty.'),{fix:T('Dibuja barras, muros o losas, abre un modelo guardado o usa «🤖 IA…».','Draw beams, walls or slabs, open a saved model, or use «🤖 AI…».')});
+  return revFinalize({items:IT,stats:{nodes:0,bars:0,walls:0,slabs:0,loads:0,footings:0,mats:0,levels:0,supports:0,units:M.units||cu,sw:M.sw!==false}});
+ }
+
+ /* --- 2. Nudos --- */
+ const badN=[];N.forEach((n,i)=>{if(!nodeOK(i))badN.push(i)});
+ if(badN.length)add('err','def',T('Nudos con coordenadas no válidas: '+tags(badN.map(i=>'N'+(i+1)),8)+'.','Nodes with invalid coordinates: '+tags(badN.map(i=>'N'+(i+1)),8)+'.'),{sel:{t:'n',i:badN[0]},fix:T('Corrige x, y, z en el panel del nudo.','Correct x, y, z in the node panel.')});
+ const byPos=new Map(),dupN=[];
+ N.forEach((n,i)=>{if(!nodeOK(i))return;const k=[n.x,n.y,n.z].map(v=>(+v).toFixed(4)).join('|');if(byPos.has(k))dupN.push([byPos.get(k),i]);else byPos.set(k,i)});
+ if(dupN.length){const tt=dupN.slice(0,6).map(q=>'N'+(q[0]+1)+'/N'+(q[1]+1)).join(', ')+(dupN.length>6?T(' y '+(dupN.length-6)+' más',' and '+(dupN.length-6)+' more'):'');
+  add('warn','dup',T('Nudos en la misma posición: '+tt+'.','Coincident nodes: '+tt+'.'),{sel:{t:'n',i:dupN[0][1]},fix:T('Si son el mismo nudo, mueve uno o vuelve a cargar el modelo para fusionarlos.','If they are the same node, move one or reload the model so they merge.')})}
+
+ /* --- 3. Barras --- */
+ const zeroB=[],badRefB=[],badSecB=[],badEB=[],eMis=[],dupB=[];const seenB=new Map();
+ B.forEach((r,i)=>{
+  if(!r||!nodeOK(r.i)||!nodeOK(r.j)){badRefB.push(i);return}
+  used.add(r.i);used.add(r.j);
+  const a=N[r.i],b=N[r.j],L=Math.hypot(b.x-a.x,b.y-a.y,b.z-a.z);
+  if(!(L>1e-6))zeroB.push(i);
+  const k=Math.min(r.i,r.j)+'-'+Math.max(r.i,r.j);
+  if(seenB.has(k))dupB.push(i);else seenB.set(k,i);
+  let sc=null;try{sc=sp(r)}catch(e){}
+  if(!(sc&&sc.A>1e-9))badSecB.push(i);
+  const E=+r.E;
+  if(!(E>0)||E>1000)badEB.push(i);
+  if(r.mat==='H'&&+r.fc>0&&E>0){const Ee=4.7*Math.sqrt(+r.fc);if(Math.abs(E-Ee)>0.15*Ee)eMis.push('B'+(i+1))}
+ });
+ if(badRefB.length)add('err','def',T('Barras con nudos inexistentes: '+tags(badRefB.map(i=>'B'+(i+1)),8)+'.','Beams with missing nodes: '+tags(badRefB.map(i=>'B'+(i+1)),8)+'.'),{sel:{t:'b',i:badRefB[0]},fix:T('Borra esas barras o vuelve a dibujarlas sobre nudos existentes.','Delete those beams or draw them again on existing nodes.')});
+ if(zeroB.length)add('err','def',T('Barras de longitud nula: '+tags(zeroB.map(i=>'B'+(i+1)),8)+'.','Zero-length beams: '+tags(zeroB.map(i=>'B'+(i+1)),8)+'.'),{sel:{t:'b',i:zeroB[0]},fix:T('Mueve uno de sus nudos o elimina la barra.','Move one of its nodes or delete the beam.')});
+ if(badSecB.length)add('err','secc',T('Barras con sección inválida (área = 0): '+tags(badSecB.map(i=>'B'+(i+1)),8)+'.','Beams with invalid section (area = 0): '+tags(badSecB.map(i=>'B'+(i+1)),8)+'.'),{sel:{t:'b',i:badSecB[0]},fix:T('Revisa b, h y el tipo de sección.','Check b, h and the section type.')});
+ if(badEB.length)add('err','secc',T('Barras con módulo E no válido: '+tags(badEB.map(i=>'B'+(i+1)),8)+'.','Beams with invalid modulus E: '+tags(badEB.map(i=>'B'+(i+1)),8)+'.'),{sel:{t:'b',i:badEB[0]},fix:T('Escribe E en GPa/ksi (hormigón ≈ 4.7·√f\'c; acero = 200 GPa).','Enter E in GPa/ksi (concrete ≈ 4.7·√f\'c; steel = 200 GPa).')});
+ if(eMis.length)add('warn','secc',T('E no corresponde a f\'c en: '+tags(eMis,5)+'.','E does not match f\'c in: '+tags(eMis,5)+'.'),{fix:T('Vuelve a elegir el material «Hormigón» (recalcula E) o corrige E/f\'c a mano.','Reselect the «Concrete» material (it recalculates E) or correct E/f\'c manually.')});
+ if(dupB.length)add('warn','dup',T('Barras repetidas entre los mismos nudos: '+tags(dupB.map(i=>'B'+(i+1)),6)+'.','Duplicate beams between the same nodes: '+tags(dupB.map(i=>'B'+(i+1)),6)+'.'),{sel:{t:'b',i:dupB[0]},fix:T('Elimina una de cada par: duplican rigidez, peso y resultados.','Delete one of each pair: they duplicate stiffness, weight and results.')});
+ const hingeB=[];B.forEach((r,i)=>{if(r&&(+(r.a1||0)||+(r.a2||0)))hingeB.push(i)});
+ if(hingeB.length)add('info','def',T('Barras con articulación en sus extremos: '+tags(hingeB.map(i=>'B'+(i+1)),8)+'.','Beams with end releases: '+tags(hingeB.map(i=>'B'+(i+1)),8)+'.'),{sel:{t:'b',i:hingeB[0]},fix:T('Comprueba que las articulaciones sean intencionales: muchas liberaciones pueden formar un mecanismo.','Check that the releases are intentional: too many can form a mechanism.')});
+
+ /* --- 4. Muros --- */
+ const zeroW=[],badRefW=[],badTW=[],thinW=[],thickW=[],badEW=[],skewW=[],flipW=[],dupW=[],noRigW=[],fixOffW=[];
+ const seenW=new Map();
+ MW.forEach((w,i)=>{
+  if(!w||!Array.isArray(w.n)||w.n.length!==4||!w.n.every(nodeOK)){badRefW.push(i);return}
+  w.n.forEach(k=>used.add(k));
+  const p=w.n.map(k=>N[k]);
+  const Lb=Math.hypot(p[1].x-p[0].x,p[1].y-p[0].y,p[1].z-p[0].z),Lt=Math.hypot(p[2].x-p[3].x,p[2].y-p[3].y,p[2].z-p[3].z),L=(Lb+Lt)/2;
+  const m0=[(p[0].x+p[1].x)/2,(p[0].y+p[1].y)/2,(p[0].z+p[1].z)/2],m1=[(p[3].x+p[2].x)/2,(p[3].y+p[2].y)/2,(p[3].z+p[2].z)/2];
+  const H=Math.hypot(m1[0]-m0[0],m1[1]-m0[1],m1[2]-m0[2]);
+  if(!(L>1e-6&&H>1e-6)){zeroW.push(i);return}
+  const t=+w.t;
+  if(!(t>0))badTW.push(i);else if(t<0.05)thinW.push(i);else if(t>1)thickW.push(i);
+  const E=+w.E;if(!(E>0)||E>1000)badEW.push(i);
+  const tol=Math.max(.02,.02*L);
+  if(Math.hypot(p[3].x-p[0].x,p[3].y-p[0].y)>tol||Math.hypot(p[2].x-p[1].x,p[2].y-p[1].y)>tol)skewW.push(i);
+  if(!(m1[2]>m0[2]))flipW.push(i);
+  if(!w.rig)noRigW.push(i);
+  if(w.fix&&w.rig&&m0[2]>zmin+1e-4)fixOffW.push(i);
+  const k=w.n.slice().sort((a,b)=>a-b).join('-');
+  if(seenW.has(k))dupW.push(i);else seenW.set(k,i);
+ });
+ if(badRefW.length)add('err','def',T('Muros con nudos inexistentes: '+tags(badRefW.map(i=>'M'+(i+1)),8)+'.','Walls with missing nodes: '+tags(badRefW.map(i=>'M'+(i+1)),8)+'.'),{sel:{t:'w',i:badRefW[0]},fix:T('Vuelve a dibujar el muro sobre nudos existentes.','Draw the wall again on existing nodes.')});
+ if(zeroW.length)add('err','def',T('Muros con longitud o altura nula: '+tags(zeroW.map(i=>'M'+(i+1)),8)+'.','Walls with zero length or height: '+tags(zeroW.map(i=>'M'+(i+1)),8)+'.'),{sel:{t:'w',i:zeroW[0]},fix:T('Revisa la posición en planta de sus nudos y su altura.','Check the plan position of its nodes and its height.')});
+ if(badTW.length)add('err','secc',T('Muros con espesor t inválido: '+tags(badTW.map(i=>'M'+(i+1)),8)+'.','Walls with invalid thickness t: '+tags(badTW.map(i=>'M'+(i+1)),8)+'.'),{sel:{t:'w',i:badTW[0]},fix:T('Escribe un espesor mayor que cero (por ejemplo 200 mm).','Enter a thickness greater than zero (e.g. 200 mm).')});
+ if(thinW.length)add('warn','secc',T('Muros muy delgados (t < 50 mm): '+tags(thinW.map(i=>'M'+(i+1)),6)+'.','Very thin walls (t < 50 mm): '+tags(thinW.map(i=>'M'+(i+1)),6)+'.'),{fix:T('Verifica el espesor real; un muro estructural suele tener 100–300 mm.','Check the actual thickness; a structural wall is usually 100–300 mm.')});
+ if(thickW.length)add('warn','secc',T('Muros muy gruesos (t > 1 m): '+tags(thickW.map(i=>'M'+(i+1)),6)+'.','Very thick walls (t > 1 m): '+tags(thickW.map(i=>'M'+(i+1)),6)+'.'),{fix:T('Confirma el espesor: puede ser un error de unidades.','Confirm the thickness: it may be a unit error.')});
+ if(badEW.length)add('warn','secc',T('Muros con E no válido: '+tags(badEW.map(i=>'M'+(i+1)),6)+'.','Walls with invalid E: '+tags(badEW.map(i=>'M'+(i+1)),6)+'.'),{fix:T('Escribe E en GPa/ksi (hormigón ≈ 4.7·√f\'c).','Enter E in GPa/ksi (concrete ≈ 4.7·√f\'c).')});
+ if(skewW.length)add('warn','def',T('Muro fuera de plomo: los nudos superiores no están sobre los inferiores ('+tags(skewW.map(i=>'M'+(i+1)),6)+').','Out-of-plumb wall: top nodes are not above the bottom ones ('+tags(skewW.map(i=>'M'+(i+1)),6)+').'),{fix:T('Alinea los nudos superiores con los inferiores; el programa modela el muro como columna vertical entre centros.','Align the top nodes with the bottom ones; the program models the wall as a vertical column between centers.')});
+ if(flipW.length)add('warn','def',T('Muro con los nudos superiores por debajo de los inferiores: '+tags(flipW.map(i=>'M'+(i+1)),6)+'.','Wall with top nodes below the bottom nodes: '+tags(flipW.map(i=>'M'+(i+1)),6)+'.'),{fix:T('Corrige la altura o el orden de los nudos del muro.','Correct the wall height or node order.')});
+ if(noRigW.length)add('info','def',T('Muros que solo aportan peso (rigidez lateral desactivada): '+tags(noRigW.map(i=>'M'+(i+1)),8)+'.','Walls that only contribute weight (lateral stiffness off): '+tags(noRigW.map(i=>'M'+(i+1)),8)+'.'),{fix:T('Activa «Aporta rigidez lateral» si el muro forma parte del sistema resistente.','Enable «Contributes lateral stiffness» if the wall is part of the lateral system.')});
+ if(fixOffW.length)add('info','def',T('Muros empotrados que no arrancan en la base del modelo: '+tags(fixOffW.map(i=>'M'+(i+1)),6)+'.','Fixed-base walls that do not start at the model base: '+tags(fixOffW.map(i=>'M'+(i+1)),6)+'.'),{fix:T('Revisa la cota de esos muros.','Check the level of those walls.')});
+ if(dupW.length)add('warn','dup',T('Muros repetidos sobre los mismos 4 nudos: '+tags(dupW.map(i=>'M'+(i+1)),6)+'.','Duplicate walls on the same 4 nodes: '+tags(dupW.map(i=>'M'+(i+1)),6)+'.'),{sel:{t:'w',i:dupW[0]},fix:T('Elimina uno de cada par o diferencia su espesor/material si son capas distintas.','Delete one of each pair or give them different thickness/material if they are separate layers.')});
+
+ /* --- 5. Losas y cargas de área --- */
+ const beamsInPlane=o=>{
+  const P=(o&&o.pts)||[];if(!(P.length>=3))return false;
+  const Z=slabZs(o),pl=fitPlaneZ(P,Z),flat=Math.abs(pl.b)<1e-9&&Math.abs(pl.c)<1e-9;
+  const xs=P.map(q=>+q[0]).filter(isFinite),ys=P.map(q=>+q[1]).filter(isFinite);
+  if(!xs.length||!ys.length)return false;
+  const tol=Math.max(.05,.03*Math.hypot(Math.max(...xs)-Math.min(...xs),Math.max(...ys)-Math.min(...ys)));
+  return B.some(r=>{const a=N[r.i],b=N[r.j];if(!a||!b)return false;
+   if(flat)return Math.abs(a.z-pl.a)<tol&&Math.abs(b.z-pl.a)<tol;
+   return Math.abs(pl.a+pl.b*a.x+pl.c*a.y-a.z)<tol&&Math.abs(pl.a+pl.b*b.x+pl.c*b.y-b.z)<tol});
+ };
+ const badS=[],zeroS=[],thinS=[],thickS=[],warpS=[],dupS=[],noBeamS=[],diaS=[],badES=[];const seenS=new Set();
+ LS.forEach((s,i)=>{
+  if(!s||!Array.isArray(s.pts)||s.pts.length<3||!s.pts.every(q=>q&&isFinite(+q[0])&&isFinite(+q[1]))){badS.push(i);return}
+  const A=polyA(s.pts);if(!(A>1e-9)){zeroS.push(i);return}
+  const t=+s.t;
+  if(!(t>0))badS.push(i);else if(t<0.06)thinS.push(i);else if(t>0.5)thickS.push(i);
+  const E=+s.E;if(!(E>0)||E>1000)badES.push(i);
+  if(slabWarp(s)>0.01)warpS.push(i);
+  if(!beamsInPlane(s))noBeamS.push(i);
+  const Z=slabZs(s);let match=0;
+  s.pts.forEach((q,k)=>{const idx=N.findIndex(n=>Math.hypot(n.x-q[0],n.y-q[1],n.z-Z[k])<1e-5);if(idx>=0){match++;used.add(idx)}});
+  if(s.dia!==false&&match<3)diaS.push(i);
+  const key=s.pts.map(q=>(+q[0]).toFixed(3)+','+(+q[1]).toFixed(3)).sort().join(';')+'@'+revFmt(+s.z||0,3);
+  if(seenS.has(key))dupS.push(i);else seenS.add(key);
+ });
+ if(badS.length)add('err','def',T('Losas con vértices inválidos o espesor ≤ 0: '+tags(badS.map(i=>'L'+(i+1)),8)+'.','Slabs with invalid vertices or thickness ≤ 0: '+tags(badS.map(i=>'L'+(i+1)),8)+'.'),{sel:{t:'s',i:badS[0]},fix:T('Revisa los vértices y el espesor de la losa.','Check the slab vertices and thickness.')});
+ if(zeroS.length)add('err','def',T('Losas con área nula: '+tags(zeroS.map(i=>'L'+(i+1)),8)+'.','Slabs with zero area: '+tags(zeroS.map(i=>'L'+(i+1)),8)+'.'),{sel:{t:'s',i:zeroS[0]},fix:T('Corrige los vértices: no deben estar alineados ni repetidos.','Correct the vertices: they must not be collinear or repeated.')});
+ if(thinS.length)add('warn','secc',T('Losas muy delgadas (t < 60 mm): '+tags(thinS.map(i=>'L'+(i+1)),6)+'.','Very thin slabs (t < 60 mm): '+tags(thinS.map(i=>'L'+(i+1)),6)+'.'),{fix:T('Confirma el espesor; una losa estructural suele tener 100–250 mm.','Confirm the thickness; a structural slab is usually 100–250 mm.')});
+ if(thickS.length)add('warn','secc',T('Losas muy gruesas (t > 500 mm): '+tags(thickS.map(i=>'L'+(i+1)),6)+'.','Very thick slabs (t > 500 mm): '+tags(thickS.map(i=>'L'+(i+1)),6)+'.'),{fix:T('Confirma el espesor: puede ser un error de unidades.','Confirm the thickness: it may be a unit error.')});
+ if(warpS.length)add('warn','def',T('Losas con vértices no coplanares: '+tags(warpS.map(i=>'L'+(i+1)),6)+'.','Slabs with non-coplanar vertices: '+tags(warpS.map(i=>'L'+(i+1)),6)+'.'),{sel:{t:'s',i:warpS[0]},fix:T('Ajusta las cotas a un mismo plano; si no, no se calculan Mx/My y el reparto es aproximado.','Set the vertices to the same plane; otherwise Mx/My are not calculated and load distribution is approximate.')});
+ if(noBeamS.length)add('warn','carga',T('Losas sin vigas en su plano que reciban su peso: '+tags(noBeamS.map(i=>'L'+(i+1)),6)+'.','Slabs with no beams in their plane to receive their weight: '+tags(noBeamS.map(i=>'L'+(i+1)),6)+'.'),{sel:{t:'s',i:noBeamS[0]},fix:T('Dibuja las vigas de borde (o del nivel) bajo la losa; si no, su peso y sus cargas se pierden.','Draw the edge (or level) beams under the slab; otherwise its weight and loads are lost.')});
+ if(diaS.length)add('info','def',T('Losas con diafragma activo pero menos de 3 vértices sobre nudos: '+tags(diaS.map(i=>'L'+(i+1)),6)+'.','Slabs with diaphragm on but fewer than 3 vertices on nodes: '+tags(diaS.map(i=>'L'+(i+1)),6)+'.'),{fix:T('Haz coincidir al menos 3 vértices con nudos o desactiva el diafragma en el panel de la losa.','Make at least 3 vertices coincide with nodes or turn the diaphragm off in the slab panel.')});
+ if(dupS.length)add('warn','dup',T('Losas repetidas: '+tags(dupS.map(i=>'L'+(i+1)),6)+'.','Duplicate slabs: '+tags(dupS.map(i=>'L'+(i+1)),6)+'.'),{sel:{t:'s',i:dupS[0]},fix:T('Elimina las losas repetidas: duplican peso y rigidez.','Delete duplicate slabs: they duplicate weight and stiffness.')});
+ if(badES.length)add('warn','secc',T('Losas con módulo E no válido: '+tags(badES.map(i=>'L'+(i+1)),6)+'.','Slabs with invalid modulus E: '+tags(badES.map(i=>'L'+(i+1)),6)+'.'),{sel:{t:'s',i:badES[0]},fix:T('Escribe E en GPa/ksi (hormigón ≈ 4.7·√f\'c).','Enter E in GPa/ksi (concrete ≈ 4.7·√f\'c).')});
+ const badC=[],negC=[],noBeamC=[];
+ CS.forEach((c,i)=>{
+  if(!c||!Array.isArray(c.pts)||c.pts.length<3||!c.pts.every(q=>q&&isFinite(+q[0])&&isFinite(+q[1]))){badC.push(i);return}
+  if(!(+c.q>0))negC.push(i);
+  else if(!beamsInPlane(c))noBeamC.push(i);
+ });
+ if(badC.length)add('err','def',T('Cargas de área con vértices inválidos: '+tags(badC.map(i=>'Q'+(i+1)),8)+'.','Area loads with invalid vertices: '+tags(badC.map(i=>'Q'+(i+1)),8)+'.'),{sel:{t:'c',i:badC[0]},fix:T('Revisa o vuelve a dibujar el polígono de la carga.','Check or redraw the load polygon.')});
+ if(negC.length)add('warn','carga',T('Cargas de área nulas o negativas: '+tags(negC.map(i=>'Q'+(i+1)),6)+'.','Zero or negative area loads: '+tags(negC.map(i=>'Q'+(i+1)),6)+'.'),{sel:{t:'c',i:negC[0]},fix:T('Escribe una presión mayor que cero (si es una descarga, usa carga nodal).','Enter a pressure greater than zero (for uplift, use nodal loads).')});
+ if(noBeamC.length)add('warn','carga',T('Cargas de área sin vigas en su plano que las reciban: '+tags(noBeamC.map(i=>'Q'+(i+1)),6)+'.','Area loads with no beams in their plane: '+tags(noBeamC.map(i=>'Q'+(i+1)),6)+'.'),{sel:{t:'c',i:noBeamC[0]},fix:T('Comprueba la cota de la carga y las vigas del nivel.','Check the load level and the beams at that level.')});
+
+ /* --- 6. Zapatas y matres --- */
+ const badZ=[],negZ=[],noSupZ=[],pedZ=[],dupZ=[],badMatZ=[];const seenZ=new Set();
+ ZP.forEach((z,i)=>{
+  if(!z||!nodeOK(z.n)){badZ.push(i);return}
+  used.add(z.n);
+  const Bv=+z.B,Lv=+z.L,Hv=+z.H;
+  if(!(Bv>0&&Lv>0&&Hv>0))negZ.push(i);
+  const nd=N[z.n];
+  if(!(nd&&nd.r&&nd.r.some(v=>+v))&&!wallBaseFix.has(z.n))noSupZ.push(i);
+  const c1=+z.c1||0,c2=+z.c2||0;
+  if((c1>0&&c1>Bv+1e-9)||(c2>0&&c2>Lv+1e-9))pedZ.push(i);
+  if(!(+z.fc>0)||!((+z.fy||0)>0)||!(+z.qa>0))badMatZ.push(i);
+  const k=String(z.n);if(seenZ.has(k))dupZ.push(i);else seenZ.add(k);
+ });
+ if(badZ.length)add('err','def',T('Zapatas sobre nudos inexistentes: '+tags(badZ.map(i=>'Z'+(i+1)),8)+'.','Footings on missing nodes: '+tags(badZ.map(i=>'Z'+(i+1)),8)+'.'),{sel:{t:'z',i:badZ[0]},fix:T('Vuelve a crear la zapata sobre un nudo existente.','Create the footing again on an existing node.')});
+ if(negZ.length)add('err','secc',T('Zapatas con dimensiones no válidas: '+tags(negZ.map(i=>'Z'+(i+1)),6)+'.','Footings with invalid dimensions: '+tags(negZ.map(i=>'Z'+(i+1)),6)+'.'),{sel:{t:'z',i:negZ[0]},fix:T('B, L y H deben ser mayores que cero.','B, L and H must be greater than zero.')});
+ if(noSupZ.length)add('warn','fund',T('Zapatas en nudos sin apoyo: '+tags(noSupZ.map(i=>'Z'+(i+1)),6)+'.','Footings on unsupported nodes: '+tags(noSupZ.map(i=>'Z'+(i+1)),6)+'.'),{sel:{t:'z',i:noSupZ[0]},fix:T('Asigna un apoyo al nudo o comprueba que la zapata está en un pilar con apoyo.','Assign a support to the node or check that the footing is on a supported column.')});
+ if(pedZ.length)add('warn','fund',T('Pedestal mayor que la zapata: '+tags(pedZ.map(i=>'Z'+(i+1)),6)+'.','Pedestal larger than the footing: '+tags(pedZ.map(i=>'Z'+(i+1)),6)+'.'),{fix:T('Aumenta B/L o reduce c1/c2.','Increase B/L or reduce c1/c2.')});
+ if(dupZ.length)add('warn','dup',T('Zapatas repetidas en el mismo nudo: '+tags(dupZ.map(i=>'Z'+(i+1)),6)+'.','Duplicate footings on the same node: '+tags(dupZ.map(i=>'Z'+(i+1)),6)+'.'),{sel:{t:'z',i:dupZ[0]},fix:T('Deja una sola zapata por nudo.','Keep a single footing per node.')});
+ if(badMatZ.length)add('warn','fund',T('Zapatas con f\'c, fy o capacidad qa no válidos: '+tags(badMatZ.map(i=>'Z'+(i+1)),6)+'.','Footings with invalid f\'c, fy or allowable qa: '+tags(badMatZ.map(i=>'Z'+(i+1)),6)+'.'),{sel:{t:'z',i:badMatZ[0]},fix:T('Comprueba f\'c, fy y la capacidad admisible del terreno.','Check f\'c, fy and the allowable soil capacity.')});
+ const badP=[],negP=[],noColP=[],dupP=[];const seenP=new Set();
+ PT.forEach((p,i)=>{
+  if(!p||!Array.isArray(p.pts)||p.pts.length<3||!p.pts.every(q=>q&&isFinite(+q[0])&&isFinite(+q[1]))){badP.push(i);return}
+  if(!(polyA(p.pts)>1e-9)){badP.push(i);return}
+  if(!(+p.H>0)||!(+p.ks>0))negP.push(i);
+  let inside=0;N.forEach((n,k)=>{if(n&&((n.r&&n.r.some(v=>+v))||wallBaseFix.has(k))&&inPoly(p.pts,+n.x,+n.y))inside++});
+  if(!inside)noColP.push(i);
+  const k=p.pts.map(q=>(+q[0]).toFixed(3)+','+(+q[1]).toFixed(3)).sort().join(';')+'@'+revFmt(+p.z||0,3);
+  if(seenP.has(k))dupP.push(i);else seenP.add(k);
+ });
+ if(badP.length)add('err','def',T('Matres con vértices inválidos: '+tags(badP.map(i=>'MT'+(i+1)),6)+'.','Mats with invalid vertices: '+tags(badP.map(i=>'MT'+(i+1)),6)+'.'),{sel:{t:'p',i:badP[0]},fix:T('Revisa o vuelve a dibujar el polígono de la matre.','Check or redraw the mat polygon.')});
+ if(negP.length)add('err','secc',T('Matres con canto o balasto no válidos: '+tags(negP.map(i=>'MT'+(i+1)),6)+'.','Mats with invalid depth or subgrade modulus: '+tags(negP.map(i=>'MT'+(i+1)),6)+'.'),{sel:{t:'p',i:negP[0]},fix:T('H y ks deben ser mayores que cero.','H and ks must be greater than zero.')});
+ if(noColP.length)add('warn','fund',T('Matres sin nudos con apoyo dentro de su planta: '+tags(noColP.map(i=>'MT'+(i+1)),6)+'.','Mats with no supported nodes inside their plan: '+tags(noColP.map(i=>'MT'+(i+1)),6)+'.'),{sel:{t:'p',i:noColP[0]},fix:T('Dibuja la matre debajo de los pilares apoyados o asigna apoyos dentro de ella.','Draw the mat under the supported columns or assign supports inside it.')});
+ if(dupP.length)add('warn','dup',T('Matres repetidas: '+tags(dupP.map(i=>'MT'+(i+1)),6)+'.','Duplicate mats: '+tags(dupP.map(i=>'MT'+(i+1)),6)+'.'),{sel:{t:'p',i:dupP[0]},fix:T('Deja una sola matre por zona.','Keep a single mat per area.')});
+
+ /* --- 7. Grupos --- */
+ const lens={n:N.length,b:B.length,w:MW.length,s:LS.length,c:CS.length,z:ZP.length,p:PT.length,a:AN.length};
+ const badG=[];GR.forEach((g,i)=>{if(!g||!Array.isArray(g.items)||g.items.length<2||g.items.some(q=>!q||lens[q.t]===undefined||+q.i<0||+q.i>=lens[q.t]))badG.push(i)});
+ if(badG.length)add('warn','dup',T('Grupos con referencias inválidas: '+tags(badG.map(i=>'G'+(i+1)),5)+'.','Groups with invalid references: '+tags(badG.map(i=>'G'+(i+1)),5)+'.'),{fix:T('Desagrupa y vuelve a agrupar esos elementos.','Ungroup and group those elements again.')});
+
+ /* --- 8. Nudos sin elementos --- */
+ const orphan=[];N.forEach((n,i)=>{if(nodeOK(i)&&!used.has(i))orphan.push(i)});
+ if(orphan.length)add('warn','dup',T('Nudos sin elementos que los usen: '+tags(orphan.map(i=>'N'+(i+1)),8)+'.','Nodes not used by any element: '+tags(orphan.map(i=>'N'+(i+1)),8)+'.'),{sel:{t:'n',i:orphan[0]},fix:T('Conéctalos con una barra o elimínalos; un nudo suelto no aporta rigidez.','Connect them with a beam or delete them; a loose node adds no stiffness.')});
+
+ /* --- 9. Apoyos y estabilidad --- */
+ const sup=[];N.forEach((n,i)=>{if(n&&n.r&&n.r.some(v=>+v))sup.push(i)});
+ const supUse=sup.filter(i=>used.has(i));
+ const wallFix=wallBaseFix.size>0,springs=B.some(r=>Math.abs(+r.kz||0)>1e-9||Math.abs(+r.ky||0)>1e-9);
+ if(!supUse.length&&!wallFix&&!springs)add('err','apoy',T('El modelo no tiene apoyos útiles (los apoyos en nudos sin elementos no cuentan).','The model has no useful supports (supports on nodes without elements do not count).'),{fix:T('Asigna al menos un apoyo fijo, articulado o rodillo en nudos conectados, o empotra los muros en la base.','Assign at least one fixed, pin or roller support on connected nodes, or fix the walls at their base.')});
+ else{
+  const orphanSup=sup.filter(i=>!used.has(i));
+  if(orphanSup.length)add('warn','apoy',T('Apoyos en nudos sin elementos: '+tags(orphanSup.map(i=>'N'+(i+1)),8)+'.','Supports on nodes without elements: '+tags(orphanSup.map(i=>'N'+(i+1)),8)+'.'),{sel:{t:'n',i:orphanSup[0]},fix:T('Conecta esos nudos o quita el apoyo.','Connect those nodes or remove the support.')});
+  const hasV=supUse.some(i=>+N[i].r[2])||wallFix||B.some(r=>+r.kz>0);
+  if(!hasV)add('err','apoy',T('Ningún apoyo útil restringe el descenso vertical (Uz): el análisis no tendrá equilibrio vertical.','No useful support restrains vertical displacement (Uz): the analysis will have no vertical equilibrium.'),{fix:T('Pon un apoyo fijo, articulado o rodillo en la base, o usa resortes kz en una viga suelo.','Add a fixed, pinned or roller support at the base, or use kz springs on a grade beam.')});
+  const xs=N.filter((n,i)=>nodeOK(i)).map(n=>+n.x),ys=N.filter((n,i)=>nodeOK(i)).map(n=>+n.y);
+  if(xs.length&&ys.length){
+   const spanX=Math.max(...xs)-Math.min(...xs),spanY=Math.max(...ys)-Math.min(...ys);
+   const planarY=spanY<1e-6,planarX=spanX<1e-6;
+   const hasX=supUse.some(i=>+N[i].r[0])||wallFix,hasY=supUse.some(i=>+N[i].r[1])||wallFix||B.some(r=>+r.ky>0);
+   if(!hasX)add('err','apoy',T(planarX?'Pórtico plano (plano YZ): falta restringir el desplazamiento fuera del plano (Ux).':'No hay apoyos que restrinjan el desplazamiento horizontal en X (Ux): traslación libre del modelo.',planarX?'Plane frame (YZ plane): out-of-plane displacement (Ux) is not restrained.':'No supports restrain horizontal displacement in X (Ux): rigid-body translation.'),{fix:T('Asigna un apoyo fijo o articulado en dirección X.','Assign a fixed or pinned support in the X direction.')});
+   if(!hasY)add('err','apoy',T(planarY?'Pórtico plano (plano XZ): falta restringir el desplazamiento fuera del plano (Uy).':'No hay apoyos que restrinjan el desplazamiento horizontal en Y (Uy): traslación libre del modelo.',planarY?'Plane frame (XZ plane): out-of-plane displacement (Uy) is not restrained.':'No supports restrain horizontal displacement in Y (Uy): rigid-body translation.'),{fix:T('Asigna un apoyo fijo o articulado en dirección Y.','Assign a fixed or pinned support in the Y direction.')});
+  }
+ }
+
+ /* --- 10. Cargas --- */
+ const sw=M.sw!==false;
+ const nodal=N.some(n=>n&&n.f&&n.f.some(v=>Math.abs(+v)>1e-9));
+ const barLoad=B.some(r=>r&&['wa','wb','xa','xb','ya','yb','pza','pzb','pya','pyb'].some(k=>Math.abs(+r[k]||0)>1e-9));
+ const areaLoad=CS.some(c=>+c.q>0);
+ const selfLoad=sw&&((B.length>0)||LS.some(s=>+s.gw>0&&+s.t>0)||MW.some(w=>+w.gw>0&&+w.t>0));
+ if(!nodal&&!barLoad&&!areaLoad&&!selfLoad&&!PT.length)add('warn','carga',T('No hay cargas aplicadas: los resultados serán nulos salvo el peso propio.','No loads applied: results will be zero except self-weight.'),{fix:T('Añade cargas nodales, en barras o de área, o activa «Peso propio».','Add nodal, beam or area loads, or enable «Self-weight».')});
+ if(!sw&&(LS.length||MW.length))add('info','carga',T('Peso propio desactivado: las losas y muros no aportan su peso al análisis ni al sismo.','Self-weight is off: slabs and walls do not contribute their weight to the analysis or seismic mass.'),{fix:T('Activa «Peso propio» en la barra de resultados si corresponde.','Enable «Self-weight» in the results bar if appropriate.')});
+ const loadOrphan=[];N.forEach((n,i)=>{if(n&&n.f&&n.f.some(v=>Math.abs(+v)>1e-9)&&!used.has(i))loadOrphan.push(i)});
+ if(loadOrphan.length)add('warn','carga',T('Cargas nodales en nudos sin elementos: '+tags(loadOrphan.map(i=>'N'+(i+1)),8)+' (no llegan a la estructura).','Nodal loads on nodes without elements: '+tags(loadOrphan.map(i=>'N'+(i+1)),8)+' (they do not reach the structure).'),{sel:{t:'n',i:loadOrphan[0]},fix:T('Conecta esos nudos o mueve la carga a un nudo de la estructura.','Connect those nodes or move the load to a structural node.')});
+
+ /* --- 11. Sismo y viento --- */
+ const Si=M.sis||{},Vi=M.viento||{},badSis=[];
+ if(Si){
+  if(!(Si.ss>=0&&Si.ss<=3))badSis.push('Ss');
+  if(!(Si.s1>=0&&Si.s1<=2))badSis.push('S1');
+  if(!(Si.riesgo>=1&&Si.riesgo<=4))badSis.push(T('riesgo','risk'));
+  if(!/^[A-F]$/.test(String(Si.clase||'')))badSis.push(T('clase de sitio','site class'));
+  if(!(Si.fA>=0&&Si.fA<=1))badSis.push('fA');
+  if(!(Si.nmo>=1&&Si.nmo<=20))badSis.push(T('nº de modos','no. of modes'));
+  if(!(Si.sis>=0&&Si.sis<SISTEMAS.length))badSis.push(T('sistema resistente','structural system'));
+  if(['elf','mod','rec'].indexOf(String(Si.met))<0)badSis.push(T('método','method'));
+  if(['asce22','prbc18'].indexOf(Si.cod)<0)badSis.push(T('norma','code'));
+  if(badSis.length)add('warn','sismo',T('Parámetros sísmicos fuera de rango: '+badSis.join(', ')+'.','Seismic parameters out of range: '+badSis.join(', ')+'.'),{fix:T('Corrígelos en «Sismo…» antes de ejecutar el análisis sísmico.','Correct them in «Seismic…» before running the seismic analysis.')});
+  if(Si.ecc!=null&&+Si.ecc<5)add('warn','sismo',T('Torsión accidental '+revFmt(Si.ecc,1)+' % < 5 % (mínimo reglamentario habitual).','Accidental torsion '+revFmt(Si.ecc,1)+' % < 5 % (usual code minimum).'),{fix:T('Usa al menos 5 % o justifícalo.','Use at least 5 % or justify it.')});
+ }
+ if(Vi){
+  const badV=[];
+  if(!(Vi.V>0))badV.push('V');
+  if(['B','C','D'].indexOf(String(Vi.exp))<0)badV.push(T('exposición','exposure'));
+  if(!(Vi.riesgo>=1&&Vi.riesgo<=4))badV.push(T('riesgo','risk'));
+  if(!(Vi.Kzt>0))badV.push('Kzt');
+  if(!(Vi.Kd>0))badV.push('Kd');
+  if(!(Vi.Ke>0))badV.push('Ke');
+  if(!(Vi.G>0))badV.push('G');
+  if(['asce22','prbc18'].indexOf(String(Vi.norma))<0)badV.push(T('norma','code'));
+  if(!isFinite(+Vi.Cpw)||!isFinite(+Vi.Cpl)||!isFinite(+Vi.GCpi))badV.push(T('Cp / GCpi','Cp / GCpi'));
+  if(badV.length)add('warn','sismo',T('Parámetros de viento fuera de rango: '+badV.join(', ')+'.','Wind parameters out of range: '+badV.join(', ')+'.'),{fix:T('Corrígelos en «Viento…» antes de ejecutar el análisis de viento.','Correct them in «Wind…» before running the wind analysis.')});
+ }
+
+ /* --- 12. Resumen --- */
+ const levels=[];N.forEach(n=>{const z=(n&&isFinite(+n.z))?+n.z:null;if(z!=null&&!levels.some(q=>Math.abs(q-z)<0.2))levels.push(z)});levels.sort((a,b)=>a-b);
+ const stats={nodes:N.length,bars:B.length,walls:MW.length,slabs:LS.length,loads:CS.length,footings:ZP.length,mats:PT.length,levels:levels.length,supports:sup.length,units:M.units||cu,sw:M.sw!==false};
+ return revFinalize({items:IT,stats});
+}
+
+/* Análisis de prueba: verifica que el modelo resuelve (solo modelos pequeños y sin errores). */
+function revProbarEstabilidad(rev){
+ if(!rev||rev.counts.err||!(B.length||MUROS.length))return rev;
+ if(res&&!res.err){rev.items.push({sev:'info',cat:'apoy',msg:revT('El modelo ya tiene un análisis resuelto; las reacciones están disponibles.','The model already has a solved analysis; reactions are available.')});return rev}
+ const dof=(N.length+B.reduce((s,r)=>s+Math.max(1,r.div|0),0)+MUROS.length*5+LOSAS.length*16)*6;
+ if(dof>720){rev.items.push({sev:'warn',cat:'apoy',msg:revT('Modelo grande: la estabilidad no se comprobó automáticamente porque el análisis de prueba sería lento. Pulsa «▶ Calcular» para verificarla.','Large model: stability was not checked automatically because the trial analysis would be slow. Press «▶ Calculate» to verify it.')});return rev}
+ let item=null;
+ try{
+  const r=analyze();
+  const diag=(()=>{const xs=N.map(n=>+n.x).filter(isFinite),ys=N.map(n=>+n.y).filter(isFinite),zs=N.map(n=>+n.z).filter(isFinite);return (xs.length&&ys.length&&zs.length)?Math.hypot(Math.max(...xs)-Math.min(...xs),Math.max(...ys)-Math.min(...ys),Math.max(...zs)-Math.min(...zs)):1})();
+  if(r&&r.err)item={sev:'err',cat:'apoy',msg:revT('El análisis de prueba no se puede resolver: '+r.err,'Trial analysis cannot be solved: '+r.err),fix:revT('Corrige la geometría, los apoyos o las conexiones; tal como está, el cálculo se detendría.','Fix the geometry, supports or connections; as it is, the calculation would stop.')};
+  else if(r&&(!isFinite(r.dmax)||(r.resid||[]).some(v=>!isFinite(v))))item={sev:'err',cat:'apoy',msg:revT('El análisis de prueba da resultados no finitos: hay un mecanismo o faltan apoyos.','Trial analysis gives non-finite results: there is a mechanism or missing supports.'),fix:revT('Revisa los apoyos (Ux, Uy, Uz y giros) y las conexiones entre elementos.','Check the supports (Ux, Uy, Uz and rotations) and the connections between elements.')};
+  else if(r&&Math.abs(r.dmax)>Math.max(.5,diag*.05))item={sev:'err',cat:'apoy',msg:revT('Desplazamiento máximo anómalo ('+revFmt(r.dmax*UF('d'),2)+' '+UL('d')+'): posible mecanismo o apoyo insuficiente.','Anomalous maximum displacement ('+revFmt(r.dmax*UF('d'),2)+' '+UL('d')+'): possible mechanism or insufficient support.'),fix:revT('Revisa la estabilidad del modelo antes de calcular.','Check the model stability before calculating.')};
+  else if(r)item={sev:'info',cat:'apoy',msg:revT('Análisis de prueba: el sistema se resuelve sin mecanismo (δ máx. '+revFmt(r.dmax*UF('d'),2)+' '+UL('d')+').','Trial analysis: the system solves without a mechanism (max. δ '+revFmt(r.dmax*UF('d'),2)+' '+UL('d')+').')};
+ }catch(e){item={sev:'warn',cat:'apoy',msg:revT('No se pudo completar el análisis de prueba: '+(e&&e.message?e.message:e),'Trial analysis could not be completed: '+(e&&e.message?e.message:e))}}
+ if(item)rev.items.push(item);
+ return rev;
+}
+
+/* ---------- Revisión con IA (opcional) ---------- */
+const REV_IA_SYS_ES=`Eres un ingeniero estructural revisor del programa Zapel773DWall. Recibes el resumen de un modelo 3D de barras, muros, losas y fundaciones, junto con las comprobaciones automáticas que ya hizo el programa. Tu tarea es detectar incoherencias, datos que impidan un cálculo fiable o hipótesis que deban revisarse.
+Responde SOLO con un objeto JSON, sin markdown ni texto alrededor:
+{"veredicto":"una frase","resumen":"2-3 frases","hallazgos":[{"sev":"error|aviso|sugerencia","tema":"geometria|apoyos|cargas|secciones|sismo|fundaciones|otro","elemento":"B12 / N4 / M2 / L1 / Q1 / Z1 / MT1 o vacío","mensaje":"qué está mal o es dudoso","recomendacion":"cómo corregirlo o qué verificar"}]}
+Reglas: máximo 8 hallazgos; no inventes elementos ni datos que no aparezcan en el resumen; no repitas las comprobaciones automáticas salvo para matizarlas; si no hay nada relevante devuelve "hallazgos":[]; escribe en español; sé conciso y técnico. Un «error» impide o invalida el cálculo; un «aviso» es una hipótesis dudosa; una «sugerencia» es una mejora. No pidas datos personales.`;
+const REV_IA_SYS_EN=`You are a structural engineer reviewing a model in the Zapel773DWall program. You receive a summary of a 3D model of beams, walls, slabs and foundations plus the automatic checks already performed by the program. Your task is to find inconsistencies, data that would prevent a reliable analysis, or assumptions that should be reviewed.
+Reply ONLY with a JSON object, no markdown or text around it:
+{"veredicto":"one sentence","resumen":"2-3 sentences","hallazgos":[{"sev":"error|aviso|sugerencia","tema":"geometria|apoyos|cargas|secciones|sismo|fundaciones|otro","elemento":"B12 / N4 / M2 / L1 / Q1 / Z1 / MT1 or empty","mensaje":"what is wrong or doubtful","recomendacion":"how to fix it or what to verify"}]}
+Rules: maximum 8 findings; do not invent elements or data that are not in the summary; do not repeat the automatic checks except to qualify them; if there is nothing relevant return "hallazgos":[]; write in English; be concise and technical. An «error» prevents or invalidates the calculation; an «aviso» is a doubtful assumption; a «sugerencia» is an improvement. Do not ask for personal data. Keep the Spanish JSON keys exactly as shown.`;
+
+function revProvCfg(){
+ if(REV_CFG_TMP)return REV_CFG_TMP;
+ const get=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
+ const p=get('zapel-ia-prov')||'libre';
+ if(p==='libre'||!IA_PROV[p])return {prov:'libre',key:'',model:'',url:'',nombre:revT('modelo gratuito integrado','built-in free model')};
+ const P=IA_PROV[p];
+ return {prov:p,key:get(p==='openrouter'?'zapel-or-key':'zapel-ia-key-'+p)||'',model:get(p==='openrouter'?'zapel-or-model':'zapel-ia-model-'+p)||P.def||'',url:get('zapel-ia-url')||'',nombre:P.n};
+}
+/* Captura la configuración visible en «🤖 IA…» para usarla en la revisión, aunque no se haya generado nada. */
+function revCfgFromDialog(){
+ const pv=$('iaProv');if(!pv)return null;
+ const p=pv.value||'libre',P=IA_PROV[p];
+ if(p==='libre'||!P)return {prov:'libre',key:'',model:'',url:'',nombre:revT('modelo gratuito integrado','built-in free model')};
+ const key=$('iaKey')?$('iaKey').value.trim():'';
+ const model=($('iaModel')?$('iaModel').value.trim():'')||P.def||'';
+ const url=$('iaUrl')?$('iaUrl').value.trim():'';
+ try{
+  localStorage.setItem('zapel-ia-prov',p);
+  if($('iaRec')&&$('iaRec').checked&&key)localStorage.setItem(p==='openrouter'?'zapel-or-key':'zapel-ia-key-'+p,key);
+  localStorage.setItem(p==='openrouter'?'zapel-or-model':'zapel-ia-model-'+p,model);
+  if(p==='custom')localStorage.setItem('zapel-ia-url',url);
+ }catch(e){}
+ return {prov:p,key,model,url,nombre:P.n};
+}
+
+function revApoyoLabel(r){
+ const Lb=['Ux','Uy','Uz','Rx','Ry','Rz'];const k=r?r.map((v,i)=>v?Lb[i]:null).filter(Boolean):[];
+ if(!k.length)return revT('Libre','Free');
+ if(k.length===6)return revT('Fijo (empotrado)','Fixed (fixed)');
+ if(k.join(' ')==='Uz')return revT('Rodillo (Uz)','Roller (Uz)');
+ if(k.join(' ')==='Ux Uy Uz')return revT('Articulado','Pin');
+ return k.join(' ');
+}
+function revSecLabel(r){
+ if(LANG!=='en')return secTxt(r)||('tipo '+(r.ty||'rect'));
+ const S=SEC[r.ty],names={rect:'Rectangular',T:'T-beam',circ:'Circular',I:'I section',tubR:'Rect. tube',tubC:'Circ. tube',poly:'Polygon'};
+ const dims=(S?S.slice(1):[]).map(q=>{const v=r[q[0]];return (v!==undefined&&v!==''&&isFinite(+v))?(+v*UF('s')).toFixed(0):''}).filter(Boolean);
+ return (names[r.ty]||r.ty||'rect')+(dims.length?' · '+dims.join('×')+' '+UL('s'):'');
+}
+
+function revResumenIA(rev){
+ const T=revT,A=(es,en)=>T(es,en),M=modeloSnapshot(),s=rev.stats;
+ const L=v=>revFmt(+v*UF('L'),2),S=v=>revFmt(+v*UF('s'),0);
+ const arr=[];
+ const validN=(M.N||[]).filter(n=>n&&isFinite(+n.x)&&isFinite(+n.y)&&isFinite(+n.z));
+ arr.push(A('UNIDADES: ','UNITS: ')+(M.units==='SI'?'SI (m, mm, MPa, kN)':'IM (ft, in, ksi, kip)')+' · '+A('peso propio ','self-weight ')+(M.sw?A('activado','on'):A('desactivado','off')));
+ arr.push(A('ELEMENTOS: ','ELEMENTS: ')+revStatsTxt(rev));
+ const xs=validN.map(n=>+n.x),ys=validN.map(n=>+n.y),zs=validN.map(n=>+n.z);
+ if(xs.length&&ys.length&&zs.length)arr.push(A('GEOMETRÍA: ','GEOMETRY: ')+'X '+L(Math.min(...xs))+'–'+L(Math.max(...xs))+' · Y '+L(Math.min(...ys))+'–'+L(Math.max(...ys))+' · Z '+L(Math.min(...zs))+'–'+L(Math.max(...zs))+' '+UL('L'));
+ const lv=[];zs.forEach(z=>{if(!lv.some(q=>Math.abs(q-z)<0.2))lv.push(z)});lv.sort((a,b)=>a-b);
+ if(lv.length>1)arr.push(A('NIVELES (z): ','LEVELS (z): ')+lv.map(z=>L(z)).join(', ')+' '+UL('L'));
+ const cnt={};M.N.forEach(n=>{const t=revApoyoLabel(n&&n.r);cnt[t]=(cnt[t]||0)+1});
+ arr.push(A('APOYOS: ','SUPPORTS: ')+Object.keys(cnt).map(k=>k+' ×'+cnt[k]).join(' · '));
+ const sec={};M.B.forEach(r=>{const k=String(revSecLabel(r)||('tipo '+(r.ty||'rect')));sec[k]=(sec[k]||0)+1});
+ const sk=Object.keys(sec).slice(0,6).map(k=>k+' ×'+sec[k]);if(sk.length)arr.push(A('SECCIONES DE BARRAS: ','BEAM SECTIONS: ')+sk.join(' · ')+(Object.keys(sec).length>6?' · …':''));
+ if(M.MUROS.length){const tset=[...new Set(M.MUROS.map(w=>S(w.t)))];arr.push(A('MUROS: ','WALLS: ')+'t='+tset.join('/')+' '+UL('s')+' · '+A('rigidez ','stiffness ')+(M.MUROS.filter(w=>w.rig).length)+'/'+M.MUROS.length+' · '+A('empotrados ','fixed ')+M.MUROS.filter(w=>w.fix).length);}
+ if(M.LOSAS.length){const tset=[...new Set(M.LOSAS.map(sl=>S(sl.t)))];arr.push(A('LOSAS: ','SLABS: ')+M.LOSAS.length+' · t='+tset.join('/')+' '+UL('s')+' · '+A('diafragma ','diaphragm ')+(M.LOSAS.filter(sl=>sl.dia!==false).length));}
+ const nod=M.N.reduce((c,n)=>c+(n.f&&n.f.some(v=>Math.abs(+v)>1e-9)?1:0),0);
+ const bl=M.B.reduce((c,r)=>c+(['wa','wb','xa','xb','ya','yb','pza','pzb','pya','pyb'].some(k=>Math.abs(+r[k]||0)>1e-9)?1:0),0);
+ arr.push(A('CARGAS: ','LOADS: ')+nod+A(' nudos cargados · ',' loaded nodes · ')+bl+A(' barras con carga · ',' loaded beams · ')+M.CARGAS.length+A(' cargas de área',' area loads')+(M.ZAPATAS.length?' · '+M.ZAPATAS.length+A(' zapatas',' footings'):'')+(M.PLATEAS.length?' · '+M.PLATEAS.length+A(' matres',' mats'):''));
+ const Si=M.sis||{};if(Si.ss!=null)arr.push(A('SISMO: ','SEISMIC: ')+'Ss='+revFmt(Si.ss,2)+' S1='+revFmt(Si.s1,2)+' · '+A('sitio ','site ')+Si.clase+' · '+A('riesgo ','risk ')+Si.riesgo+' · '+Si.cod+' · '+A('método ','method ')+Si.met);
+ const Vi=M.viento||{};if(Vi.V!=null)arr.push(A('VIENTO: ','WIND: ')+'V='+revFmt(Vi.V,0)+' mph · '+A('exp ','exp ')+Vi.exp+' · '+A('riesgo ','risk ')+Vi.riesgo+' · '+Vi.norma);
+ const f=rev.items.filter(it=>it.sev!=='info').slice(0,24);
+ arr.push(A('COMPROBACIONES AUTOMÁTICAS','AUTOMATIC CHECKS')+' ('+rev.counts.err+(LANG==='en'?' errors, ':' errores, ')+rev.counts.warn+(LANG==='en'?' warnings':' avisos')+'):');
+ if(!f.length)arr.push(A('- sin errores ni avisos','- no errors or warnings'));
+ f.forEach(it=>arr.push('- ['+(it.sev==='err'?A('ERROR','ERROR'):A('AVISO','WARNING'))+'] ('+revCat(it.cat)+') '+it.msg));
+ arr.push(A('No repitas estas comprobaciones; busca incoherencias de ingeniería o datos dudosos que no estén en la lista.','Do not repeat these checks; look for engineering inconsistencies or doubtful data not in the list.'));
+ return arr.join('\n').slice(0,12000);
+}
+
+function revNormalizaIA(j){
+ if(!j||typeof j!=='object'||Array.isArray(j))throw new Error(revT('La IA no devolvió un objeto JSON.','The AI did not return a JSON object.'));
+ const sevM={error:'err',err:'err',aviso:'warn',warn:'warn',warning:'warn',sugerencia:'info',suggestion:'info',info:'info'};
+ const catM={geometria:'def',geometry:'def',definicion:'def','definición':'def',apoyos:'apoy',apoyo:'apoy',supports:'apoy',cargas:'carga',carga:'carga',loads:'carga',secciones:'secc',seccion:'secc',sections:'secc',materiales:'secc',sismo:'sismo',seismic:'sismo','sismo/viento':'sismo',fundaciones:'fund',foundations:'fund',fundacion:'fund',otro:'def',other:'def'};
+ const norm=v=>String(v==null?'':v).toLowerCase().trim();
+ const arr=Array.isArray(j.hallazgos)?j.hallazgos:(Array.isArray(j.findings)?j.findings:[]);
+ const out=[];
+ arr.slice(0,10).forEach(q=>{
+  if(!q||typeof q!=='object')return;
+  const msg=String(q.mensaje||q.message||q.descripcion||'').slice(0,900).trim();
+  if(!msg)return;
+  out.push({sev:sevM[norm(q.sev||q.severidad||q.severity||q.nivel)]||'info',cat:catM[norm(q.tema||q.category||q.categoria)]||'def',
+   elem:String(q.elemento||q.element||q.ref||'').slice(0,80),msg,fix:String(q.recomendacion||q.recommendation||q.solucion||'').slice(0,900)});
+ });
+ return {veredicto:String(j.veredicto||j.verdict||'').slice(0,500),resumen:String(j.resumen||j.summary||'').slice(0,1400),items:out};
+}
+
+function renderRevIA(){
+ const st=$('revAISt'),list=$('revAIList');if(!st||!list)return;
+ const T=revT;
+ const h=$('revAIH');if(h)h.textContent=T('Revisión con IA','AI review');
+ const btn=$('revIABtn');if(btn){btn.disabled=REV_BUSY;btn.textContent=REV_BUSY?T('Consultando…','Querying…'):T('🔍 Revisar con IA','🔍 Review with AI')}
+ if(REV_BUSY){st.innerHTML='<b>'+T('Consultando el motor de IA…','Querying the AI engine…')+'</b> '+T('puede tardar hasta un minuto.','it may take up to a minute.');list.innerHTML='';return}
+ if(!REV_AI){st.innerHTML=revEsc(T('Opcional: envía un resumen del modelo al motor configurado en «🤖 IA…» para una segunda opinión. Es orientativa y no envía datos personales.','Optional: send a model summary to the engine configured in «🤖 AI…» for a second opinion. It is advisory and does not send personal data.'));list.innerHTML='';return}
+ if(REV_AI.error){st.innerHTML='<span class="er">'+revEsc(T('No se pudo completar: ','Could not complete: ')+REV_AI.error)+'</span><br>'+revEsc(T('Revisa el motor y la clave en «🤖 IA…» o usa el modelo gratuito.','Check the engine and key in «🤖 AI…» or use the free model.'));list.innerHTML='';return}
+ st.innerHTML='<b>'+revEsc(REV_AI.veredicto||T('Revisión con IA','AI review'))+'</b>'+(REV_AI.resumen?'<br>'+revEsc(REV_AI.resumen):'')+'<div style="font-size:10.5px;margin-top:3px">'+revEsc(REV_AI.prov||'IA')+(REV_AI.secs?' · '+REV_AI.secs+' s':'')+' · '+T('orientativa','advisory')+'</div>';
+ list.innerHTML=(REV_AI.items&&REV_AI.items.length)?REV_AI.items.map(q=>{
+  const lab=q.sev==='err'?T('Error','Error'):q.sev==='warn'?T('Aviso','Warning'):T('Sugerencia','Tip');
+  return '<div class="revitem '+q.sev+'"><div class="rc">'+lab+(q.elem?' · '+revEsc(q.elem):'')+' · '+revEsc(revCat(q.cat))+'</div><div class="rm">'+revEsc(q.msg)+'</div>'+(q.fix?'<div class="rf">'+revEsc(q.fix)+'</div>':'')+'</div>';
+ }).join(''):'<div class="revempty">'+T('La IA no encontró observaciones adicionales.','The AI found no additional findings.')+'</div>';
+}
+
+async function revIA(){
+ if(REV_BUSY)return;
+ if(!REV_LAST){revisarModeloActual();if(!REV_LAST)return}
+ const T=revT,cfg=revProvCfg();
+ if(cfg.prov!=='libre'&&!cfg.key&&IA_PROV[cfg.prov]&&!IA_PROV[cfg.prov].optKey){
+  REV_AI={error:T('El motor «'+cfg.nombre+'» necesita una clave. Ábrelo en «🤖 IA…» y pega la clave (o vuelve al modelo gratuito).','The «'+cfg.nombre+'» engine needs a key. Open «🤖 AI…» and paste the key (or use the free model)'),prov:cfg.nombre};renderRevIA();return}
+ const w=$('revw');if(w&&w.style.display!=='flex')w.style.display='flex';
+ const token=++REV_AI_TOKEN;
+ REV_BUSY=true;REV_AI=null;renderRevIA();
+ const t0=Date.now();
+ try{
+  const out=await iaLlama(cfg.prov,cfg.key,cfg.model,[{role:'system',content:(LANG==='en'?REV_IA_SYS_EN:REV_IA_SYS_ES)},{role:'user',content:revResumenIA(REV_LAST)}],cfg.url);
+  if(token!==REV_AI_TOKEN)return;
+  const j=iaExtraeJSON(out);
+  REV_AI=revNormalizaIA(j);REV_AI.prov=cfg.nombre;REV_AI.secs=((Date.now()-t0)/1000).toFixed(1);
+ }catch(e){if(token===REV_AI_TOKEN)REV_AI={error:(e&&e.message)?e.message:String(e),prov:cfg.nombre}}
+ finally{if(token===REV_AI_TOKEN){REV_BUSY=false;renderRevIA()}}
+}
+
+/* ---------- Interfaz de la revisión ---------- */
+function revItemHTML(it,i){
+ const T=revT,lab=it.sev==='err'?T('Error','Error'):it.sev==='warn'?T('Aviso','Warning'):T('Sugerencia','Tip');
+ return '<div class="revitem '+it.sev+'"><div class="rc"><span>'+lab+' · '+revEsc(revCat(it.cat))+'</span>'+(it.sel?'<button type="button" class="revgo" data-go="'+i+'">'+T('Ver elemento','Show element')+'</button>':'')+'</div>'+
+  '<div class="rm">'+revEsc(it.msg)+'</div>'+(it.fix?'<div class="rf">'+T('Cómo corregir: ','How to fix: ')+revEsc(it.fix)+'</div>':'')+'</div>';
+}
+
+function renderRev(){
+ const w=$('revw'),rv=REV_LAST;if(!w||!rv)return;
+ const T=revT,c=rv.counts,cls=c.err?'err':(c.warn?'warn':'');
+ const sum=$('revSum'),fil=$('revFilters'),box=$('revList');
+ if(sum)sum.innerHTML='<div class="revscore '+cls+'">'+rv.score+'</div><div style="min-width:190px"><b style="font-size:13px">'+revEsc(rv.verdict)+'</b><div class="m" style="font-size:11px;margin-top:2px">'+revEsc(revStatsTxt(rv))+'</div><div class="m" style="font-size:11px">'+T('Unidades: ','Units: ')+(rv.stats.units==='SI'?'kN · m (SI)':'kip · ft (IM)')+' · '+T('peso propio ','self-weight ')+(rv.stats.sw?T('activado','on'):T('desactivado','off'))+'</div></div><div style="margin-left:auto;display:flex;gap:4px;flex-wrap:wrap">'+['err','warn','info'].map(k=>'<span class="revchip '+(k==='info'?'ok':k)+'">'+c[k]+' '+(k==='err'?T('errores','errors'):k==='warn'?T('avisos','warnings'):T('sugerencias','tips'))+'</span>').join('')+'</div>';
+ if(fil){
+  const F=[['all',T('Todo','All'),rv.total],['err',T('Errores','Errors'),c.err],['warn',T('Avisos','Warnings'),c.warn],['info',T('Sugerencias','Tips'),c.info]];
+  fil.innerHTML=F.map(([k,l,n])=>'<button type="button" data-f="'+k+'"'+(REV_FILTER===k?' class="on"':'')+'>'+l+' ('+n+')</button>').join('')+'<select id="revCatSel" title="'+T('Filtrar por categoría','Filter by category')+'"><option value="all">'+T('Todas las categorías','All categories')+'</option>'+Object.keys(REV_CAT).map(k=>'<option value="'+k+'"'+(REV_CATF===k?' selected':'')+'>'+revCat(k)+'</option>').join('')+'</select>';
+ }
+ if(box){
+  const view=rv.items.map((it,i)=>({it,i})).sort((a,b)=>revSevOrder(a.it)-revSevOrder(b.it)||a.i-b.i)
+   .filter(q=>(REV_FILTER==='all'||q.it.sev===REV_FILTER)&&(REV_CATF==='all'||q.it.cat===REV_CATF));
+  box.innerHTML=view.length?view.map(q=>revItemHTML(q.it,q.it._i!=null?q.it._i:q.i)).join(''):'<div class="revempty">'+T('No hay observaciones en este filtro.','No findings in this filter.')+'</div>';
+ }
+ renderRevIA();
+}
+
+function revisarModeloActual(){
+ REV_AI_TOKEN++;REV_BUSY=false;
+ const rev=auditarModelo(modeloSnapshot());
+ revProbarEstabilidad(rev);
+ revFinalize(rev);
+ REV_LAST=rev;REV_AI=null;REV_FILTER='all';REV_CATF='all';
+ const w=$('revw');if(w)w.style.display='flex';
+ renderRev();
+ return rev;
+}
+/* Reevalúa la revisión abierta conservando los filtros (por ejemplo al cambiar de idioma).
+   Los textos del dictamen se generan en el idioma actual; la revisión con IA se descarta para no mezclar idiomas. */
+function revReauditar(){
+ if(!REV_LAST)return REV_LAST;
+ REV_AI_TOKEN++;REV_BUSY=false;
+ const f=REV_FILTER,cf=REV_CATF;
+ const rev=auditarModelo(modeloSnapshot());
+ revProbarEstabilidad(rev);
+ revFinalize(rev);
+ REV_LAST=rev;REV_AI=null;REV_FILTER=f;REV_CATF=cf;
+ renderRev();
+ return rev;
+}
+function abrirRevision(){const w=$('revw');if(w)w.style.display='flex';return revisarModeloActual()}
+function cerrarRevision(){const w=$('revw');if(w)w.style.display='none'}
+
+function revIr(t,i){
+ const lens={n:N.length,b:B.length,w:MUROS.length,s:LOSAS.length,c:CARGAS.length,z:ZAPATAS.length,p:PLATEAS.length};
+ if(lens[t]===undefined||i<0||i>=lens[t])return;
+ const rvw=$('revw');if(rvw)rvw.style.display='none';
+ const iaw=$('iaw');if(iaw)iaw.style.display='none';
+ SEL=[{t,i}];sel={t,i};
+ try{form();setM('model');draw()}catch(e){}
+ if($('hint'))$('hint').textContent=revT('Elemento seleccionado desde la revisión del modelo.','Element selected from the model review.');
+}
+
+function revInformeTexto(){
+ const rv=REV_LAST;if(!rv)return '';
+ const T=revT,lineas=[];
+ const sev=it=>it.sev==='err'?T('ERROR','ERROR'):it.sev==='warn'?T('AVISO','WARNING'):T('SUGERENCIA','TIP');
+ lineas.push(T('REVISIÓN DEL MODELO · Zapel773DWall','MODEL REVIEW · Zapel773DWall'));
+ lineas.push(T('Fecha: ','Date: ')+new Date().toLocaleString(T('es-PR','en-US'),{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}));
+ lineas.push(T('Unidades: ','Units: ')+(rv.stats.units==='SI'?'kN · m (SI)':'kip · ft (IM)')+' · '+T('Peso propio: ','Self-weight: ')+(rv.stats.sw?T('activado','on'):T('desactivado','off')));
+ lineas.push(revStatsTxt(rv));
+ lineas.push(T('Puntaje: ','Score: ')+rv.score+'/100 · '+rv.counts.err+T(' errores · ',' errors · ')+rv.counts.warn+T(' avisos · ',' warnings · ')+rv.counts.info+T(' sugerencias',' tips'));
+ lineas.push(T('Veredicto: ','Verdict: ')+rv.verdict);
+ lineas.push('');
+ rv.items.forEach(it=>{lineas.push('['+sev(it)+'] ('+revCat(it.cat)+') '+it.msg+(it.fix?'\n   '+T('Corrección: ','Fix: ')+it.fix:''))});
+ if(REV_AI&&!REV_AI.error){lineas.push('',T('REVISIÓN CON IA','AI REVIEW')+' ('+(REV_AI.prov||'IA')+'): '+(REV_AI.veredicto||''));if(REV_AI.resumen)lineas.push(REV_AI.resumen);(REV_AI.items||[]).forEach(it=>lineas.push('['+sev(it)+'] '+(it.elem||'')+' '+it.msg+(it.fix?'\n   '+it.fix:'')))}
+ else if(REV_AI&&REV_AI.error)lineas.push('',T('REVISIÓN CON IA: error — ','AI REVIEW: error — ')+REV_AI.error);
+ lineas.push('',T('La revisión automática es una ayuda; no sustituye el criterio del ingeniero responsable.','The automatic review is an aid; it does not replace the responsible engineer.'));
+ return lineas.join('\n');
+}
+function revCopiarFallback(t){
+ try{
+  const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();
+  const ok=document.execCommand('copy');a.remove();
+  if($('stz'))$('stz').textContent=ok?revT('Informe de revisión copiado.','Review report copied.'):revT('No se pudo copiar; usa «Descargar informe».','Could not copy; use «Download report».');
+ }catch(e){if($('stz'))$('stz').textContent=revT('No se pudo copiar; usa «Descargar informe».','Could not copy; use «Download report».')}
+}
+function revCopiar(){
+ const t=revInformeTexto();
+ if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(()=>{if($('stz'))$('stz').textContent=revT('Informe de revisión copiado.','Review report copied.')}).catch(()=>revCopiarFallback(t))}
+ else revCopiarFallback(t);
+}
+function revDescargar(){
+ try{
+  const blob=new Blob([revInformeTexto()],{type:'text/plain;charset=utf-8'}),a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='revision-modelo-'+new Date().toISOString().slice(0,10)+'.txt';
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+  if($('stz'))$('stz').textContent=revT('Informe de revisión descargado.','Review report downloaded.');
+ }catch(e){if($('stz'))$('stz').textContent=revT('No se pudo descargar el informe.','Could not download the report.')}
+}
+
+/* ---------- Inicialización de la revisión ---------- */
+(function(){
+ const w=$('revw');if(!w)return;
+ const on=(id,fn)=>{const e=$(id);if(e)e.onclick=fn};
+ on('b_rev',abrirRevision);on('revX2',cerrarRevision);on('revRe',()=>revisarModeloActual());
+ on('revCopy',revCopiar);on('revTxt',revDescargar);on('revIABtn',revIA);
+ const now=$('iaRevNow');if(now)now.onclick=()=>{try{REV_CFG_TMP=revCfgFromDialog()}catch(e){}const iw=$('iaw');if(iw)iw.style.display='none';revisarModeloActual()};
+ const fl=$('revFilters');
+ if(fl){
+  fl.addEventListener('click',e=>{const b=e.target&&e.target.closest?e.target.closest('button[data-f]'):null;if(!b)return;REV_FILTER=b.dataset.f;renderRev()});
+  fl.addEventListener('change',e=>{if(e.target&&e.target.id==='revCatSel'){REV_CATF=e.target.value;renderRev()}});
+ }
+ const rl=$('revList');
+ if(rl)rl.addEventListener('click',e=>{const b=e.target&&e.target.closest?e.target.closest('[data-go]'):null;if(!b||!REV_LAST)return;const it=REV_LAST.items[+b.dataset.go];if(it&&it.sel)revIr(it.sel.t,it.sel.i)});
+ addEventListener('keydown',e=>{if(e.key==='Escape'&&w.style.display==='flex')w.style.display='none'});
+})();
+
+/* Hook de diagnóstico (no imprescindible para la interfaz) */
+try{window.__ZAPEL_REV__={auditar:auditarModelo,revisar:revisarModeloActual,abrir:abrirRevision,informe:revInformeTexto,ia:revIA,probe:revProbarEstabilidad}}catch(e){}
+
 </script>
 <div id="rsm" style="position:fixed;inset:0;background:#0006;display:none;z-index:300;align-items:center;justify-content:center">
  <div style="background:var(--pn);border:1px solid var(--bd);border-radius:10px;padding:14px;width:min(560px,94vw);max-height:92vh;overflow:auto;box-shadow:0 8px 30px #0005">
